@@ -25,6 +25,11 @@ func init() {
 				&controllers.UserController{},
 			),
 		),
+		beego.NSNamespace("/registro_novedad",
+			beego.NSInclude(
+				&controllers.RegistroNovedadController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
