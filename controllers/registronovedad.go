@@ -6,6 +6,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
+	"github.com/udistrital/utils_oas/request"
 	"github.com/udistrital/utils_oas/time_bogota"
 )
 
@@ -34,32 +35,75 @@ func (c *RegistroNovedadController) PostRegistroNovedad() {
 	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
-	horaRegistro := time_bogota.Tiempo_bogota()
 
 	//fmt.Println(registroNovedad, alertErr, horaRegistro)
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
 
-		registroNovedadPost := make(map[string]interface{})
-		registroNovedadPost["registroNovedad"] = map[string]interface{}{
-			"Novedad":       registroNovedad["Novedad"],
-			"TipoNovedad":   registroNovedad["TipoNovedad"],
-			"Contrato":      registroNovedad["Contrato"],
-			"FechaRegistro": horaRegistro,
+		//fmt.Println(registroNovedad)
+
+		result, err1 := RegistrarNovedadMongo(registroNovedad)
+
+		//fmt.Println(registroNovedadPost, horaRegistro)
+		if err == nil {
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = result
+		} else {
+			alertErr.Type = "error"
+			alertErr.Code = "400"
+			alertas = append(alertas, err1)
+			alertErr.Body = alertas
 		}
 
-		fmt.Println(registroNovedadPost, horaRegistro)
-		alertErr.Type = "OK"
-		alertErr.Code = "200"
-		alertas = append(alertas, registroNovedadPost)
 	} else {
 		alertErr.Type = "error"
 		alertErr.Code = "400"
 		alertas = append(alertas, err.Error())
+		alertErr.Body = alertas
 	}
 
-	alertErr.Body = alertas
 	c.Data["json"] = alertErr
 	c.ServeJSON()
 
+}
+
+//RegistrarNovedadMongo Función para registrar la novedad en mongodb
+func RegistrarNovedadMongo(novedad map[string]interface{}) (status interface{}, outputError interface{}) {
+	horaRegistro := time_bogota.Tiempo_bogota()
+
+	registroNovedadPost := make(map[string]interface{})
+
+	registroNovedadPost = novedad
+
+	var resultadoRegistroMongo map[string]interface{}
+	//var identificacion map[string]interface{}
+
+	fmt.Println("Ingresa a la función de post \n", registroNovedadPost, horaRegistro)
+
+	errRegNovedadMongo := request.SendJson("http://"+beego.AppConfig.String("NovedadesApiMongoService")+"/v1/novedad", "POST", &resultadoRegistroMongo, registroNovedadPost)
+
+	fmt.Println(resultadoRegistroMongo, errRegNovedadMongo, beego.AppConfig.String("NovedadesApiMongoService"))
+
+	result := resultadoRegistroMongo["Body"]
+
+	//fmt.Println("Aqui tambien es \n", identificacion)
+	//resultado, _ := identificacion.([]map[string]interface{})
+
+	//Resultado2 := resultado[0]
+	//identificacion = map[string]interface{}{"res": resultadoRegistroMongo["Body"].(map[string]interface{})["Response"]}
+	//logs.Info(produccionAcademicaPost)
+	//fmt.Println("Aqui es \n", Resultado2)
+	if errRegNovedadMongo != nil {
+		//return nil, identificacion
+
+		return nil, result
+
+	} else {
+		return result, nil
+	}
+
+	//fmt.Println("Ingresa a la función de post \n", registroNovedadPost, horaRegistro)
+
+	//return status, outputError
 }
