@@ -70,16 +70,19 @@ func (c *RegistroNovedadController) PostRegistroNovedad() {
 
 //RegistrarNovedadMongo Función para registrar la novedad en mongodb
 func RegistrarNovedadMongo(novedad map[string]interface{}) (status interface{}, outputError interface{}) {
+
 	horaRegistro := time_bogota.Tiempo_bogota()
-
 	registroNovedadPost := make(map[string]interface{})
-
 	registroNovedadPost = novedad
-
 	var resultadoRegistroMongo map[string]interface{}
-	//var identificacion map[string]interface{}
 
-	fmt.Println("Ingresa a la función de post \n", registroNovedadPost, horaRegistro)
+	//fmt.Println("\n Enseguida se mostrará la hora \n")
+	registroNovedadPost["fecharegistro"] = horaRegistro
+	//fmt.Println(registroNovedadPost["fecharegistro"])
+	//fmt.Println("\n Aquí termina la hora \n")
+
+	fmt.Println("Ingresa a la función de post \n", registroNovedadPost)
+	fmt.Println("\n respuesta del servidor \n")
 
 	errRegNovedadMongo := request.SendJson("http://"+beego.AppConfig.String("NovedadesApiMongoService")+"/v1/novedad", "POST", &resultadoRegistroMongo, registroNovedadPost)
 
@@ -87,15 +90,7 @@ func RegistrarNovedadMongo(novedad map[string]interface{}) (status interface{}, 
 
 	result := resultadoRegistroMongo["Body"]
 
-	//fmt.Println("Aqui tambien es \n", identificacion)
-	//resultado, _ := identificacion.([]map[string]interface{})
-
-	//Resultado2 := resultado[0]
-	//identificacion = map[string]interface{}{"res": resultadoRegistroMongo["Body"].(map[string]interface{})["Response"]}
-	//logs.Info(produccionAcademicaPost)
-	//fmt.Println("Aqui es \n", Resultado2)
 	if errRegNovedadMongo != nil {
-		//return nil, identificacion
 
 		return nil, result
 
@@ -103,7 +98,4 @@ func RegistrarNovedadMongo(novedad map[string]interface{}) (status interface{}, 
 		return result, nil
 	}
 
-	//fmt.Println("Ingresa a la función de post \n", registroNovedadPost, horaRegistro)
-
-	//return status, outputError
 }
