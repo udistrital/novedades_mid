@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/astaxie/beego"
@@ -31,6 +32,39 @@ func (c *NovedadesController) URLMapping() {
 // @router / [post]
 func (c *NovedadesController) Post() {
 
+	var registroNovedad map[string]interface{}
+	var alertErr models.Alert
+	alertas := append([]interface{}{"Response:"})
+
+	//fmt.Println(registroNovedad, alertErr, horaRegistro)
+	fmt.Println("Ingresa a la función del controlador para post \n")
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
+
+		//fmt.Println(registroNovedad)
+
+		result, err1 := RegistrarNovedad(registroNovedad)
+
+		//fmt.Println(registroNovedadPost, horaRegistro)
+		if err == nil {
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = result
+		} else {
+			alertErr.Type = "error"
+			alertErr.Code = "400"
+			alertas = append(alertas, err1)
+			alertErr.Body = alertas
+		}
+
+	} else {
+		alertErr.Type = "error"
+		alertErr.Code = "400"
+		alertas = append(alertas, err.Error())
+		alertErr.Body = alertas
+	}
+
+	c.Data["json"] = alertErr
+	c.ServeJSON()
 }
 
 // GetOne ...
@@ -41,11 +75,11 @@ func (c *NovedadesController) Post() {
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (c *NovedadesController) GetOne() {
-	var resultado map[string]interface{}
-	var Result interface{}
-	var alerta models.Alert
-	alertas := append([]interface{}{"error"})
-	idStr := c.Ctx.Input.Param(":id")
+	// var resultado map[string]interface{}
+	// var Result interface{}
+	// var alerta models.Alert
+	// alertas := append([]interface{}{"error"})
+	// idStr := c.Ctx.Input.Param(":id")
 
 	//errResultado := request.GetJson("http://"+beego.AppConfig.String("EventoService")+"/calendario_evento/"+idStr, &resultado)
 
@@ -88,6 +122,43 @@ func (c *NovedadesController) Put() {
 // @router /:id [delete]
 func (c *NovedadesController) Delete() {
 
+}
+
+//RegistrarNovedadMongo Función para registrar la novedad en mongodb
+func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outputError interface{}) {
+
+	registroNovedadPost := make(map[string]interface{})
+	registroNovedadPost = novedad
+	//var resultadoRegistroMongo map[string]interface{}
+
+	switch registroNovedadPost["tiponovedad"] {
+	case "59d7965e867ee188e42d8c72":
+		//suspensión
+		fmt.Println("Novedad de suspensión")
+	case "59d79683867ee188e42d8c97":
+		//cesión
+		fmt.Println("Novedad de cesión")
+	case "59d796ac867ee188e42d8cbf":
+		//reinicio
+		fmt.Println("Novedad de reinicio")
+	case "59d797aa867ee188e42d8db6":
+		//liquidación
+		fmt.Println("Novedad de liquidación")
+	case "59d79809867ee188e42d8e0d":
+		//terminacion anticipada
+		fmt.Println("Novedad de terminación anticipada")
+	case "59d7985e867ee188e42d8e64":
+		//adición
+		fmt.Println("Novedad de adición")
+	case "59d79894867ee188e42d8e9b":
+		//prórroga
+		fmt.Println("Novedad de prorroga")
+	case "59d79904867ee188e42d8f02":
+		//adicion/prorroga
+		fmt.Println("Novedad de adicion/prorroga")
+	}
+
+	return nil, nil
 }
 
 //Función que construirá la novedad a ser consultada.

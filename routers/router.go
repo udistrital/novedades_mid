@@ -30,6 +30,11 @@ func init() {
 				&controllers.RegistroNovedadController{},
 			),
 		),
+		beego.NSNamespace("/novedad",
+			beego.NSInclude(
+				&controllers.NovedadesController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
