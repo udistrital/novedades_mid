@@ -129,6 +129,9 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 
 	registroNovedadPost := make(map[string]interface{})
 	registroNovedadPost = novedad
+
+	var NovedadPoscontractualPost map[string]interface{}
+	var resultadoRegistro map[string]interface{}
 	//var resultadoRegistroMongo map[string]interface{}
 
 	switch registroNovedadPost["tiponovedad"] {
@@ -150,6 +153,8 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	case "59d7985e867ee188e42d8e64":
 		//adición
 		fmt.Println("Novedad de adición")
+		NovedadPoscontractualPost = ConstruirNovedadAdicionPost(registroNovedadPost)
+		fmt.Println(NovedadPoscontractualPost)
 	case "59d79894867ee188e42d8e9b":
 		//prórroga
 		fmt.Println("Novedad de prorroga")
@@ -158,7 +163,18 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		fmt.Println("Novedad de adicion/prorroga")
 	}
 
-	return nil, nil
+	errRegNovedad := request.SendJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+
+	if errRegNovedad != nil {
+		fmt.Println("\n entro al error \n")
+		return nil, NovedadPoscontractualPost
+
+	} else {
+		fmt.Println("\n entro al true \n")
+		return NovedadPoscontractualPost, nil
+
+	}
+
 }
 
 //Función que construirá la novedad a ser consultada.
@@ -180,4 +196,98 @@ func ConsultarNovedadID(idNovedad string) (novedad map[string]interface{}, outpu
 	errnovedad := request.GetJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/novedades_poscontractuales/?query=ContratoId:"+novedadid, &getnovedad)
 
 	return nil, errnovedad
+}
+
+func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
+	NovedadAdicion := make(map[string]interface{})
+	NovedadAdicion = novedad
+
+	NovedadAdicionPost := make(map[string]interface{})
+	contratoid, _ := NovedadAdicion["contrato"].(int64)
+	numerocdpid, _ := NovedadAdicion["numerocdp"].(int64)
+	numerosolicitud, _ := NovedadAdicion["numerosolicitud"].(string)
+	vigencia, _ := NovedadAdicion["vigencia"].(int64)
+	vigenciacdp, _ := NovedadAdicion["vigencia"].(int64)
+
+	NovedadAdicionPost["NovedadPoscontractual"] = map[string]interface{}{
+		"Aclaracion":        nil,
+		"Activo":            true,
+		"ContratoId":        contratoid,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"Motivo":            NovedadAdicion["motivo"],
+		"NumeroCdpId":       numerocdpid,
+		"NumeroSolicitud":   numerosolicitud,
+		"Observacion":       nil,
+		"TipoNovedad":       6,
+		"Vigencia":          vigencia,
+		"VigenciaCdp":       vigenciacdp,
+	}
+
+	fechas := make([]map[string]interface{}, 0)
+
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadAdicion["fechasolicitud"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 7,
+		},
+	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadAdicion["fechaadicion"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 1,
+		},
+	})
+
+	NovedadAdicionPost["Fechas"] = fechas
+
+	propiedades := make([]map[string]interface{}, 0)
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 6,
+		},
+		"propiedad": NovedadAdicion["valoradicion"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 2,
+		},
+		"propiedad": NovedadAdicion["cesionario"],
+	})
+
+	NovedadAdicionPost["Propiedad"] = propiedades
+
+	fmt.Println(NovedadAdicionPost)
+
+	return NovedadAdicionPost
 }
