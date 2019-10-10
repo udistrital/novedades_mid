@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
@@ -158,6 +159,8 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	case "59d79894867ee188e42d8e9b":
 		//prórroga
 		fmt.Println("Novedad de prorroga")
+		NovedadPoscontractualPost = ConstruirNovedadProrrogaPost(registroNovedadPost)
+		fmt.Println(NovedadPoscontractualPost)
 	case "59d79904867ee188e42d8f02":
 		//adicion/prorroga
 		fmt.Println("Novedad de adicion/prorroga")
@@ -203,11 +206,15 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	NovedadAdicion = novedad
 
 	NovedadAdicionPost := make(map[string]interface{})
-	contratoid, _ := NovedadAdicion["contrato"].(int64)
-	numerocdpid, _ := NovedadAdicion["numerocdp"].(int64)
-	numerosolicitud, _ := NovedadAdicion["numerosolicitud"].(string)
-	vigencia, _ := NovedadAdicion["vigencia"].(int64)
-	vigenciacdp, _ := NovedadAdicion["vigencia"].(int64)
+	contratoid, _ := strconv.ParseInt(NovedadAdicion["contrato"].(string), 10, 32)
+	numerocdpid, _ := strconv.ParseInt(NovedadAdicion["numerocdp"].(string), 10, 32)
+	numerosolicitudentero := NovedadAdicion["numerosolicitud"].(float64)
+	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	vigencia, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
+
+	fmt.Println(NovedadAdicion["contrato"], NovedadAdicion["numerocdp"], NovedadAdicion["numerosolicitud"], NovedadAdicion["vigencia"], NovedadAdicion["vigencia"])
+	fmt.Println("\n", contratoid, numerocdpid, numerosolicitud, vigencia, vigenciacdp, "\n")
 
 	NovedadAdicionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -290,4 +297,126 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	fmt.Println(NovedadAdicionPost)
 
 	return NovedadAdicionPost
+}
+
+func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
+	NovedadProrroga := make(map[string]interface{})
+	NovedadProrroga = novedad
+
+	NovedadProrrogaPost := make(map[string]interface{})
+	contratoid, _ := strconv.ParseInt(NovedadProrroga["contrato"].(string), 10, 32)
+	numerocdpid, _ := strconv.ParseInt(NovedadProrroga["numerocdp"].(string), 10, 32)
+	numerosolicitudentero := NovedadProrroga["numerosolicitud"].(float64)
+	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	vigencia, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
+
+	NovedadProrrogaPost["NovedadPoscontractual"] = map[string]interface{}{
+		"Aclaracion":        nil,
+		"Activo":            true,
+		"ContratoId":        contratoid,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"Motivo":            NovedadProrroga["motivo"],
+		"NumeroCdpId":       numerocdpid,
+		"NumeroSolicitud":   numerosolicitud,
+		"Observacion":       nil,
+		"TipoNovedad":       7,
+		"Vigencia":          vigencia,
+		"VigenciaCdp":       vigenciacdp,
+	}
+
+	fechas := make([]map[string]interface{}, 0)
+
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadProrroga["fechasolicitud"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 7,
+		},
+	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             "2019-10-08T15:43:51.710Z",
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 1,
+		},
+	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadProrroga["fechaprorroga"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 4,
+		},
+	})
+
+	NovedadProrrogaPost["Fechas"] = fechas
+
+	propiedades := make([]map[string]interface{}, 0)
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 6,
+		},
+		"propiedad": NovedadProrroga["valoradicion"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 5,
+		},
+		"propiedad": NovedadProrroga["tiempoprorroga"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 2,
+		},
+		"propiedad": NovedadProrroga["cesionario"],
+	})
+
+	NovedadProrrogaPost["Propiedad"] = propiedades
+
+	fmt.Println(NovedadProrrogaPost)
+
+	return NovedadProrrogaPost
 }
