@@ -132,6 +132,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 
 	var NovedadPoscontractualPost map[string]interface{}
 	var resultadoRegistro map[string]interface{}
+	var errRegNovedad interface{}
 	//var resultadoRegistroMongo map[string]interface{}
 
 	switch registroNovedadPost["tiponovedad"] {
@@ -143,6 +144,8 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	case "59d79683867ee188e42d8c97":
 		//cesión
 		fmt.Println("Novedad de cesión")
+		NovedadPoscontractualPost = models.ConstruirNovedadCesion(registroNovedadPost)
+		fmt.Println(NovedadPoscontractualPost)
 	case "59d796ac867ee188e42d8cbf":
 		//reinicio
 		fmt.Println("Novedad de reinicio")
@@ -170,7 +173,11 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		fmt.Println(NovedadPoscontractualPost)
 	}
 
-	errRegNovedad := request.SendJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+	if registroNovedadPost["tiponovedad"] == "59d79683867ee188e42d8c97" {
+		errRegNovedad = request.SendJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+	} else {
+		errRegNovedad = request.SendJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+	}
 
 	if errRegNovedad != nil {
 		fmt.Println("\n entro al error \n")
