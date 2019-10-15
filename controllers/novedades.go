@@ -40,12 +40,12 @@ func (c *NovedadesController) Post() {
 	fmt.Println("Ingresa a la función del controlador para post \n")
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
 
-		//fmt.Println(registroNovedad)
+		fmt.Println("Aqui se muestra JSON de entrada \n", registroNovedad)
 
 		result, err1 := RegistrarNovedad(registroNovedad)
 
 		//fmt.Println(registroNovedadPost, horaRegistro)
-		if err == nil {
+		if err1 == nil {
 			alertErr.Type = "OK"
 			alertErr.Code = "200"
 			alertErr.Body = result
@@ -54,6 +54,7 @@ func (c *NovedadesController) Post() {
 			alertErr.Code = "400"
 			alertas = append(alertas, err1)
 			alertErr.Body = alertas
+			c.Ctx.Output.SetStatus(404)
 		}
 
 	} else {
@@ -61,6 +62,7 @@ func (c *NovedadesController) Post() {
 		alertErr.Code = "400"
 		alertas = append(alertas, err.Error())
 		alertErr.Body = alertas
+		c.Ctx.Output.SetStatus(404)
 	}
 
 	c.Data["json"] = alertErr
@@ -145,7 +147,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		//cesión
 		fmt.Println("Novedad de cesión")
 		NovedadPoscontractualPost = models.ConstruirNovedadCesion(registroNovedadPost)
-		fmt.Println(NovedadPoscontractualPost)
+		// fmt.Println(NovedadPoscontractualPost)
 	case "59d796ac867ee188e42d8cbf":
 		//reinicio
 		fmt.Println("Novedad de reinicio")
@@ -179,13 +181,16 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		errRegNovedad = request.SendJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 	}
 
-	if errRegNovedad != nil {
+	if resultadoRegistro["Status"] == "400" || errRegNovedad != nil {
 		fmt.Println("\n entro al error \n")
-		return nil, NovedadPoscontractualPost
+		fmt.Println(errRegNovedad)
+		//fmt.Println(resultadoRegistro["Status"])
+		return nil, resultadoRegistro
 
 	} else {
 		fmt.Println("\n entro al true \n")
-		return NovedadPoscontractualPost, nil
+		fmt.Println()
+		return resultadoRegistro, nil
 
 	}
 

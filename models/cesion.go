@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -306,7 +305,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 
 	NovedadCesionPost["Poliza"] = poliza
 
-	fmt.Println(NovedadCesionPost)
+	// fmt.Println(NovedadCesionPost)
 
 	return NovedadCesionPost
 }
