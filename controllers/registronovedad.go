@@ -1,7 +1,13 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/astaxie/beego"
+	"github.com/udistrital/novedades_mid/models"
+	"github.com/udistrital/utils_oas/request"
+	"github.com/udistrital/utils_oas/time_bogota"
 )
 
 // RegistroNovedadController operations for RegistroNovedad
@@ -11,70 +17,85 @@ type RegistroNovedadController struct {
 
 // URLMapping ...
 func (c *RegistroNovedadController) URLMapping() {
-	c.Mapping("Post", c.Post)
-	c.Mapping("GetOne", c.GetOne)
-	c.Mapping("GetAll", c.GetAll)
-	c.Mapping("Put", c.Put)
-	c.Mapping("Delete", c.Delete)
+	c.Mapping("PostRegistroNovedad", c.PostRegistroNovedad)
+	//c.Mapping("GetOneRegistroNovedad", c.GetOneRegistroNovedad)
+	//c.Mapping("GetAllRegistroNovedad", c.GetAllRegistroNovedad)
+	//c.Mapping("PutRegistroNovedad", c.PutRegistroNovedad)
+	//c.Mapping("DeleteRegistroNovedad", c.DeleteRegistroNovedad)
 }
 
-// Post ...
-// @Title Create
-// @Description create RegistroNovedad
-// @Param	body		body 	models.RegistroNovedad	true		"body for RegistroNovedad content"
-// @Success 201 {object} models.RegistroNovedad
+// PostRegistroNovedad ...
+// @Title PostRegistroNovedad
+// @Description Agregar RegistroNovedad
+// @Param   body        body    {}  true        "body Agregar RegistroNovedad content"
+// @Success 200 {}
 // @Failure 403 body is empty
 // @router / [post]
-func (c *RegistroNovedadController) Post() {
+func (c *RegistroNovedadController) PostRegistroNovedad() {
+	var registroNovedad map[string]interface{}
+	var alertErr models.Alert
+	alertas := append([]interface{}{"Response:"})
+
+	//fmt.Println(registroNovedad, alertErr, horaRegistro)
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
+
+		//fmt.Println(registroNovedad)
+
+		result, err1 := RegistrarNovedadMongo(registroNovedad)
+
+		//fmt.Println(registroNovedadPost, horaRegistro)
+		if err == nil {
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = result
+		} else {
+			alertErr.Type = "error"
+			alertErr.Code = "400"
+			alertas = append(alertas, err1)
+			alertErr.Body = alertas
+		}
+
+	} else {
+		alertErr.Type = "error"
+		alertErr.Code = "400"
+		alertas = append(alertas, err.Error())
+		alertErr.Body = alertas
+	}
+
+	c.Data["json"] = alertErr
+	c.ServeJSON()
 
 }
 
-// GetOne ...
-// @Title GetOne
-// @Description get RegistroNovedad by id
-// @Param	id		path 	string	true		"The key for staticblock"
-// @Success 200 {object} models.RegistroNovedad
-// @Failure 403 :id is empty
-// @router /:id [get]
-func (c *RegistroNovedadController) GetOne() {
+//RegistrarNovedadMongo Función para registrar la novedad en mongodb
+func RegistrarNovedadMongo(novedad map[string]interface{}) (status interface{}, outputError interface{}) {
 
-}
+	horaRegistro := time_bogota.Tiempo_bogota()
+	registroNovedadPost := make(map[string]interface{})
+	registroNovedadPost = novedad
+	var resultadoRegistroMongo map[string]interface{}
 
-// GetAll ...
-// @Title GetAll
-// @Description get RegistroNovedad
-// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
-// @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
-// @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
-// @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
-// @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
-// @Success 200 {object} models.RegistroNovedad
-// @Failure 403
-// @router / [get]
-func (c *RegistroNovedadController) GetAll() {
+	//fmt.Println("\n Enseguida se mostrará la hora \n")
+	registroNovedadPost["fecharegistro"] = horaRegistro
+	//fmt.Println(registroNovedadPost["fecharegistro"])
+	//fmt.Println("\n Aquí termina la hora \n")
 
-}
+	fmt.Println("Ingresa a la función de post \n", registroNovedadPost)
+	fmt.Println("\n respuesta del servidor \n")
 
-// Put ...
-// @Title Put
-// @Description update the RegistroNovedad
-// @Param	id		path 	string	true		"The id you want to update"
-// @Param	body		body 	models.RegistroNovedad	true		"body for RegistroNovedad content"
-// @Success 200 {object} models.RegistroNovedad
-// @Failure 403 :id is not int
-// @router /:id [put]
-func (c *RegistroNovedadController) Put() {
+	errRegNovedadMongo := request.SendJson("http://"+beego.AppConfig.String("NovedadesApiMongoService")+"/v1/novedad", "POST", &resultadoRegistroMongo, registroNovedadPost)
 
-}
+	fmt.Println(resultadoRegistroMongo, errRegNovedadMongo, beego.AppConfig.String("NovedadesApiMongoService"))
 
-// Delete ...
-// @Title Delete
-// @Description delete the RegistroNovedad
-// @Param	id		path 	string	true		"The id you want to delete"
-// @Success 200 {string} delete success!
-// @Failure 403 id is empty
-// @router /:id [delete]
-func (c *RegistroNovedadController) Delete() {
+	result := resultadoRegistroMongo["Body"]
+
+	if errRegNovedadMongo != nil {
+
+		return nil, result
+
+	} else {
+		return result, nil
+	}
 
 }
