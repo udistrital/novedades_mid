@@ -116,6 +116,8 @@ func (c *NovedadesController) GetOne() {
 				novedadesformated = append(novedadesformated, novedadformated)
 			case 7:
 				fmt.Println("Novedad Prórroga")
+				novedadformated = models.GetNovedadProrroga(novedad)
+				novedadesformated = append(novedadesformated, novedadformated)
 			case 8:
 				fmt.Println("Novedad Adición/prorroga")
 				novedadformated = models.GetNovedadAdProrroga(novedad)
