@@ -54,7 +54,7 @@ func (c *NovedadesController) Post() {
 			alertErr.Code = "400"
 			alertas = append(alertas, err1)
 			alertErr.Body = alertas
-			c.Ctx.Output.SetStatus(404)
+			c.Ctx.Output.SetStatus(400)
 		}
 
 	} else {
@@ -62,7 +62,7 @@ func (c *NovedadesController) Post() {
 		alertErr.Code = "400"
 		alertas = append(alertas, err.Error())
 		alertErr.Body = alertas
-		c.Ctx.Output.SetStatus(404)
+		c.Ctx.Output.SetStatus(400)
 	}
 
 	c.Data["json"] = alertErr
@@ -77,13 +77,61 @@ func (c *NovedadesController) Post() {
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (c *NovedadesController) GetOne() {
-	// var resultado map[string]interface{}
-	// var Result interface{}
-	// var alerta models.Alert
-	// alertas := append([]interface{}{"error"})
-	// idStr := c.Ctx.Input.Param(":id")
+	var novedades []map[string]interface{}
+	var novedadformated map[string]interface{}
+	//var Result interface{}
+	var alerta models.Alert
+	//alertas := append([]interface{}{"error"})
+	idStr := c.Ctx.Input.Param(":id")
+	fmt.Println(idStr)
 
-	//errResultado := request.GetJson("http://"+beego.AppConfig.String("EventoService")+"/calendario_evento/"+idStr, &resultado)
+	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr, &novedades)
+	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr)
+
+	for _, novedad := range novedades {
+
+		fmt.Println(novedad["TipoNovedad"])
+		idTipoNovedad := novedad["TipoNovedad"].(float64)
+
+		switch idTipoNovedad {
+		case 1:
+			fmt.Println("Novedad suspensión")
+		case 2:
+			fmt.Println("Novedad Cesión")
+		case 3:
+			fmt.Println("Novedad Reinicio")
+		case 4:
+			fmt.Println("Novedad Liquidacion")
+		case 5:
+			fmt.Println("Novedad Terminación Anticipada")
+		case 6:
+			fmt.Println("Novedad Adición")
+			novedadformated = models.GetNovedadAdicionPost(novedad)
+		case 7:
+			fmt.Println("Novedad Prórroga")
+		case 8:
+			fmt.Println("Novedad Adición/prorroga")
+		case 9:
+			fmt.Println("Novedad Inicio")
+		}
+		fmt.Println(novedadformated)
+	}
+
+	fmt.Println(error)
+	if novedades != nil {
+		alerta.Type = "OK"
+		alerta.Code = "200"
+		alerta.Body = novedadformated
+	} else {
+		alerta.Type = "error"
+		alerta.Code = "400"
+		alerta.Body = "No se ha podido realizar la petición GET"
+	}
+
+	fmt.Println(novedades)
+
+	c.Data["json"] = alerta
+	c.ServeJSON()
 
 }
 
@@ -100,6 +148,16 @@ func (c *NovedadesController) GetOne() {
 // @Failure 403
 // @router / [get]
 func (c *NovedadesController) GetAll() {
+	var resultado interface{}
+	//var Result interface{}
+	var alerta models.Alert
+	//resultado = models.GetNovedades("/v1/novedades_poscontractuales")
+	// fmt.Println(errResultado, resultado)
+	alerta.Type = "OK"
+	alerta.Code = "200"
+	alerta.Body = resultado
+	c.Data["json"] = alerta
+	c.ServeJSON()
 
 }
 
