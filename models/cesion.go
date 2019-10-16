@@ -1,7 +1,11 @@
 package models
 
 import (
+	"fmt"
 	"strconv"
+
+	"github.com/astaxie/beego"
+	"github.com/udistrital/utils_oas/request"
 )
 
 func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
@@ -308,4 +312,154 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 	// fmt.Println(NovedadCesionPost)
 
 	return NovedadCesionPost
+}
+
+func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
+	NovedadAdicion := make(map[string]interface{})
+	var fechas []map[string]interface{}
+	var propiedades []map[string]interface{}
+	var poliza []map[string]interface{}
+	NovedadAdicion = novedad
+	NovedadAdicionGet := make(map[string]interface{})
+	var fechaadicion interface{}
+	var fechacesion interface{}
+	var fechaliquidacion interface{}
+	var fechaprorroga interface{}
+	var fecharegistro interface{}
+	var fechareinicio interface{}
+	var fechasuspension interface{}
+	var fechaterminacionanticipada interface{}
+	var fechasolicitud interface{}
+	var fechaoficio interface{}
+
+	var cedente interface{}
+	var cesionario interface{}
+	var numeroactaentrega interface{}
+	var numerooficioestadocuentas interface{}
+	var periodosuspension interface{}
+	var plazoactual interface{}
+	var tiempoprorroga interface{}
+	var valoradicion interface{}
+	var valorfinalcontrato interface{}
+
+	var polizas interface{}
+	var entidadaseguradora interface{}
+
+	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
+	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
+	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/poliza/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &poliza)
+
+	for _, fecha := range fechas {
+		tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
+		nombrefecha := tipofecha["Nombre"]
+		if nombrefecha == "FechaAdicion" {
+			fechaadicion = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaCesion" {
+			fechacesion = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaLiquidacion" {
+			fechaliquidacion = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaProrroga" {
+			fechaprorroga = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaRegistro" {
+			fecharegistro = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaReinicio" {
+			fechareinicio = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaSuspension" {
+			fechasuspension = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaSolicitud" {
+			fechasolicitud = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaTerminacionAnticipada" {
+			fechaterminacionanticipada = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaOficio" {
+			fechaoficio = fecha["Fecha"]
+		}
+		//fmt.Println(fechaadicion, fechasolicitud)
+	}
+	for _, propiedad := range propiedades {
+		tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
+		nombrepropiedad := tipopropiedad["Nombre"]
+		if nombrepropiedad == "Cedente" {
+			cedente = propiedad["Propiedad"]
+		}
+		if nombrepropiedad == "Cesionario" {
+			cesionario = propiedad["Propiedad"]
+		}
+		if nombrepropiedad == "NumeroActaEntrega" {
+			numeroactaentrega = propiedad["Propiedad"]
+		}
+		if nombrepropiedad == "NumeroOficioEstadoCuentas" {
+			numerooficioestadocuentas = propiedad["Propiedad"]
+		}
+		if nombrepropiedad == "PeriodoSuspension" {
+			periodosuspension = propiedad["Propiedad"]
+		}
+		if nombrepropiedad == "PlazoActual" {
+			plazoactual = propiedad["Propiedad"]
+		}
+		if nombrepropiedad == "TiempoProrroga" {
+			tiempoprorroga = propiedad["Propiedad"]
+		}
+		if nombrepropiedad == "ValorAdicion" {
+			valoradicion = propiedad["Propiedad"]
+		}
+		if nombrepropiedad == "ValorFinalContrato" {
+			valorfinalcontrato = propiedad["Propiedad"]
+		}
+		//fmt.Println(cesionario, valoradicion)
+	}
+
+	for _, poliz := range poliza {
+
+		polizas = poliz["NumeroPolizaId"]
+		entidadaseguradora = poliz["EntidadAseguradoraId"]
+	}
+
+	NovedadAdicionGet = map[string]interface{}{
+		"id":                         NovedadAdicion["Id"].(float64),
+		"aclaracion":                 NovedadAdicion["Aclaracion"],
+		"camposaclaracion":           "",
+		"camposmodificacion":         "",
+		"camposmodificados":          "",
+		"cedente":                    cedente,
+		"cesionario":                 cesionario,
+		"contrato":                   NovedadAdicion["ContratoId"],
+		"fechaadicion":               fechaadicion,
+		"fechacesion":                fechacesion,
+		"fechaliquidacion":           fechaliquidacion,
+		"fechaprorroga":              fechaprorroga,
+		"fecharegistro":              fecharegistro,
+		"fechareinicio":              fechareinicio,
+		"fechasolicitud":             fechasolicitud,
+		"fechasuspension":            fechasuspension,
+		"fechaterminacionanticipada": fechaterminacionanticipada,
+		"motivo":                     NovedadAdicion["Motivo"],
+		"numeroactaentrega":          numeroactaentrega,
+		"numerocdp":                  NovedadAdicion["NumeroCdpId"],
+		"numerooficioestadocuentas":  numerooficioestadocuentas,
+		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
+		"observacion":                NovedadAdicion["Observacion"],
+		"periodosuspension":          periodosuspension,
+		"plazoactual":                plazoactual,
+		"poliza":                     polizas,
+		"tiempoprorroga":             tiempoprorroga,
+		"tiponovedad":                NovedadAdicion["TipoNovedad"],
+		"valoradicion":               valoradicion,
+		"valorfinalcontrato":         valorfinalcontrato,
+		"vigencia":                   NovedadAdicion["Vigencia"],
+		"fechaoficio":                fechaoficio,
+		"entidadaseguradora":         entidadaseguradora,
+	}
+
+	fmt.Println(error, error1, error2)
+
+	return NovedadAdicionGet
 }

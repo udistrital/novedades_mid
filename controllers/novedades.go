@@ -87,7 +87,7 @@ func (c *NovedadesController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	fmt.Println(idStr)
 
-	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr, &novedades)
+	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+"&limit=0", &novedades)
 	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr)
 
 	fmt.Println("posicion 1 del vector ", novedades[0], vacio)
@@ -106,10 +106,12 @@ func (c *NovedadesController) GetOne() {
 				novedadesformated = append(novedadesformated, novedadformated)
 			case 2:
 				fmt.Println("Novedad Cesión")
+				novedadformated = models.GetNovedadCesion(novedad)
+				novedadesformated = append(novedadesformated, novedadformated)
 			case 3:
 				fmt.Println("Novedad Reinicio")
-			case 4:
-				fmt.Println("Novedad Liquidacion")
+				novedadformated = models.GetNovedadReinicio(novedad)
+				novedadesformated = append(novedadesformated, novedadformated)
 			case 5:
 				fmt.Println("Novedad Terminación Anticipada")
 				novedadformated = models.GetNovedadTAnticipada(novedad)
@@ -126,8 +128,6 @@ func (c *NovedadesController) GetOne() {
 				fmt.Println("Novedad Adición/prorroga")
 				novedadformated = models.GetNovedadAdProrroga(novedad)
 				novedadesformated = append(novedadesformated, novedadformated)
-			case 9:
-				fmt.Println("Novedad Inicio")
 			}
 			//fmt.Println(novedadformated)
 
