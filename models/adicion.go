@@ -106,7 +106,7 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	return NovedadAdicionPost
 }
 
-func GetNovedadAdicionPost(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
+func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
 	NovedadAdicion := make(map[string]interface{})
 	var fechas []map[string]interface{}
 	var propiedades []map[string]interface{}

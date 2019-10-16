@@ -79,6 +79,8 @@ func (c *NovedadesController) Post() {
 func (c *NovedadesController) GetOne() {
 	var novedades []map[string]interface{}
 	var novedadformated map[string]interface{}
+	novedadesformated := make([]map[string]interface{}, 0)
+	var vacio map[string]interface{}
 	//var Result interface{}
 	var alerta models.Alert
 	//alertas := append([]interface{}{"error"})
@@ -88,47 +90,58 @@ func (c *NovedadesController) GetOne() {
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr, &novedades)
 	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr)
 
-	for _, novedad := range novedades {
+	fmt.Println("posicion 1 del vector ", novedades[0], vacio)
+	if novedades[0]["TipoNovedad"] != nil {
 
-		fmt.Println(novedad["TipoNovedad"])
-		idTipoNovedad := novedad["TipoNovedad"].(float64)
+		fmt.Println("No está vacío", len(novedades))
+		for _, novedad := range novedades {
 
-		switch idTipoNovedad {
-		case 1:
-			fmt.Println("Novedad suspensión")
-		case 2:
-			fmt.Println("Novedad Cesión")
-		case 3:
-			fmt.Println("Novedad Reinicio")
-		case 4:
-			fmt.Println("Novedad Liquidacion")
-		case 5:
-			fmt.Println("Novedad Terminación Anticipada")
-		case 6:
-			fmt.Println("Novedad Adición")
-			novedadformated = models.GetNovedadAdicionPost(novedad)
-		case 7:
-			fmt.Println("Novedad Prórroga")
-		case 8:
-			fmt.Println("Novedad Adición/prorroga")
-		case 9:
-			fmt.Println("Novedad Inicio")
+			fmt.Println(novedad["TipoNovedad"])
+			idTipoNovedad := novedad["TipoNovedad"].(float64)
+
+			switch idTipoNovedad {
+			case 1:
+				fmt.Println("Novedad suspensión")
+			case 2:
+				fmt.Println("Novedad Cesión")
+			case 3:
+				fmt.Println("Novedad Reinicio")
+			case 4:
+				fmt.Println("Novedad Liquidacion")
+			case 5:
+				fmt.Println("Novedad Terminación Anticipada")
+			case 6:
+				fmt.Println("Novedad Adición")
+				novedadformated = models.GetNovedadAdicion(novedad)
+				novedadesformated = append(novedadesformated, novedadformated)
+			case 7:
+				fmt.Println("Novedad Prórroga")
+			case 8:
+				fmt.Println("Novedad Adición/prorroga")
+				novedadformated = models.GetNovedadAdProrroga(novedad)
+				novedadesformated = append(novedadesformated, novedadformated)
+			case 9:
+				fmt.Println("Novedad Inicio")
+			}
+			//fmt.Println(novedadformated)
+
 		}
-		fmt.Println(novedadformated)
+	} else {
+		novedadesformated = []map[string]interface{}{}
 	}
 
 	fmt.Println(error)
 	if novedades != nil {
 		alerta.Type = "OK"
 		alerta.Code = "200"
-		alerta.Body = novedadformated
+		alerta.Body = novedadesformated
 	} else {
 		alerta.Type = "error"
 		alerta.Code = "400"
 		alerta.Body = "No se ha podido realizar la petición GET"
 	}
 
-	fmt.Println(novedades)
+	//fmt.Println(novedades)
 
 	c.Data["json"] = alerta
 	c.ServeJSON()
