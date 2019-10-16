@@ -3,6 +3,9 @@ package models
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/astaxie/beego"
+	"github.com/udistrital/utils_oas/request"
 )
 
 func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
@@ -136,4 +139,81 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	fmt.Println(NovedadTAnticipadaPost)
 
 	return NovedadTAnticipadaPost
+}
+
+func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
+	NovedadAdicion := make(map[string]interface{})
+	var fechas []map[string]interface{}
+	var propiedades []map[string]interface{}
+	NovedadAdicion = novedad
+	NovedadAdicionGet := make(map[string]interface{})
+	var fecharegistro interface{}
+	var fechaterminacionanticipada interface{}
+	var fechasolicitud interface{}
+
+	var numerooficioestadocuentas interface{}
+
+	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64), &fechas)
+	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64), &propiedades)
+
+	for _, fecha := range fechas {
+		tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
+		nombrefecha := tipofecha["Nombre"]
+		if nombrefecha == "FechaRegistro" {
+			fecharegistro = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaSolicitud" {
+			fechasolicitud = fecha["Fecha"]
+		}
+		if nombrefecha == "FechaTerminacionAnticipada" {
+			fechaterminacionanticipada = fecha["Fecha"]
+		}
+		//fmt.Println(fechaadicion, fechasolicitud)
+	}
+	for _, propiedad := range propiedades {
+		tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
+		nombrepropiedad := tipopropiedad["Nombre"]
+		if nombrepropiedad == "NumeroOficioEstadoCuentas" {
+			numerooficioestadocuentas = propiedad["Propiedad"]
+		}
+		//fmt.Println(cesionario, valoradicion)
+	}
+
+	NovedadAdicionGet = map[string]interface{}{
+		"id":                         NovedadAdicion["Id"].(float64),
+		"aclaracion":                 "",
+		"camposaclaracion":           "",
+		"camposmodificacion":         "",
+		"camposmodificados":          "",
+		"cedente":                    "",
+		"cesionario":                 "",
+		"contrato":                   NovedadAdicion["ContratoId"],
+		"fechaadicion":               "",
+		"fechacesion":                "",
+		"fechaliquidacion":           "",
+		"fechaprorroga":              "",
+		"fecharegistro":              fecharegistro,
+		"fechareinicio":              "",
+		"fechasolicitud":             fechasolicitud,
+		"fechasuspension":            "",
+		"fechaterminacionanticipada": fechaterminacionanticipada,
+		"motivo":                     NovedadAdicion["Motivo"],
+		"numeroactaentrega":          "",
+		"numerocdp":                  "",
+		"numerooficioestadocuentas":  numerooficioestadocuentas,
+		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
+		"observacion":                "",
+		"periodosuspension":          "",
+		"plazoactual":                "",
+		"poliza":                     "",
+		"tiempoprorroga":             "",
+		"tiponovedad":                NovedadAdicion["TipoNovedad"],
+		"valoradicion":               "",
+		"valorfinalcontrato":         "",
+		"vigencia":                   NovedadAdicion["Vigencia"],
+	}
+
+	fmt.Println(error, error1)
+
+	return NovedadAdicionGet
 }

@@ -102,6 +102,8 @@ func (c *NovedadesController) GetOne() {
 			switch idTipoNovedad {
 			case 1:
 				fmt.Println("Novedad suspensión")
+				novedadformated = models.GetNovedadSuspension(novedad)
+				novedadesformated = append(novedadesformated, novedadformated)
 			case 2:
 				fmt.Println("Novedad Cesión")
 			case 3:
@@ -110,6 +112,8 @@ func (c *NovedadesController) GetOne() {
 				fmt.Println("Novedad Liquidacion")
 			case 5:
 				fmt.Println("Novedad Terminación Anticipada")
+				novedadformated = models.GetNovedadTAnticipada(novedad)
+				novedadesformated = append(novedadesformated, novedadformated)
 			case 6:
 				fmt.Println("Novedad Adición")
 				novedadformated = models.GetNovedadAdicion(novedad)
