@@ -75,7 +75,7 @@ func (c *NovedadesController) Post() {
 // @Param	id		path 	string	true		"The key for staticblock"
 // @Success 200 {object} models.Novedades
 // @Failure 403 :id is empty
-// @router /:id [get]
+// @router /:id/:vigencia [get]
 func (c *NovedadesController) GetOne() {
 	var novedades []map[string]interface{}
 	var novedadformated map[string]interface{}
@@ -85,10 +85,11 @@ func (c *NovedadesController) GetOne() {
 	var alerta models.Alert
 	//alertas := append([]interface{}{"error"})
 	idStr := c.Ctx.Input.Param(":id")
+	vigencia := c.Ctx.Input.Param(":vigencia")
 	fmt.Println(idStr)
 
-	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+"&limit=0", &novedades)
-	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr)
+	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0", &novedades)
+	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr + ",vigencia:" + vigencia + "&limit=0")
 
 	fmt.Println("posicion 1 del vector ", novedades[0], vacio)
 	if novedades[0]["TipoNovedad"] != nil {

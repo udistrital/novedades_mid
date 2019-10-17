@@ -27,15 +27,6 @@ func init() {
 
     beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"],
         beego.ControllerComments{
-            Method: "GetOne",
-            Router: `/:id`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"],
-        beego.ControllerComments{
             Method: "Put",
             Router: `/:id`,
             AllowHTTPMethods: []string{"put"},
@@ -48,6 +39,15 @@ func init() {
             Method: "Delete",
             Router: `/:id`,
             AllowHTTPMethods: []string{"delete"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"],
+        beego.ControllerComments{
+            Method: "GetOne",
+            Router: `/:id/:vigencia`,
+            AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

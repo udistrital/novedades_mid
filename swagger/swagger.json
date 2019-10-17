@@ -103,33 +103,6 @@
             }
         },
         "/novedad/{id}": {
-            "get": {
-                "tags": [
-                    "novedad"
-                ],
-                "description": "get Novedades by id",
-                "operationId": "NovedadesController.GetOne",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "The key for staticblock",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.Novedades"
-                        }
-                    },
-                    "403": {
-                        "description": ":id is empty"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "novedad"
@@ -187,6 +160,35 @@
                     },
                     "403": {
                         "description": "id is empty"
+                    }
+                }
+            }
+        },
+        "/novedad/{id}/{vigencia}": {
+            "get": {
+                "tags": [
+                    "novedad"
+                ],
+                "description": "get Novedades by id",
+                "operationId": "NovedadesController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Novedades"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
                     }
                 }
             }
