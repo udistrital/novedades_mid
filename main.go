@@ -17,14 +17,14 @@ func main() {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"PUT", "PATCH", "GET", "POST", "OPTIONS", "DELETE"},
 		AllowHeaders: []string{"Origin", "x-requested-with",
-		  "content-type",
-		  "accept",
-		  "origin",
-		  "authorization",
-		  "x-csrftoken"},
+			"content-type",
+			"accept",
+			"origin",
+			"authorization",
+			"x-csrftoken"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-	  }))
+	}))
 
 	beego.Run()
 }

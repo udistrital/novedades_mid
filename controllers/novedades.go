@@ -253,9 +253,9 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	}
 
 	if registroNovedadPost["tiponovedad"] == "59d79683867ee188e42d8c97" {
-		errRegNovedad = request.SendJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+		errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 	} else {
-		errRegNovedad = request.SendJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+		errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 	}
 
 	if resultadoRegistro["Status"] == "400" || errRegNovedad != nil {
