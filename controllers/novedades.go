@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
@@ -266,12 +267,38 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		return nil, resultadoRegistro
 
 	} else {
-		fmt.Println("\n entro al true \n")
+		fmt.Println("\n entro al true \n", resultadoRegistro)
 		fmt.Println()
+
+		idRegistroAdmAmazon, _ := RegistroAdministrativaAmazon(resultadoRegistro)
+
+		fmt.Println(idRegistroAdmAmazon)
+
 		return resultadoRegistro, nil
 
 	}
 
+}
+
+//Función que duplicará los datos de registro de novedades de adición y cesión
+func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdmAmazon int, outputError interface{}) {
+	NovedadAmazon := Novedad
+	var NovedadGET []map[string]interface{}
+
+	NovedadMap := NovedadAmazon["NovedadPoscontractual"].(map[string]interface{})
+	idStrf64 := NovedadMap["Id"].(float64)
+	idStr := strconv.FormatFloat(idStrf64, 'f', -1, 64)
+
+	fmt.Println("\n aqui se muestra el ID de la novedad que se acaba de guardar \n", idStr)
+
+	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=id:"+idStr+"&limit=0", &NovedadGET)
+
+	NovedadAdmAmazonFormatted := models.FormatAdmAmazonNovedad(NovedadGET)
+	//errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+
+	fmt.Println("Aqui se muestra la traducción de la novedad para replica en AdmAmazon \n", NovedadAdmAmazonFormatted, error)
+
+	return 0, nil
 }
 
 //Función que construirá la novedad a ser consultada.
