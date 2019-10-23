@@ -1,9 +1,13 @@
 package controllers
 
 import (
+	"encoding/json"
+	"encoding/xml"
+	"fmt"
+	"net/http"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
-	"github.com/udistrital/utils_oas/request"
 )
 
 // ArgoReplicaController operations for ArgoReplica
@@ -39,11 +43,59 @@ func (c *ArgoReplicaController) Post() {
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (c *ArgoReplicaController) GetOne() {
-	var resultjbpm map[string]interface{}
+	var resultjbpm interface{}
+	var resultjbpmjson models.JbpmReplica
 	idStr := c.Ctx.Input.Param(":id")
 	var alerta models.Alert
-	error := request.GetJson(beego.AppConfig.String("jbpmService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0", &resultjbpm)
+	//error := request.GetJson(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr, &resultjbpm)
+	error := getXml(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr, &resultjbpm)
 
+	fmt.Println(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr+"\n", resultjbpm)
+
+	if error == nil {
+
+		json_jbpmreplica, error_json := json.Marshal(resultjbpm)
+
+		if error_json == nil {
+
+			if err := json.Unmarshal(json_jbpmreplica, &resultjbpmjson); err == nil {
+
+				fmt.Println("entro al true \n", resultjbpmjson)
+				alerta.Type = "OK"
+				alerta.Code = "200"
+				alerta.Body = resultjbpmjson
+				c.Data["json"] = alerta
+				c.Ctx.Output.SetStatus(200)
+
+			} else {
+				alerta.Type = "error"
+				alerta.Code = "400"
+				alerta.Body = "falló el unmarshall"
+				c.Data["json"] = alerta
+				//c.Abort("400")
+				c.Ctx.Output.SetStatus(400)
+
+			}
+
+		} else {
+			alerta.Type = "error"
+			alerta.Code = "400"
+			alerta.Body = "No se pudo formatear a JSON"
+			c.Data["json"] = alerta
+			//c.Abort("400")
+			c.Ctx.Output.SetStatus(400)
+		}
+
+	} else {
+		fmt.Println("entro al error\n", error)
+		alerta.Type = "error"
+		alerta.Code = "400"
+		alerta.Body = "No se ha podido realizar la petición GET"
+		c.Data["json"] = alerta
+		//c.Abort("400")
+		c.Ctx.Output.SetStatus(400)
+	}
+	c.ServeJSON()
 }
 
 // GetAll ...
@@ -83,4 +135,18 @@ func (c *ArgoReplicaController) Put() {
 // @router /:id [delete]
 func (c *ArgoReplicaController) Delete() {
 
+}
+
+func getXml(url string, target interface{}) error {
+	r, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			beego.Error(err)
+		}
+	}()
+
+	return xml.NewDecoder(r.Body).Decode(target)
 }
