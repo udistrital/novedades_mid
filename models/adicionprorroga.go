@@ -213,3 +213,92 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 
 	return NovedadAdicionGet
 }
+
+func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedadformatted map[string]interface{}) {
+	var NovedadesAdicion []map[string]interface{}
+	var fechas []map[string]interface{}
+	var propiedades []map[string]interface{}
+	var ultimasnovedades []map[string]interface{}
+	NovedadesAdicion = novedad
+	NovedadAdicionGet := make(map[string]interface{})
+	var fechaadicion interface{}
+	var fechasolicitud interface{}
+	var fechaprorroga interface{}
+	var cesionario interface{}
+	var valoradicion interface{}
+	var tiempoprorroga interface{}
+	var id interface{}
+
+	var idultimanovedad interface{}
+
+	fmt.Println(fechaadicion)
+	fmt.Println(NovedadesAdicion)
+
+	for _, NovedadAdicion := range NovedadesAdicion {
+
+		id = NovedadAdicion["Id"]
+		fmt.Println(NovedadAdicion)
+
+		fmt.Println("Aqui se muestra el id luego de ser pasado por el for \n", id)
+
+		error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
+		error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
+		error2 := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual/?sortby=id&order=desc&limit=1", &ultimasnovedades)
+
+		for _, ultimanovedad := range ultimasnovedades {
+
+			idultimanovedad = ultimanovedad["Id"]
+
+		}
+		fmt.Println("Aquí se muestra el id de la última novedad en admamazon \n", idultimanovedad)
+
+		for _, fecha := range fechas {
+			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
+			nombrefecha := tipofecha["Nombre"]
+			if nombrefecha == "FechaAdicion" {
+				fechaadicion = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaSolicitud" {
+				fechasolicitud = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaProrroga" {
+				fechaprorroga = fecha["Fecha"]
+			}
+			//fmt.Println(fechaadicion, fechasolicitud)
+		}
+		for _, propiedad := range propiedades {
+			tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
+			nombrepropiedad := tipopropiedad["Nombre"]
+			if nombrepropiedad == "Cesionario" {
+				cesionario = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "ValorAdicion" {
+				valoradicion = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "TiempoProrroga" {
+				tiempoprorroga = propiedad["Propiedad"]
+			}
+			//fmt.Println(cesionario, valoradicion)
+		}
+
+		NovedadAdicionGet = map[string]interface{}{
+			"Id":              (idultimanovedad.(float64) + 1),
+			"NumeroContrato":  strconv.FormatFloat(NovedadAdicion["ContratoId"].(float64), 'f', -1, 64),
+			"Vigencia":        NovedadAdicion["Vigencia"].(float64),
+			"TipoNovedad":     220,
+			"FechaInicio":     fechaprorroga,
+			"FechaFin":        "2019-10-08T18:26:20.046Z",
+			"FechaRegistro":   fechasolicitud,
+			"Contratista":     cesionario.(float64),
+			"NumeroCdp":       NovedadAdicion["NumeroCdpId"].(float64),
+			"VigenciaCdp":     NovedadAdicion["Vigencia"].(float64),
+			"PlazoEjecucion":  tiempoprorroga.(float64),
+			"UnidadEjecucion": 205,
+			"ValorNovedad":    valoradicion.(float64),
+		}
+
+		fmt.Println(error, error1, error2)
+	}
+
+	return NovedadAdicionGet
+}
