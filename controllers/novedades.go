@@ -206,7 +206,7 @@ func (c *NovedadesController) Delete() {
 
 }
 
-//RegistrarNovedadMongo Función para registrar la novedad en mongodb
+//RegistrarNovedadMongo Función para registrar la novedad en postgresql
 func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outputError interface{}) {
 
 	registroNovedadPost := make(map[string]interface{})

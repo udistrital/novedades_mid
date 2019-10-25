@@ -229,6 +229,8 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 	var tiempoprorroga interface{}
 	var id interface{}
 
+	fmt.Println(fechasolicitud, fechaprorroga, cesionario, valoradicion, tiempoprorroga)
+
 	var idultimanovedad interface{}
 
 	fmt.Println(fechaadicion)
@@ -295,6 +297,20 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 			"PlazoEjecucion":  tiempoprorroga.(float64),
 			"UnidadEjecucion": 205,
 			"ValorNovedad":    valoradicion.(float64),
+
+			// "Id":              503,
+			// "NumeroContrato":  "241",
+			// "Vigencia":        2017,
+			// "TipoNovedad":     219,
+			// "FechaInicio":     "2018-06-01T00:00:00Z",
+			// "FechaFin":        "2018-12-22T00:00:00Z",
+			// "FechaRegistro":   "2018-06-13T00:00:00Z",
+			// "Contratista":     11087,
+			// "NumeroCdp":       0,
+			// "VigenciaCdp":     0,
+			// "PlazoEjecucion":  202,
+			// "UnidadEjecucion": 205,
+			// "ValorNovedad":    0,
 		}
 
 		fmt.Println(error, error1, error2)
