@@ -9,6 +9,7 @@ import (
 	"github.com/udistrital/novedades_mid/models"
 	"github.com/udistrital/utils_oas/formatdata"
 	"github.com/udistrital/utils_oas/request"
+	"github.com/udistrital/utils_oas/time_bogota"
 )
 
 // NovedadesController operations for Novedades
@@ -271,13 +272,16 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		fmt.Println("\n entro al true \n", resultadoRegistro)
 		fmt.Println()
 
-		idRegistroAdmAmazon, error_registroamazon := RegistroAdministrativaAmazon(resultadoRegistro)
+		if registroNovedadPost["tiponovedad"] == "59d79904867ee188e42d8f02" || registroNovedadPost["tiponovedad"] == "59d79683867ee188e42d8c97" {
 
-		if error_registroamazon == nil {
+			idRegistroAdmAmazon, error_registroamazon := RegistroAdministrativaAmazon(resultadoRegistro)
 
+			if error_registroamazon == nil {
+				return nil, error_registroamazon
+			}
+
+			fmt.Println(idRegistroAdmAmazon)
 		}
-
-		fmt.Println(idRegistroAdmAmazon)
 
 		return resultadoRegistro, nil
 
@@ -291,6 +295,7 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 	var NovedadGET []map[string]interface{}
 	var NovedadAdmAmazonFormatted map[string]interface{}
 	var resultadoregistroadmamazon map[string]interface{}
+	var resultadoregistrojbpm map[string]interface{}
 	var errRegNovedad error
 
 	NovedadMap := NovedadAmazon["NovedadPoscontractual"].(map[string]interface{})
@@ -310,11 +315,36 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 		fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
 		formatdata.JsonPrint(resultadoregistroadmamazon)
 		fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
+	} else if NovedadGET[0]["TipoNovedad"].(float64) == 2 {
+		NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadCesion(NovedadGET)
+		urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
+		errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
+		fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
+		formatdata.JsonPrint(resultadoregistroadmamazon)
+		fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
 	}
-	//errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 
 	fmt.Println("Aqui se muestra la traducción de la novedad para replica en AdmAmazon \n", NovedadAdmAmazonFormatted, error)
 	formatdata.JsonPrint(NovedadAdmAmazonFormatted)
+
+	if errRegNovedad == nil {
+		idResultRegistroAdmAmazon := resultadoregistroadmamazon["Id"]
+
+		registrojbpm := map[string]interface{}{
+			"_post_novedad": map[string]interface{}{
+				"argonovedad_id":     idResultRegistroAdmAmazon.(string),
+				"novedad_id":         idStrf64,
+				"fecha_creacion":     time_bogota.TiempoBogotaFormato(),
+				"fecha_modificacion": time_bogota.TiempoBogotaFormato(),
+			},
+		}
+
+		formatdata.JsonPrint(registrojbpm)
+
+		errRegNovedad = request.SendJson(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad", "POST", &resultadoregistrojbpm, registrojbpm)
+
+	}
+
 	return 0, nil
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
+	"github.com/udistrital/utils_oas/time_bogota"
 )
 
 func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
@@ -218,20 +219,18 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 	var NovedadesAdicion []map[string]interface{}
 	var fechas []map[string]interface{}
 	var propiedades []map[string]interface{}
-	var ultimasnovedades []map[string]interface{}
+
 	NovedadesAdicion = novedad
 	NovedadAdicionGet := make(map[string]interface{})
-	var fechaadicion interface{}
-	var fechasolicitud interface{}
-	var fechaprorroga interface{}
+	var fechaadicion string
+	var fechasolicitud string
+	var fechaprorroga string
 	var cesionario interface{}
 	var valoradicion interface{}
 	var tiempoprorroga interface{}
 	var id interface{}
 
 	fmt.Println(fechasolicitud, fechaprorroga, cesionario, valoradicion, tiempoprorroga)
-
-	var idultimanovedad interface{}
 
 	fmt.Println(fechaadicion)
 	fmt.Println(NovedadesAdicion)
@@ -245,26 +244,21 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 
 		error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 		error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
-		error2 := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual/?sortby=id&order=desc&limit=1", &ultimasnovedades)
-
-		for _, ultimanovedad := range ultimasnovedades {
-
-			idultimanovedad = ultimanovedad["Id"]
-
-		}
-		fmt.Println("Aquí se muestra el id de la última novedad en admamazon \n", idultimanovedad)
 
 		for _, fecha := range fechas {
 			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
 			nombrefecha := tipofecha["Nombre"]
 			if nombrefecha == "FechaAdicion" {
-				fechaadicion = fecha["Fecha"]
+				fechaadicion = fecha["Fecha"].(string)
+				fechaadicion = time_bogota.TiempoCorreccionFormato(fechaadicion)
 			}
 			if nombrefecha == "FechaSolicitud" {
-				fechasolicitud = fecha["Fecha"]
+				fechasolicitud = fecha["Fecha"].(string)
+				fechasolicitud = time_bogota.TiempoCorreccionFormato(fechasolicitud)
 			}
 			if nombrefecha == "FechaProrroga" {
-				fechaprorroga = fecha["Fecha"]
+				fechaprorroga = fecha["Fecha"].(string)
+				fechaprorroga = time_bogota.TiempoCorreccionFormato(fechaprorroga)
 			}
 			//fmt.Println(fechaadicion, fechasolicitud)
 		}
@@ -284,12 +278,12 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 		}
 
 		NovedadAdicionGet = map[string]interface{}{
-			"Id":              (idultimanovedad.(float64) + 1),
+			//"Id":              (idultimanovedad.(float64) + 1),
 			"NumeroContrato":  strconv.FormatFloat(NovedadAdicion["ContratoId"].(float64), 'f', -1, 64),
 			"Vigencia":        NovedadAdicion["Vigencia"].(float64),
 			"TipoNovedad":     220,
 			"FechaInicio":     fechaprorroga,
-			"FechaFin":        "2019-10-08T18:26:20.046Z",
+			"FechaFin":        "0001-01-01T00:00:00Z",
 			"FechaRegistro":   fechasolicitud,
 			"Contratista":     cesionario.(float64),
 			"NumeroCdp":       NovedadAdicion["NumeroCdpId"].(float64),
@@ -313,7 +307,7 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 			// "ValorNovedad":    0,
 		}
 
-		fmt.Println(error, error1, error2)
+		fmt.Println(error, error1)
 	}
 
 	return NovedadAdicionGet
