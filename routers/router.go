@@ -35,6 +35,11 @@ func init() {
 				&controllers.NovedadesController{},
 			),
 		),
+		beego.NSNamespace("/argo_replica",
+			beego.NSInclude(
+				&controllers.ArgoReplicaController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

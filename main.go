@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "github.com/udistrital/novedades_mid/routers"
+	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
@@ -17,14 +18,16 @@ func main() {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"PUT", "PATCH", "GET", "POST", "OPTIONS", "DELETE"},
 		AllowHeaders: []string{"Origin", "x-requested-with",
-		  "content-type",
-		  "accept",
-		  "origin",
-		  "authorization",
-		  "x-csrftoken"},
+			"content-type",
+			"accept",
+			"origin",
+			"authorization",
+			"x-csrftoken"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-	  }))
+	}))
 
+	apistatus.Init()
 	beego.Run()
+
 }
