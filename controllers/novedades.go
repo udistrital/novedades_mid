@@ -219,37 +219,37 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	//var resultadoRegistroMongo map[string]interface{}
 
 	switch registroNovedadPost["tiponovedad"] {
-	case "59d7965e867ee188e42d8c72":
+	case "NP_SUS":
 		//suspensión
 		fmt.Println("Novedad de suspensión")
 		NovedadPoscontractualPost = models.ConstruirNovedadSuspension(registroNovedadPost)
 		fmt.Println(NovedadPoscontractualPost)
-	case "59d79683867ee188e42d8c97":
+	case "NP_CES":
 		//cesión
 		fmt.Println("Novedad de cesión")
 		NovedadPoscontractualPost = models.ConstruirNovedadCesion(registroNovedadPost)
 		// fmt.Println(NovedadPoscontractualPost)
-	case "59d796ac867ee188e42d8cbf":
+	case "NP_REI":
 		//reinicio
 		fmt.Println("Novedad de reinicio")
 		NovedadPoscontractualPost = models.ConstruirNovedadReinicio(registroNovedadPost)
 		fmt.Println(NovedadPoscontractualPost)
-	case "59d79809867ee188e42d8e0d":
+	case "NP_TER":
 		//terminacion anticipada
 		fmt.Println("Novedad de terminación anticipada")
 		NovedadPoscontractualPost = models.ConstruirNovedadTAnticipada(registroNovedadPost)
 		fmt.Println(NovedadPoscontractualPost)
-	case "59d7985e867ee188e42d8e64":
+	case "NP_ADI":
 		//adición
 		fmt.Println("Novedad de adición")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdicionPost(registroNovedadPost)
 		fmt.Println(NovedadPoscontractualPost)
-	case "59d79894867ee188e42d8e9b":
+	case "NP_PRO":
 		//prórroga
 		fmt.Println("Novedad de prorroga")
 		NovedadPoscontractualPost = models.ConstruirNovedadProrrogaPost(registroNovedadPost)
 		fmt.Println(NovedadPoscontractualPost)
-	case "59d79904867ee188e42d8f02":
+	case "NP_ADPRO":
 		//adicion/prorroga
 		fmt.Println("Novedad de adicion/prorroga")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdProrrogaPost(registroNovedadPost)
