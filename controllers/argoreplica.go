@@ -72,21 +72,30 @@ func (c *ArgoReplicaController) GetOne() {
 				NovedadGETtrad := NovedadGET[0]
 				fmt.Println("\n", novedadid, "\n", error)
 
-				switch NovedadGETtrad["TipoNovedad"].(float64) {
-				case 8:
-					novedadformated = models.GetNovedadAdicion(NovedadGETtrad)
-				case 2:
-					novedadformated = models.GetNovedadCesion(NovedadGETtrad)
-				}
+				if NovedadGETtrad["TipoNovedad"].(float64) == 8 || NovedadGETtrad["TipoNovedad"].(float64) == 2 {
+					switch NovedadGETtrad["TipoNovedad"].(float64) {
+					case 8:
+						novedadformated = models.GetNovedadAdicion(NovedadGETtrad)
+					case 2:
+						novedadformated = models.GetNovedadCesion(NovedadGETtrad)
+					}
 
-				formatdata.JsonPrint(NovedadGETtrad)
-				formatdata.JsonPrint(novedadformated)
-				alerta.Type = "OK"
-				alerta.Code = "200"
-				alerta.Body = novedadformated
-				c.Data["json"] = alerta
-				//c.Abort("400")
-				c.Ctx.Output.SetStatus(200)
+					formatdata.JsonPrint(NovedadGETtrad)
+					formatdata.JsonPrint(novedadformated)
+					alerta.Type = "OK"
+					alerta.Code = "200"
+					alerta.Body = novedadformated
+					c.Data["json"] = alerta
+					//c.Abort("400")
+					c.Ctx.Output.SetStatus(200)
+				} else {
+					alerta.Type = "error"
+					alerta.Code = "400"
+					alerta.Body = "La novedad no es de adición/prórroga o cesión"
+					c.Data["json"] = alerta
+					//c.Abort("400")
+					c.Ctx.Output.SetStatus(400)
+				}
 
 			} else {
 				alerta.Type = "error"

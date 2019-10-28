@@ -276,7 +276,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 
 			idRegistroAdmAmazon, error_registroamazon := RegistroAdministrativaAmazon(resultadoRegistro)
 
-			if error_registroamazon == nil {
+			if error_registroamazon != nil {
 				return nil, error_registroamazon
 			}
 
@@ -326,8 +326,9 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 
 	fmt.Println("Aqui se muestra la traducción de la novedad para replica en AdmAmazon \n", NovedadAdmAmazonFormatted, error)
 	formatdata.JsonPrint(NovedadAdmAmazonFormatted)
+	fmt.Println(resultadoregistroadmamazon["Id"])
 
-	if errRegNovedad == nil {
+	if errRegNovedad == nil && resultadoregistroadmamazon["Id"] != nil {
 		idResultRegistroAdmAmazon := resultadoregistroadmamazon["Id"]
 
 		registrojbpm := map[string]interface{}{
@@ -343,9 +344,13 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 
 		errRegNovedad = request.SendJson(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad", "POST", &resultadoregistrojbpm, registrojbpm)
 
+		return 0, nil
+
+	} else {
+		errorRegistro := "No se pudo guardar en Administrativa amazon"
+		return 0, errorRegistro
 	}
 
-	return 0, nil
 }
 
 //Función que construirá la novedad a ser consultada.
