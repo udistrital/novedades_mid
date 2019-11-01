@@ -175,7 +175,7 @@ func (c *NovedadesController) GetAll() {
 	//var Result interface{}
 	var alerta models.Alert
 	//resultado = models.GetNovedades("/v1/novedades_poscontractuales")
-	// fmt.Println(errResultado, resultado)
+	//fmt.Println(errResultado, resultado)
 	alerta.Type = "OK"
 	alerta.Code = "200"
 	alerta.Body = resultado
@@ -256,7 +256,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		fmt.Println(NovedadPoscontractualPost)
 	}
 
-	if registroNovedadPost["tiponovedad"] == "59d79683867ee188e42d8c97" {
+	if registroNovedadPost["tiponovedad"] == "NP_CES" {
 		errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 	} else {
 		errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
@@ -272,7 +272,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		fmt.Println("\n entro al true \n", resultadoRegistro)
 		fmt.Println()
 
-		if registroNovedadPost["tiponovedad"] == "59d79904867ee188e42d8f02" || registroNovedadPost["tiponovedad"] == "59d79683867ee188e42d8c97" {
+		if registroNovedadPost["tiponovedad"] == "NP_ADPRO" || registroNovedadPost["tiponovedad"] == "NP_CES" {
 
 			idRegistroAdmAmazon, error_registroamazon := RegistroAdministrativaAmazon(resultadoRegistro)
 
@@ -333,16 +333,19 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 
 		registrojbpm := map[string]interface{}{
 			"_post_novedad": map[string]interface{}{
-				"argonovedad_id":     idResultRegistroAdmAmazon.(string),
+				"argonovedad_id":     idResultRegistroAdmAmazon.(float64),
 				"novedad_id":         idStrf64,
 				"fecha_creacion":     time_bogota.TiempoBogotaFormato(),
 				"fecha_modificacion": time_bogota.TiempoBogotaFormato(),
+				"activo":             true,
 			},
 		}
 
 		formatdata.JsonPrint(registrojbpm)
 
-		errRegNovedad = request.SendJson(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad", "POST", &resultadoregistrojbpm, registrojbpm)
+		errRegNovedad = models.SendJson(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad", "POST", &resultadoregistrojbpm, registrojbpm)
+
+		fmt.Println(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad", "\n", resultadoregistrojbpm)
 
 		return 0, nil
 
