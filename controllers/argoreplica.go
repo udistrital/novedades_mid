@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"encoding/json"
-	"encoding/xml"
 	"fmt"
-	"net/http"
+	"strconv"
+
+	"github.com/udistrital/utils_oas/formatdata"
+	"github.com/udistrital/utils_oas/request"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
@@ -43,44 +44,72 @@ func (c *ArgoReplicaController) Post() {
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (c *ArgoReplicaController) GetOne() {
-	var resultjbpm interface{}
-	var resultjbpmjson models.JbpmReplica
+	var resultjbpm map[string]interface{}
+	var novedad_replicaCollection map[string]interface{}
+	var novedad []interface{}
+	var NovedadGET []map[string]interface{}
+	var datos_replica map[string]interface{}
+	var novedadid float64
+
+	var novedadformated map[string]interface{}
+	//var resultjbpmjson models.JbpmReplica
 	idStr := c.Ctx.Input.Param(":id")
 	var alerta models.Alert
-	//error := request.GetJson(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr, &resultjbpm)
-	error := getXml(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr, &resultjbpm)
-
-	fmt.Println(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr+"\n", resultjbpm)
+	error := models.GetJsonWSO2(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr, &resultjbpm)
+	formatdata.JsonPrint(resultjbpm)
 
 	if error == nil {
+		novedad_replicaCollection = resultjbpm["novedad_replicaCollection"].(map[string]interface{})
+		if novedad_replicaCollection["novedad"] != nil {
 
-		json_jbpmreplica, error_json := json.Marshal(resultjbpm)
+			novedad = novedad_replicaCollection["novedad"].([]interface{})
+			datos_replica = novedad[0].(map[string]interface{})
+			novedadid, _ = strconv.ParseFloat(datos_replica["novedad_id"].(string), 32)
+			idStr1 := strconv.FormatFloat(novedadid, 'f', -1, 64)
+			error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=id:"+idStr1+"&limit=0", &NovedadGET)
+			if error == nil {
 
-		if error_json == nil {
+				NovedadGETtrad := NovedadGET[0]
+				fmt.Println("\n", novedadid, "\n", error)
 
-			if err := json.Unmarshal(json_jbpmreplica, &resultjbpmjson); err == nil {
+				if NovedadGETtrad["TipoNovedad"].(float64) == 8 || NovedadGETtrad["TipoNovedad"].(float64) == 2 {
+					switch NovedadGETtrad["TipoNovedad"].(float64) {
+					case 8:
+						novedadformated = models.GetNovedadAdicion(NovedadGETtrad)
+					case 2:
+						novedadformated = models.GetNovedadCesion(NovedadGETtrad)
+					}
 
-				fmt.Println("entro al true \n", resultjbpmjson)
-				alerta.Type = "OK"
-				alerta.Code = "200"
-				alerta.Body = resultjbpmjson
-				c.Data["json"] = alerta
-				c.Ctx.Output.SetStatus(200)
+					formatdata.JsonPrint(NovedadGETtrad)
+					formatdata.JsonPrint(novedadformated)
+					alerta.Type = "OK"
+					alerta.Code = "200"
+					alerta.Body = novedadformated
+					c.Data["json"] = alerta
+					//c.Abort("400")
+					c.Ctx.Output.SetStatus(200)
+				} else {
+					alerta.Type = "error"
+					alerta.Code = "400"
+					alerta.Body = "La novedad no es de adición/prórroga o cesión"
+					c.Data["json"] = alerta
+					//c.Abort("400")
+					c.Ctx.Output.SetStatus(400)
+				}
 
 			} else {
 				alerta.Type = "error"
 				alerta.Code = "400"
-				alerta.Body = "falló el unmarshall"
+				alerta.Body = "No se pudo realizar el get con el id específicado"
 				c.Data["json"] = alerta
 				//c.Abort("400")
 				c.Ctx.Output.SetStatus(400)
-
 			}
 
 		} else {
 			alerta.Type = "error"
 			alerta.Code = "400"
-			alerta.Body = "No se pudo formatear a JSON"
+			alerta.Body = "No se encontraron datos asociados a ese id"
 			c.Data["json"] = alerta
 			//c.Abort("400")
 			c.Ctx.Output.SetStatus(400)
@@ -135,18 +164,4 @@ func (c *ArgoReplicaController) Put() {
 // @router /:id [delete]
 func (c *ArgoReplicaController) Delete() {
 
-}
-
-func getXml(url string, target interface{}) error {
-	r, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := r.Body.Close(); err != nil {
-			beego.Error(err)
-		}
-	}()
-
-	return xml.NewDecoder(r.Body).Decode(target)
 }
