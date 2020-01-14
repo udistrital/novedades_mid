@@ -1,6 +1,10 @@
 # novedades_mid
 novedades_mid, MID para el negocio de novedades, el proyecto está programado en el lenguaje Go y creado con el [framework beego](https://beego.me/).
 
+El Api tiene la funcionalidad de cominicar el cliente de novedades con el CRUD, el mid provee un manejo de datos para proveerle al cliente los datos en la estructura que este requiere ya que antes se usaba un Api para una base de datos en Mongo.
+
+adicionalmente el api proveecomunicacion con un api de administrativa_amazon_api con el fin de que cierta novedades especificas aparezcan en ela aplicativo de condor.
+
 ***Instlaciones Previas:***
 * [Golang](https://github.com/udistrital/introduccion_oas/blob/master/instalacion_de_herramientas/golang.md)
 * [BeeGo](https://github.com/udistrital/introduccion_oas/blob/master/instalacion_de_herramientas/beego.md)
@@ -33,42 +37,29 @@ Para instalar el proyecto realizar los siguientes pasos:
     go get
 ```
 
-## Variables de entorno 
-
-* El puerto por el que se expone la api **httpport = 8502**; si se cambia de puerto se debe editar la configuración en el [cliente](https://github.com/udistrital/novedades_cliente), especificamente la varible de entorno ARGO_NOSQL_SERVICE.
-* La variable de entorno corresponde al puerto en donde se desplegará el API y corresponde a la siguiente :
-```shell 
-    NOVEDADES_API_HTTP_PORT=8502
-```
 
 ## Ejecución del proyecto
 
 * Ubicado en la raíz del proyecto, ejecutar:
-```shell 
-    NOVEDADES_API_HTTP_PORT=8502 bee run
+```bash
+    NOVEDADES_API_HTTP_PORT=[puerto en el que quiere ejcutar el api] NOVEDADES_CRUD_SERVICE=[dereccion donde se encuentra el api crud de novedades inluyendo el puerto] ADMINISTRATIVA_AMAZON_SERVICE=[dereccion donde se encuentra el api de administrativa_amazon_service inluyendo el puerto] JBPM_SERVICE=[direccion del servicio de jbpm] bee run
 ```
 * O si se quiere ejecutar el swager:
 ```shell 
-    NOVEDADES_API_HTTP_PORT=8502 bee run -downdoc=true -gendoc=true
+    NOVEDADES_API_HTTP_PORT=[puerto en el que quiere ejcutar el api] NOVEDADES_CRUD_SERVICE=[dereccion donde se encuentra el api crud de novedades inluyendo el puerto] ADMINISTRATIVA_AMAZON_SERVICE=[dereccion donde se encuentra el api de administrativa_amazon_service inluyendo el puerto] JBPM_SERVICE=[direccion del servicio de jbpm] bee run -downdoc=true -gendoc=true
 ```
-
-### Puertos
-
-* El servidor se expone en el puerto: localhost:8502
-
-* Para ver la documentación de swagger: [localhost:8502/swagger/](http://localhost:8502/swagger/)
-    *Nota*: En el swagger sale un error, hacer caso omiso.
 
 ### EndPoints
 
-Cada controlador tiene los metodos :
-* Post
- los endpoint a los cuales apuntar son los siguientes:
+Al ejecutar el swagger se puede tener mayor apreciacion de los diferentes metodos de peticion por cada endpoint cuales son los distinpos endpoint disponibles y como usarlos.
 
 
-||End Point|
-|----------------|------------------------|
-| **registroNovedad** | `[host de la maquina]:[puerto]/v1/registro_novedad` |
+## Licencia
 
+This file is part of cumplidos-cliente.
 
+cumplidos-cliente is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
+Foobar is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with Foobar. If not, see https://www.gnu.org/licenses/.
