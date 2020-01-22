@@ -44,7 +44,7 @@ go get
 - NOVEDADES_API_HTTP_PORT=[puerto en el que quiere ejcutar el api]
 - NOVEDADES_CRUD_SERVICE=[dereccion donde se encuentra el api crud de novedades inluyendo el puerto]
 - ADMINISTRATIVA_AMAZON_SERVICE=[dereccion donde se encuentra el api de administrativa_amazon_service inluyendo el puerto]
-- JBPM_SERVICE=[direccion del servicio de jbpm] bee run
+- JBPM_SERVICE=[direccion del servicio de jbpm]
 
 
 ### Ejecución del proyecto
