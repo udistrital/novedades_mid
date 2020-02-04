@@ -12,53 +12,53 @@ adicionalmente el api proveecomunicacion con un api de administrativa_amazon_api
 
 ## Especificaciones Técnicas
 
-### Opción 1
-Ejecutar desde la terminal 'go get repositorio':
+### Instalación
 
+#### Opción 1
 ```shell
 go get github.com/udistrital/novedades_mid
 ```
-### Opción 2
-Para instalar el proyecto realizar los siguientes pasos:
-- Para clonar el proyecto en la carpeta local go/src/github.com/udistrital ir a la consola y ejecutar:
+#### Opción 2
 ```shell
+# Para clonar el proyecto en la carpeta local go/src/github.com/udistrital
 cd go/src/github.com/udistrital
-```
-- Ejecutar:
-```shell
+
+# clonar repo
 git clone https://github.com/udistrital/novedades_mid.git
-```
 
-- Ir a la carpeta del proyecto:
-```shell
+# Ir a la carpeta del proyecto:
 cd novedades_mid
-```
 
-- Instalar dependencias del proyecto:
-```shell
+# Instalar dependencias del proyecto
 go get
 ```
 
 ### Variables de Entorno
-
-- NOVEDADES_API_HTTP_PORT=[puerto en el que quiere ejcutar el api]
-- NOVEDADES_CRUD_SERVICE=[dereccion donde se encuentra el api crud de novedades inluyendo el puerto]
-- ADMINISTRATIVA_AMAZON_SERVICE=[dereccion donde se encuentra el api de administrativa_amazon_service inluyendo el puerto]
-- JBPM_SERVICE=[direccion del servicio de jbpm]
-
+```shell
+NOVEDADES_API_HTTP_PORT=[puerto en el que quiere ejcutar el api]
+NOVEDADES_CRUD_SERVICE=[dereccion donde se encuentra el api crud de novedades inluyendo el puerto]
+ADMINISTRATIVA_AMAZON_SERVICE=[dereccion donde se encuentra el api de administrativa_amazon_service inluyendo el puerto]
+JBPM_SERVICE=[direccion del servicio de jbpm]
+```
 
 ### Ejecución del proyecto
 
-* Ubicado en la raíz del proyecto, ejecutar:
-```bash
-NOVEDADES_API_HTTP_PORT=XXX NOVEDADES_CRUD_SERVICE=XXX
-ADMINISTRATIVA_AMAZON_SERVICE=XXX JBPM_SERVICE=XXX bee run
-```
-* O si se quiere ejecutar el swager:
+Ubicado en la raíz del proyecto, ejecutar:
 ```shell
-NOVEDADES_API_HTTP_PORT=XXX NOVEDADES_CRUD_SERVICE=XXX
-ADMINISTRATIVA_AMAZON_SERVICE=XXX JBPM_SERVICE=XXX bee run -downdoc=true -gendoc=true
+NOVEDADES_API_HTTP_PORT=XXX NOVEDADES_CRUD_SERVICE=XXX ADMINISTRATIVA_AMAZON_SERVICE=XXX JBPM_SERVICE=XXX bee run
 ```
+O si se quiere ejecutar el swager:
+```shell
+NOVEDADES_API_HTTP_PORT=XXX NOVEDADES_CRUD_SERVICE=XXX ADMINISTRATIVA_AMAZON_SERVICE=XXX JBPM_SERVICE=XXX bee run -downdoc=true -gendoc=true
+```
+
+### Puertos
+
+El servidor se expone por defecto en el puerto: localhost:8080
+
+Para ver la documentación de swagger: [localhost:8080/swagger/](http://localhost:8080/swagger/)
+
+**Nota**: *En el swagger sale un error, hacer caso omiso.*
 
 ### EndPoints
 
@@ -67,9 +67,9 @@ Al ejecutar el swagger se puede tener mayor apreciacion de los diferentes metodo
 
 ## Licencia
 
-This file is part of cumplidos-cliente.
+This file is part of novedades_mid
 
-cumplidos-cliente is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+novedades_mid is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 Foobar is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
