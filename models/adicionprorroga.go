@@ -244,7 +244,7 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 
 		error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 		error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
-
+		
 		for _, fecha := range fechas {
 			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
 			nombrefecha := tipofecha["Nombre"]
@@ -282,10 +282,10 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 			"NumeroContrato":  strconv.FormatFloat(NovedadAdicion["ContratoId"].(float64), 'f', -1, 64),
 			"Vigencia":        NovedadAdicion["Vigencia"].(float64),
 			"TipoNovedad":     220,
-			"FechaInicio":     fechaprorroga,
+			"FechaInicio":     nil,
 			"FechaFin":        "0001-01-01T00:00:00Z",
 			"FechaRegistro":   fechasolicitud,
-			"Contratista":     cesionario.(float64),
+			"Contratista":     nil,
 			"NumeroCdp":       NovedadAdicion["NumeroCdpId"].(float64),
 			"VigenciaCdp":     NovedadAdicion["Vigencia"].(float64),
 			"PlazoEjecucion":  tiempoprorroga.(float64),
