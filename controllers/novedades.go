@@ -271,9 +271,9 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	} else {
 		fmt.Println("\n entro al true \n")
 		formatdata.JsonPrint(resultadoRegistro)
-		fmt.Println("\n",registroNovedadPost["tiponovedad"])
+		fmt.Println("\n", registroNovedadPost["tiponovedad"])
 
-		if registroNovedadPost["tiponovedad"] == "NP_ADPRO" || registroNovedadPost["tiponovedad"] == "NP_CES"  {
+		if registroNovedadPost["tiponovedad"] == "NP_ADPRO" || registroNovedadPost["tiponovedad"] == "NP_CES" {
 			fmt.Println("\n entro a la replica de datos\n")
 			idRegistroAdmAmazon, error_registroamazon := RegistroAdministrativaAmazon(resultadoRegistro)
 
@@ -307,9 +307,9 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=id:"+idStr+"&limit=0", &NovedadGET)
 	fmt.Println("Aqui muestro la novedad obtenida mediante GET \n", NovedadGET)
-	
+
 	//Para novedad de adición prorroga
-	if NovedadGET[0]["TipoNovedad"].(float64) == 8{
+	if NovedadGET[0]["TipoNovedad"].(float64) == 8 {
 		NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadAdProrroga(NovedadGET)
 		fmt.Println(NovedadAdmAmazonFormatted)
 		urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
