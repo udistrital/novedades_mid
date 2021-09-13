@@ -61,6 +61,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:GestorDocumentalController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:GestorDocumentalController"],
+        beego.ControllerComments{
+            Method: "GetOne",
+            Router: "/:enlace",
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"],
         beego.ControllerComments{
             Method: "Post",

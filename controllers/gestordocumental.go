@@ -5,6 +5,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
+	"github.com/udistrital/utils_oas/request"
 )
 
 // GestorDocumentalController operations for Nuxeo
@@ -17,6 +18,45 @@ func (c *GestorDocumentalController) URLMapping() {
 	c.Mapping("Post", c.Post)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("GetOne", c.GetOne)
+}
+
+// GetGestorDocumental ...
+// @Title GetGestorDocumental
+// @Description obtener documento por enlace
+// @Param	enlace		path 	string	true		"The key for staticblock"
+// @Success 200 {}
+// @Failure 403 :enlace is empty
+// @router /:enlace [get]
+func (c *GestorDocumentalController) GetOne() {
+	var novedad map[string]interface{}
+	idStr := c.Ctx.Input.Param(":enlace")
+	var alertErr models.Alert
+	alertas := append([]interface{}{"Response:"})
+
+	error := request.GetJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/"+idStr, &novedad)
+
+	if error == nil {
+		if len(novedad) == 2 && novedad["Status"].(string) == "500" {
+			alertErr.Type = "error"
+			alertErr.Code = "500"
+			alertErr.Body = novedad
+			c.Ctx.Output.SetStatus(500)
+		} else {
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = novedad
+		}
+
+	} else {
+		alertErr.Type = "error"
+		alertErr.Code = "400"
+		alertas = append(alertas, error)
+		alertErr.Body = alertas
+		c.Ctx.Output.SetStatus(400)
+	}
+	c.Data["json"] = alertErr
+	c.ServeJSON()
 }
 
 // PostGestorDocumental ...
