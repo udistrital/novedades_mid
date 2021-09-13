@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
@@ -36,15 +35,10 @@ func (c *RegistroNovedadController) PostRegistroNovedad() {
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
 
-	//fmt.Println(registroNovedad, alertErr, horaRegistro)
-
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
-
-		//fmt.Println(registroNovedad)
 
 		result, err1 := RegistrarNovedadMongo(registroNovedad)
 
-		//fmt.Println(registroNovedadPost, horaRegistro)
 		if err == nil {
 			alertErr.Type = "OK"
 			alertErr.Code = "200"
@@ -76,17 +70,9 @@ func RegistrarNovedadMongo(novedad map[string]interface{}) (status interface{}, 
 	registroNovedadPost = novedad
 	var resultadoRegistroMongo map[string]interface{}
 
-	//fmt.Println("\n Enseguida se mostrará la hora \n")
 	registroNovedadPost["fecharegistro"] = horaRegistro
-	//fmt.Println(registroNovedadPost["fecharegistro"])
-	//fmt.Println("\n Aquí termina la hora \n")
-
-	fmt.Println("Ingresa a la función de post \n", registroNovedadPost)
-	fmt.Println("\n respuesta del servidor \n")
 
 	errRegNovedadMongo := request.SendJson("http://"+beego.AppConfig.String("NovedadesApiMongoService")+"/v1/novedad", "POST", &resultadoRegistroMongo, registroNovedadPost)
-
-	fmt.Println(resultadoRegistroMongo, errRegNovedadMongo, beego.AppConfig.String("NovedadesApiMongoService"))
 
 	result := resultadoRegistroMongo["Body"]
 
