@@ -17,6 +17,7 @@ adicionalmente el api proveecomunicacion con un api de administrativa_amazon_api
 NOVEDADES_API_HTTP_PORT=[puerto en el que quiere ejcutar el api]
 NOVEDADES_CRUD_SERVICE=[dereccion donde se encuentra el api crud de novedades inluyendo el puerto]
 ADMINISTRATIVA_AMAZON_SERVICE=[dereccion donde se encuentra el api de administrativa_amazon_service inluyendo el puerto]
+GESTOR_DOCUMENTAL_MID=[dereccion donde se encuentra el api de gestor_documental_mid incluyendo el puerto]
 JBPM_SERVICE=[direccion del servicio de jbpm]
 ```
 **NOTA:** Las variables se pueden ver en el fichero conf/app.conf

@@ -40,6 +40,11 @@ func init() {
 				&controllers.ArgoReplicaController{},
 			),
 		),
+		beego.NSNamespace("/gestor_documental",
+			beego.NSInclude(
+				&controllers.GestorDocumentalController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

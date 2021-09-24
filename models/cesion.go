@@ -350,78 +350,83 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
 	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/poliza/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &poliza)
 
-	for _, fecha := range fechas {
-		tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
-		nombrefecha := tipofecha["Nombre"]
-		if nombrefecha == "FechaAdicion" {
-			fechaadicion = fecha["Fecha"]
+	if len(fechas[0]) > 0 {
+		for _, fecha := range fechas {
+			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
+			nombrefecha := tipofecha["Nombre"]
+			if nombrefecha == "FechaAdicion" {
+				fechaadicion = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaCesion" {
+				fechacesion = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaLiquidacion" {
+				fechaliquidacion = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaProrroga" {
+				fechaprorroga = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaRegistro" {
+				fecharegistro = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaReinicio" {
+				fechareinicio = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaSuspension" {
+				fechasuspension = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaSolicitud" {
+				fechasolicitud = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaTerminacionAnticipada" {
+				fechaterminacionanticipada = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaOficio" {
+				fechaoficio = fecha["Fecha"]
+			}
+			//fmt.Println(fechaadicion, fechasolicitud)
 		}
-		if nombrefecha == "FechaCesion" {
-			fechacesion = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaLiquidacion" {
-			fechaliquidacion = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaProrroga" {
-			fechaprorroga = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaRegistro" {
-			fecharegistro = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaReinicio" {
-			fechareinicio = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaSuspension" {
-			fechasuspension = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaSolicitud" {
-			fechasolicitud = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaTerminacionAnticipada" {
-			fechaterminacionanticipada = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaOficio" {
-			fechaoficio = fecha["Fecha"]
-		}
-		//fmt.Println(fechaadicion, fechasolicitud)
 	}
-	for _, propiedad := range propiedades {
-		tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
-		nombrepropiedad := tipopropiedad["Nombre"]
-		if nombrepropiedad == "Cedente" {
-			cedente = propiedad["Propiedad"]
+	if len(propiedades[0]) > 0 {
+		for _, propiedad := range propiedades {
+			tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
+			nombrepropiedad := tipopropiedad["Nombre"]
+			if nombrepropiedad == "Cedente" {
+				cedente = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "Cesionario" {
+				cesionario = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "NumeroActaEntrega" {
+				numeroactaentrega = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "NumeroOficioEstadoCuentas" {
+				numerooficioestadocuentas = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "PeriodoSuspension" {
+				periodosuspension = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "PlazoActual" {
+				plazoactual = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "TiempoProrroga" {
+				tiempoprorroga = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "ValorAdicion" {
+				valoradicion = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "ValorFinalContrato" {
+				valorfinalcontrato = propiedad["Propiedad"]
+			}
+			//fmt.Println(cesionario, valoradicion)
 		}
-		if nombrepropiedad == "Cesionario" {
-			cesionario = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "NumeroActaEntrega" {
-			numeroactaentrega = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "NumeroOficioEstadoCuentas" {
-			numerooficioestadocuentas = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "PeriodoSuspension" {
-			periodosuspension = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "PlazoActual" {
-			plazoactual = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "TiempoProrroga" {
-			tiempoprorroga = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "ValorAdicion" {
-			valoradicion = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "ValorFinalContrato" {
-			valorfinalcontrato = propiedad["Propiedad"]
-		}
-		//fmt.Println(cesionario, valoradicion)
 	}
+	if len(propiedades[0]) > 0 {
+		for _, poliz := range poliza {
 
-	for _, poliz := range poliza {
-
-		polizas = poliz["NumeroPolizaId"]
-		entidadaseguradora = poliz["EntidadAseguradoraId"]
+			polizas = poliz["NumeroPolizaId"]
+			entidadaseguradora = poliz["EntidadAseguradoraId"]
+		}
 	}
 
 	NovedadAdicionGet = map[string]interface{}{
