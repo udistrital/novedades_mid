@@ -105,7 +105,7 @@ func RegistrarDoc(documento []map[string]interface{}) (status interface{}, outpu
 	var resultadoRegistro map[string]interface{}
 	var errRegDoc interface{}
 
-	errRegDoc = models.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/upload", "POST", &resultadoRegistro, documento)
+	errRegDoc = models.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/upload", "POST", &resultadoRegistro, documento)
 
 	if resultadoRegistro["Status"].(string) == "200" && errRegDoc == nil {
 
