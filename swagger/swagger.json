@@ -191,6 +191,60 @@
                 }
             }
         },
+        "/gestor_documental/": {
+            "post": {
+                "tags": [
+                    "gestor_documental"
+                ],
+                "description": "Crear documento en Nuxeo",
+                "operationId": "GestorDocumentalController.PostGestorDocumental",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Crear documento en Nuxeo",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/{}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestor_documental/{enlace}": {
+            "get": {
+                "tags": [
+                    "gestor_documental"
+                ],
+                "description": "obtener documento por enlace",
+                "operationId": "GestorDocumentalController.GetGestorDocumental",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "enlace",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{}"
+                    },
+                    "403": {
+                        "description": ":enlace is empty"
+                    }
+                }
+            }
+        },
         "/novedad/": {
             "get": {
                 "tags": [
@@ -799,6 +853,10 @@
         {
             "name": "argo_replica",
             "description": "ArgoReplicaController operations for ArgoReplica\n"
+        },
+        {
+            "name": "gestor_documental",
+            "description": "GestorDocumentalController operations for Nuxeo\n"
         }
     ]
 }
