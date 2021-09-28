@@ -16,12 +16,10 @@ type GestorDocumentalController struct {
 // URLMapping ...
 func (c *GestorDocumentalController) URLMapping() {
 	c.Mapping("Post", c.Post)
-	c.Mapping("Put", c.Put)
-	c.Mapping("Delete", c.Delete)
 	c.Mapping("GetOne", c.GetOne)
 }
 
-// GetGestorDocumental ...
+// GetOne ...
 // @Title GetGestorDocumental
 // @Description obtener documento por enlace
 // @Param	enlace		path 	string	true		"The key for staticblock"
@@ -59,7 +57,7 @@ func (c *GestorDocumentalController) GetOne() {
 	c.ServeJSON()
 }
 
-// PostGestorDocumental ...
+// Post ...
 // @Title PostGestorDocumental
 // @Description Crear documento en Nuxeo
 // @Param   body        body    {}  true        "Crear documento en Nuxeo"
