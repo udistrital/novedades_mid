@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
-	//"github.com/udistrital/novedades_mid/helpers"
-	. "github.com/udistrital/golog"
 	"github.com/udistrital/novedades_mid/models"
+
+	. "github.com/udistrital/golog"
 )
 
 // CambioEstadoContratoValidoController operations for CambioEstadoContratoValido
