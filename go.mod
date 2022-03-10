@@ -6,7 +6,6 @@ require (
 	github.com/astaxie/beego v1.12.3
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/udistrital/auditoria v0.0.0-20200115201815-9680ae9c2515
-	github.com/udistrital/golog v0.0.0-20171023162822-91dc4aca08d2
 	github.com/udistrital/utils_oas v0.0.0-20211125230753-1091d2af48e2
 )
 
@@ -22,8 +21,6 @@ require (
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775 // indirect
-	github.com/mndrix/ps v0.0.0-20170330174427-18e65badd6ab // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/prometheus/client_golang v1.10.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect

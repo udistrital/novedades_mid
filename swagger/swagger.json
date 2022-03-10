@@ -764,9 +764,59 @@
                     }
                 }
             }
+        },
+        "/validarCambioEstado/": {
+            "post": {
+                "tags": [
+                    "validarCambioEstado"
+                ],
+                "description": "create ValidarCambiosEstado",
+                "operationId": "CambioEstadoContratoValidoController.ValidarCambiosEstado",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Crear documento en Nuxeo",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/{}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Alert"
+                        }
+                    },
+                    "400": {
+                        "description": "body is empty"
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "41252.0xc000410270.false": {
+            "title": "false",
+            "type": "object"
+        },
+        "models.Alert": {
+            "title": "Alert",
+            "type": "object",
+            "properties": {
+                "Body": {
+                    "$ref": "#/definitions/41252.0xc000410270.false"
+                },
+                "Code": {
+                    "type": "string"
+                },
+                "Type": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ArgoReplica": {
             "title": "ArgoReplica",
             "type": "object"
@@ -841,6 +891,10 @@
         {
             "name": "user",
             "description": "Operations about Users\n"
+        },
+        {
+            "name": "validarCambioEstado",
+            "description": "CambioEstadoContratoValidoController operations for CambioEstadoContratoValido\n"
         },
         {
             "name": "registro_novedad",

@@ -2,13 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
-
-	. "github.com/udistrital/golog"
+	//. "github.com/udistrital/golog"
 )
 
 // CambioEstadoContratoValidoController operations for CambioEstadoContratoValido
@@ -24,34 +21,51 @@ func (c *CambioEstadoContratoValidoController) URLMapping() {
 // ValidarCambiosEstado ...
 // @Title ValidarCambiosEstado
 // @Description create ValidarCambiosEstado
-// @Success 201 {int} models.EstadoContrato
-// @Failure 403 body is empty
+// @Param   body        body    {}  true        "Crear documento en Nuxeo"
+// @Success 201 {object} models.Alert
+// @Failure 400 body is empty
 // @router / [post]
 func (c *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 
 	var estados []models.EstadoContrato //0: actual y 1:siguiente
-
-	reglasbase, err := CargarReglasBase("AdministrativaContratacion")
-	if err != nil {
-		beego.Error(err)
-		c.Abort("400")
-	}
-
-	m := NewMachine().Consult(reglasbase)
+	var alertErr models.Alert
+	alertas := append([]interface{}{"Response:"})
+	//result, err1 := consultarCambioEstado(estados)
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &estados); err == nil {
-
-		if m.CanProve(`estado(` + strings.ToLower(estados[0].NombreEstado) + `,` + strings.ToLower(estados[1].NombreEstado) + `).`) {
-			c.Data["json"] = "true"
+		result, err1 := consultaEstado(estados)
+		if err1 == nil {
+			alertErr.Type = "OK"
+			alertErr.Code = "201"
+			alertErr.Body = result
 		} else {
-			c.Data["json"] = "false"
+			alertErr.Type = "error"
+			alertErr.Code = "400"
+			alertas = append(alertas, err.Error())
+			alertErr.Body = alertas
+			c.Ctx.Output.SetStatus(400)
 		}
 
 	} else {
-		c.Data["json"] = err.Error()
-		fmt.Println("error1: ", err)
+		alertErr.Type = "error"
+		alertErr.Code = "400"
+		alertas = append(alertas, err.Error())
+		alertErr.Body = alertas
+		c.Ctx.Output.SetStatus(400)
 	}
 
+	c.Data["json"] = alertErr
 	c.ServeJSON()
 
+}
+
+func consultaEstado(estados []models.EstadoContrato) (status string, err error) {
+	var resEstado string
+
+	errRegDoc := models.SendJson(beego.AppConfig.String("AdminMidApi")+"/validarCambioEstado", "POST", &resEstado, &estados)
+
+	if errRegDoc == nil {
+		return resEstado, nil
+	}
+	return "", errRegDoc
 }
