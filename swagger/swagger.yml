@@ -530,7 +530,7 @@ definitions:
   '{}':
     title: '{}'
     type: object
-  41252.0xc00046b7d0.false:
+  41252.0xc000431080.false:
     title: "false"
     type: object
   models.Alert:
@@ -538,7 +538,7 @@ definitions:
     type: object
     properties:
       Body:
-        $ref: '#/definitions/41252.0xc00046b7d0.false'
+        $ref: '#/definitions/41252.0xc000431080.false'
       Code:
         type: string
       Type:

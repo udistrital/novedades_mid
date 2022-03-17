@@ -38,6 +38,7 @@ func (c *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 			alertErr.Type = "OK"
 			alertErr.Code = "201"
 			alertErr.Body = result
+
 		} else {
 			alertErr.Type = "error"
 			alertErr.Code = "400"
