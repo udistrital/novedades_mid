@@ -91,8 +91,8 @@ func (c *NovedadesController) GetOne() {
 	vigencia := c.Ctx.Input.Param(":vigencia")
 	fmt.Println(idStr)
 
-	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0", &novedades)
-	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr + ",vigencia:" + vigencia + "&limit=0")
+	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0&sortby=FechaCreacion&order=desc", &novedades)
+	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr + ",vigencia:" + vigencia + "&limit=0&sortby=FechaCreacion&order=desc")
 
 	fmt.Println("posicion 1 del vector ", novedades[0], vacio)
 	if novedades[0]["TipoNovedad"] != nil {
