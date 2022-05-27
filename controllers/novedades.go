@@ -274,16 +274,16 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		formatdata.JsonPrint(resultadoRegistro)
 		fmt.Println("\n", registroNovedadPost["tiponovedad"])
 
-		if registroNovedadPost["tiponovedad"] == "NP_ADPRO" || registroNovedadPost["tiponovedad"] == "NP_CES" {
-			fmt.Println("\n entro a la replica de datos\n")
-			idRegistroAdmAmazon, error_registroamazon := RegistroAdministrativaAmazon(resultadoRegistro)
+		// if registroNovedadPost["tiponovedad"] == "NP_ADPRO" || registroNovedadPost["tiponovedad"] == "NP_CES" {
+		// 	fmt.Println("\n entro a la replica de datos\n")
+		// 	idRegistroAdmAmazon, error_registroamazon := RegistroAdministrativaAmazon(resultadoRegistro)
 
-			if error_registroamazon != nil {
-				return nil, error_registroamazon
-			}
+		// 	if error_registroamazon != nil {
+		// 		return nil, error_registroamazon
+		// 	}
 
-			fmt.Println(idRegistroAdmAmazon)
-		}
+		// 	fmt.Println(idRegistroAdmAmazon)
+		// }
 
 		return resultadoRegistro, nil
 
@@ -329,7 +329,7 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 
 	fmt.Println("Aqui se muestra la traducción de la novedad para replica en AdmAmazon \n", NovedadAdmAmazonFormatted, error)
 	formatdata.JsonPrint(NovedadAdmAmazonFormatted)
-	fmt.Println(resultadoregistroadmamazon["Id"])
+	fmt.Println("Resultado registro admiamazon", resultadoregistroadmamazon["Id"])
 
 	if errRegNovedad == nil && resultadoregistroadmamazon["Id"] != nil {
 		idResultRegistroAdmAmazon := resultadoregistroadmamazon["Id"]

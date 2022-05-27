@@ -145,6 +145,7 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
+
 	fmt.Println(fechas[0]["TipoFecha"])
 	if len(fechas[0]) != 0 {
 		for _, fecha := range fechas {
@@ -161,6 +162,7 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 				fechaprorroga = fecha["Fecha"]
 			}
 			//fmt.Println(fechaadicion, fechasolicitud)
+
 		}
 	}
 	if len(propiedades[0]) != 0 {
