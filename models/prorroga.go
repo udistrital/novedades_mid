@@ -145,34 +145,41 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
-	fmt.Println("Fechas:", fechas)
-	for _, fecha := range fechas {
-		tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
-		nombrefecha := tipofecha["Nombre"]
-		if nombrefecha == "FechaAdicion" {
-			fechaadicion = fecha["Fecha"]
+
+	fmt.Println(fechas[0]["TipoFecha"])
+	if len(fechas[0]) != 0 {
+		for _, fecha := range fechas {
+			fmt.Println("fecha: ", fecha)
+			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
+			nombrefecha := tipofecha["Nombre"]
+			if nombrefecha == "FechaAdicion" {
+				fechaadicion = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaSolicitud" {
+				fechasolicitud = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaProrroga" {
+				fechaprorroga = fecha["Fecha"]
+			}
+			//fmt.Println(fechaadicion, fechasolicitud)
+
 		}
-		if nombrefecha == "FechaSolicitud" {
-			fechasolicitud = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaProrroga" {
-			fechaprorroga = fecha["Fecha"]
-		}
-		//fmt.Println(fechaadicion, fechasolicitud)
 	}
-	for _, propiedad := range propiedades {
-		tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
-		nombrepropiedad := tipopropiedad["Nombre"]
-		if nombrepropiedad == "Cesionario" {
-			cesionario = propiedad["Propiedad"]
+	if len(propiedades[0]) != 0 {
+		for _, propiedad := range propiedades {
+			tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
+			nombrepropiedad := tipopropiedad["Nombre"]
+			if nombrepropiedad == "Cesionario" {
+				cesionario = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "ValorAdicion" {
+				valoradicion = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "TiempoProrroga" {
+				tiempoprorroga = propiedad["Propiedad"]
+			}
+			//fmt.Println(cesionario, valoradicion)
 		}
-		if nombrepropiedad == "ValorAdicion" {
-			valoradicion = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "TiempoProrroga" {
-			tiempoprorroga = propiedad["Propiedad"]
-		}
-		//fmt.Println(cesionario, valoradicion)
 	}
 
 	NovedadAdicionGet = map[string]interface{}{

@@ -83,61 +83,62 @@ func (c *NovedadesController) GetOne() {
 	var novedades []map[string]interface{}
 	var novedadformated map[string]interface{}
 	novedadesformated := make([]map[string]interface{}, 0)
-	var vacio map[string]interface{}
+	// var vacio map[string]interface{}
 	//var Result interface{}
 	var alerta models.Alert
 	//alertas := append([]interface{}{"error"})
 	idStr := c.Ctx.Input.Param(":id")
 	vigencia := c.Ctx.Input.Param(":vigencia")
-	fmt.Println(idStr)
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0&sortby=FechaCreacion&order=desc", &novedades)
 	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr + ",vigencia:" + vigencia + "&limit=0&sortby=FechaCreacion&order=desc")
+	fmt.Println("Novedades: ", novedades)
+	// fmt.Println("posicion 1 del vector ", novedades[0], vacio)
 
-	fmt.Println("posicion 1 del vector ", novedades[0], vacio)
-	if novedades[0]["TipoNovedad"] != nil {
+	if len(novedades) != 0 {
+		if novedades[0]["TipoNovedad"] != nil {
+			// fmt.Println("No está vacío", len(novedades))
+			for _, novedad := range novedades {
 
-		fmt.Println("No está vacío", len(novedades))
-		for _, novedad := range novedades {
+				// fmt.Println(novedad["TipoNovedad"])
+				idTipoNovedad := novedad["TipoNovedad"].(float64)
 
-			fmt.Println(novedad["TipoNovedad"])
-			idTipoNovedad := novedad["TipoNovedad"].(float64)
+				switch idTipoNovedad {
+				case 1:
+					fmt.Println("Novedad suspensión")
+					novedadformated = models.GetNovedadSuspension(novedad)
+					novedadesformated = append(novedadesformated, novedadformated)
+				case 2:
+					fmt.Println("Novedad Cesión")
+					novedadformated = models.GetNovedadCesion(novedad)
+					novedadesformated = append(novedadesformated, novedadformated)
+				case 3:
+					fmt.Println("Novedad Reinicio")
+					novedadformated = models.GetNovedadReinicio(novedad)
+					novedadesformated = append(novedadesformated, novedadformated)
+				case 5:
+					fmt.Println("Novedad Terminación Anticipada")
+					novedadformated = models.GetNovedadTAnticipada(novedad)
+					novedadesformated = append(novedadesformated, novedadformated)
+				case 6:
+					fmt.Println("Novedad Adición")
+					novedadformated = models.GetNovedadAdicion(novedad)
+					novedadesformated = append(novedadesformated, novedadformated)
+				case 7:
+					fmt.Println("Novedad Prórroga")
+					novedadformated = models.GetNovedadProrroga(novedad)
+					novedadesformated = append(novedadesformated, novedadformated)
+				case 8:
+					fmt.Println("Novedad Adición/prorroga")
+					novedadformated = models.GetNovedadAdProrroga(novedad)
+					novedadesformated = append(novedadesformated, novedadformated)
+				}
+				//fmt.Println(novedadformated)
 
-			switch idTipoNovedad {
-			case 1:
-				fmt.Println("Novedad suspensión")
-				novedadformated = models.GetNovedadSuspension(novedad)
-				novedadesformated = append(novedadesformated, novedadformated)
-			case 2:
-				fmt.Println("Novedad Cesión")
-				novedadformated = models.GetNovedadCesion(novedad)
-				novedadesformated = append(novedadesformated, novedadformated)
-			case 3:
-				fmt.Println("Novedad Reinicio")
-				novedadformated = models.GetNovedadReinicio(novedad)
-				novedadesformated = append(novedadesformated, novedadformated)
-			case 5:
-				fmt.Println("Novedad Terminación Anticipada")
-				novedadformated = models.GetNovedadTAnticipada(novedad)
-				novedadesformated = append(novedadesformated, novedadformated)
-			case 6:
-				fmt.Println("Novedad Adición")
-				novedadformated = models.GetNovedadAdicion(novedad)
-				novedadesformated = append(novedadesformated, novedadformated)
-			case 7:
-				fmt.Println("Novedad Prórroga")
-				novedadformated = models.GetNovedadProrroga(novedad)
-				novedadesformated = append(novedadesformated, novedadformated)
-			case 8:
-				fmt.Println("Novedad Adición/prorroga")
-				novedadformated = models.GetNovedadAdProrroga(novedad)
-				novedadesformated = append(novedadesformated, novedadformated)
 			}
-			//fmt.Println(novedadformated)
-
+		} else {
+			novedadesformated = []map[string]interface{}{}
 		}
-	} else {
-		novedadesformated = []map[string]interface{}{}
 	}
 
 	fmt.Println(error)
