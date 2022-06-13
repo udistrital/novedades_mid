@@ -207,7 +207,6 @@ func (c *NovedadesController) Put() {
 		if err := models.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &reinicio); err == nil {
 			fmt.Println("ruta", beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &reinicio)
 			fmt.Println("objetoReinicio", reinicio)
-			fmt.Println("respuesta", result)
 			alertErr.Type = "OK"
 			alertErr.Code = "200"
 			alertErr.Body = result
