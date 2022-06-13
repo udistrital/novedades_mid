@@ -30,6 +30,7 @@ func (c *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 	var estados []models.EstadoContrato //0: actual y 1:siguiente
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
+
 	//result, err1 := consultarCambioEstado(estados)
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &estados); err == nil {
