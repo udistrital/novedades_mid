@@ -193,7 +193,42 @@ func (c *NovedadesController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (c *NovedadesController) Put() {
+	var reinicio map[string]interface{} //[]models.NovedadSuspensionPut
+	var alertErr models.Alert
+	var result map[string]interface{}
+	alertas := append([]interface{}{"Response:"})
+	idStr := c.Ctx.Input.Param(":id")
+	fmt.Println("idstr", idStr)
+	fmt.Println("objetoC", c.Ctx.Input.RequestBody)
+	url := "/novedad_postcontractual/" + idStr
 
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reinicio); err == nil {
+		fmt.Println("Aqui se muestra JSON de entrada \n", reinicio)
+		if err := models.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &reinicio); err == nil {
+			fmt.Println("ruta", beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &reinicio)
+			fmt.Println("objetoReinicio", reinicio)
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = result
+
+		} else {
+			alertErr.Type = "error"
+			alertErr.Code = "400"
+			alertas = append(alertas, err)
+			alertErr.Body = alertas
+			c.Ctx.Output.SetStatus(400)
+		}
+
+	} else {
+		alertErr.Type = "error"
+		alertErr.Code = "400"
+		alertas = append(alertas, err.Error())
+		alertErr.Body = alertas
+		c.Ctx.Output.SetStatus(400)
+	}
+
+	c.Data["json"] = alertErr
+	c.ServeJSON()
 }
 
 // Delete ...
@@ -309,22 +344,31 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 	fmt.Println("Aqui muestro la novedad obtenida mediante GET \n", NovedadGET)
 
 	//Para novedad de adición prorroga
-	if NovedadGET[0]["TipoNovedad"].(float64) == 8 {
-		NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadAdProrroga(NovedadGET)
-		fmt.Println(NovedadAdmAmazonFormatted)
-		urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
-		errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
-		fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
-		formatdata.JsonPrint(resultadoregistroadmamazon)
-		fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
-	} else if NovedadGET[0]["TipoNovedad"].(float64) == 2 {
-		NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadCesion(NovedadGET)
-		urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
-		errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
-		fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
-		formatdata.JsonPrint(resultadoregistroadmamazon)
-		fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
-	}
+
+	//código que se volverá a poner en servicio para optimización
+	// if NovedadGET[0]["TipoNovedad"].(float64) == 8 {
+	// 	NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadAdProrroga(NovedadGET)
+	// 	fmt.Println(NovedadAdmAmazonFormatted)
+	// 	urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
+	// 	errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
+	// 	fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
+	// 	formatdata.JsonPrint(resultadoregistroadmamazon)
+	// 	fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
+	// } else if NovedadGET[0]["TipoNovedad"].(float64) == 2 {
+	// 	NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadCesion(NovedadGET)
+	// 	urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
+	// 	errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
+	// 	fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
+	// 	formatdata.JsonPrint(resultadoregistroadmamazon)
+	// 	fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
+	// }
+
+	NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadCesion(NovedadGET)
+	urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
+	errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
+	fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
+	formatdata.JsonPrint(resultadoregistroadmamazon)
+	fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
 
 	fmt.Println("Aqui se muestra la traducción de la novedad para replica en AdmAmazon \n", NovedadAdmAmazonFormatted, error)
 	formatdata.JsonPrint(NovedadAdmAmazonFormatted)
