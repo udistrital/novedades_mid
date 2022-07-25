@@ -15,13 +15,15 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	NovedadAdicionPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadAdicion["contrato"].(string), 10, 32)
 	numerocdpid, _ := strconv.ParseInt(NovedadAdicion["numerocdp"].(string), 10, 32)
+	numerorp, _ := strconv.ParseInt(NovedadAdicion["numerorp"].(string), 10, 32)
 	numerosolicitudentero := NovedadAdicion["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
+	vigenciarp, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
 
 	fmt.Println(NovedadAdicion["contrato"], NovedadAdicion["numerocdp"], NovedadAdicion["numerosolicitud"], NovedadAdicion["vigencia"], NovedadAdicion["vigencia"])
-	fmt.Println("\n", contratoid, numerocdpid, numerosolicitud, vigencia, vigenciacdp, "\n")
+	fmt.Println("\n", contratoid, numerocdpid, numerorp, numerosolicitud, vigencia, vigenciacdp, vigenciarp, "\n")
 
 	NovedadAdicionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -37,6 +39,8 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 		"TipoNovedad":       6,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
+		"NumeroRp":          numerorp,
+		"VigenciaRp":        vigenciarp,
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -97,6 +101,34 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 			"Id": 2,
 		},
 		"propiedad": NovedadAdicion["cesionario"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 14,
+		},
+		"propiedad": NovedadAdicion["numerorp"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 15,
+		},
+		"propiedad": NovedadAdicion["vigenciarp"],
 	})
 
 	NovedadAdicionPost["Propiedad"] = propiedades
