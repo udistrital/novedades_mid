@@ -16,10 +16,12 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 	NovedadAdProrrogaPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadAdProrroga["contrato"].(string), 10, 32)
 	numerocdpid, _ := strconv.ParseInt(NovedadAdProrroga["numerocdp"].(string), 10, 32)
+	numerorp, _ := strconv.ParseInt(NovedadAdProrroga["numerorp"].(string), 10, 32)
 	numerosolicitudentero := NovedadAdProrroga["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadAdProrroga["vigencia"].(string), 10, 32)
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdProrroga["vigencia"].(string), 10, 32)
+	vigenciarp, _ := strconv.ParseInt(NovedadAdProrroga["vigencia"].(string), 10, 32)
 
 	NovedadAdProrrogaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -35,6 +37,8 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 		"TipoNovedad":       8,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
+		"NumeroRp":          numerorp,
+		"VigenciaRp":        vigenciarp,
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -122,6 +126,34 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 			"Id": 2,
 		},
 		"propiedad": NovedadAdProrroga["cesionario"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 14,
+		},
+		"propiedad": NovedadAdProrroga["numerorp"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 15,
+		},
+		"propiedad": NovedadAdProrroga["vigenciarp"],
 	})
 
 	NovedadAdProrrogaPost["Propiedad"] = propiedades
