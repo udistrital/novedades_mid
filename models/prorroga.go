@@ -15,10 +15,12 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 	NovedadProrrogaPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadProrroga["contrato"].(string), 10, 32)
 	numerocdpid, _ := strconv.ParseInt(NovedadProrroga["numerocdp"].(string), 10, 32)
+	numerorp, _ := strconv.ParseInt(NovedadProrroga["numerorp"].(string), 10, 32)
 	numerosolicitudentero := NovedadProrroga["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
 	vigenciacdp, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
+	vigenciarp, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
 
 	NovedadProrrogaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -34,6 +36,8 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 		"TipoNovedad":       7,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
+		"NumeroRp":          numerorp,
+		"VigenciaRp":        vigenciarp,
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -121,6 +125,34 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 			"Id": 2,
 		},
 		"propiedad": NovedadProrroga["cesionario"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 14,
+		},
+		"propiedad": NovedadProrroga["numerorp"],
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 15,
+		},
+		"propiedad": NovedadProrroga["vigenciarp"],
 	})
 
 	NovedadProrrogaPost["Propiedad"] = propiedades
