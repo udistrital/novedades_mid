@@ -138,7 +138,7 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 		"IdTipoPropiedad": map[string]interface{}{
 			"Id": 14,
 		},
-		"propiedad": NovedadProrroga["numerorp"],
+		"propiedad": numerorp,
 	})
 
 	propiedades = append(propiedades, map[string]interface{}{
@@ -152,12 +152,12 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 		"IdTipoPropiedad": map[string]interface{}{
 			"Id": 15,
 		},
-		"propiedad": NovedadProrroga["vigenciarp"],
+		"propiedad": vigenciarp,
 	})
 
 	NovedadProrrogaPost["Propiedad"] = propiedades
 
-	fmt.Println(NovedadProrrogaPost)
+	// fmt.Println(NovedadProrrogaPost)
 
 	return NovedadProrrogaPost
 }

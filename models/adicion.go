@@ -114,7 +114,7 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 		"IdTipoPropiedad": map[string]interface{}{
 			"Id": 14,
 		},
-		"propiedad": NovedadAdicion["numerorp"],
+		"propiedad": numerorp,
 	})
 
 	propiedades = append(propiedades, map[string]interface{}{
@@ -128,12 +128,12 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 		"IdTipoPropiedad": map[string]interface{}{
 			"Id": 15,
 		},
-		"propiedad": NovedadAdicion["vigenciarp"],
+		"propiedad": vigenciarp,
 	})
 
 	NovedadAdicionPost["Propiedad"] = propiedades
 
-	fmt.Println(NovedadAdicionPost)
+	// fmt.Println(NovedadAdicionPost)
 
 	return NovedadAdicionPost
 }
