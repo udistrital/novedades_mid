@@ -317,8 +317,6 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		// 	if error_registroamazon != nil {
 		// 		return nil, error_registroamazon
 		// 	}
-
-		// 	fmt.Println(idRegistroAdmAmazon)
 		// }
 
 		return resultadoRegistro, nil
