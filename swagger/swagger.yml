@@ -506,10 +506,43 @@ paths:
       responses:
         "200":
           description: '{string} logout success'
+  /validarCambioEstado/:
+    post:
+      tags:
+      - validarCambioEstado
+      description: create ValidarCambiosEstado
+      operationId: CambioEstadoContratoValidoController.ValidarCambiosEstado
+      parameters:
+      - in: body
+        name: body
+        description: Crear documento en Nuxeo
+        required: true
+        schema:
+          $ref: '#/definitions/{}'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Alert'
+        "400":
+          description: body is empty
 definitions:
   '{}':
     title: '{}'
     type: object
+  41252.0xc000431080.false:
+    title: "false"
+    type: object
+  models.Alert:
+    title: Alert
+    type: object
+    properties:
+      Body:
+        $ref: '#/definitions/41252.0xc000431080.false'
+      Code:
+        type: string
+      Type:
+        type: string
   models.ArgoReplica:
     title: ArgoReplica
     type: object
@@ -559,6 +592,9 @@ tags:
 - name: user
   description: |
     Operations about Users
+- name: validarCambioEstado
+  description: |
+    CambioEstadoContratoValidoController operations for CambioEstadoContratoValido
 - name: registro_novedad
   description: |
     RegistroNovedadController operations for RegistroNovedad

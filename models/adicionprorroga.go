@@ -16,10 +16,12 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 	NovedadAdProrrogaPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadAdProrroga["contrato"].(string), 10, 32)
 	numerocdpid, _ := strconv.ParseInt(NovedadAdProrroga["numerocdp"].(string), 10, 32)
+	numerorp, _ := strconv.ParseInt(NovedadAdProrroga["numerorp"].(string), 10, 32)
 	numerosolicitudentero := NovedadAdProrroga["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadAdProrroga["vigencia"].(string), 10, 32)
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdProrroga["vigencia"].(string), 10, 32)
+	vigenciarp, _ := strconv.ParseInt(NovedadAdProrroga["vigencia"].(string), 10, 32)
 
 	NovedadAdProrrogaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -35,6 +37,8 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 		"TipoNovedad":       8,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
+		"NumeroRp":          numerorp,
+		"VigenciaRp":        vigenciarp,
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -124,9 +128,37 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 		"propiedad": NovedadAdProrroga["cesionario"],
 	})
 
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 14,
+		},
+		"propiedad": numerorp,
+	})
+
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 15,
+		},
+		"propiedad": vigenciarp,
+	})
+
 	NovedadAdProrrogaPost["Propiedad"] = propiedades
 
-	fmt.Println(NovedadAdProrrogaPost)
+	// fmt.Println(NovedadAdProrrogaPost)
 
 	return NovedadAdProrrogaPost
 }
@@ -147,33 +179,37 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
 
-	for _, fecha := range fechas {
-		tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
-		nombrefecha := tipofecha["Nombre"]
-		if nombrefecha == "FechaAdicion" {
-			fechaadicion = fecha["Fecha"]
+	if len(fechas[0]) != 0 {
+		for _, fecha := range fechas {
+			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
+			nombrefecha := tipofecha["Nombre"]
+			if nombrefecha == "FechaAdicion" {
+				fechaadicion = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaSolicitud" {
+				fechasolicitud = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaProrroga" {
+				fechaprorroga = fecha["Fecha"]
+			}
+			//fmt.Println(fechaadicion, fechasolicitud)
 		}
-		if nombrefecha == "FechaSolicitud" {
-			fechasolicitud = fecha["Fecha"]
-		}
-		if nombrefecha == "FechaProrroga" {
-			fechaprorroga = fecha["Fecha"]
-		}
-		//fmt.Println(fechaadicion, fechasolicitud)
 	}
-	for _, propiedad := range propiedades {
-		tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
-		nombrepropiedad := tipopropiedad["Nombre"]
-		if nombrepropiedad == "Cesionario" {
-			cesionario = propiedad["Propiedad"]
+	if len(propiedades[0]) != 0 {
+		for _, propiedad := range propiedades {
+			tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
+			nombrepropiedad := tipopropiedad["Nombre"]
+			if nombrepropiedad == "Cesionario" {
+				cesionario = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "ValorAdicion" {
+				valoradicion = propiedad["Propiedad"]
+			}
+			if nombrepropiedad == "TiempoProrroga" {
+				tiempoprorroga = propiedad["Propiedad"]
+			}
+			//fmt.Println(cesionario, valoradicion)
 		}
-		if nombrepropiedad == "ValorAdicion" {
-			valoradicion = propiedad["Propiedad"]
-		}
-		if nombrepropiedad == "TiempoProrroga" {
-			tiempoprorroga = propiedad["Propiedad"]
-		}
-		//fmt.Println(cesionario, valoradicion)
 	}
 
 	NovedadAdicionGet = map[string]interface{}{
@@ -244,7 +280,7 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 
 		error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 		error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
-		
+
 		for _, fecha := range fechas {
 			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
 			nombrefecha := tipofecha["Nombre"]
