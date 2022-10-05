@@ -310,15 +310,6 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		formatdata.JsonPrint(resultadoRegistro)
 		fmt.Println("\n", registroNovedadPost["tiponovedad"])
 
-		// if registroNovedadPost["tiponovedad"] == "NP_ADPRO" || registroNovedadPost["tiponovedad"] == "NP_CES" {
-		// 	fmt.Println("\n entro a la replica de datos\n")
-		// 	idRegistroAdmAmazon, error_registroamazon := RegistroAdministrativaAmazon(resultadoRegistro)
-
-		// 	if error_registroamazon != nil {
-		// 		return nil, error_registroamazon
-		// 	}
-		// }
-
 		return resultadoRegistro, nil
 
 	}
@@ -338,41 +329,20 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 	idStrf64 := NovedadMap["Id"].(float64)
 	idStr := strconv.FormatFloat(idStrf64, 'f', -1, 64)
 
-	fmt.Println("\n aqui se muestra el ID de la novedad que se acaba de guardar \n", idStr)
+	// ID de la novedad que se acaba de guardar
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=id:"+idStr+"&limit=0", &NovedadGET)
 	fmt.Println("Aqui muestro la novedad obtenida mediante GET \n", NovedadGET)
 
 	//Para novedad de adición prorroga
 
-	//código que se volverá a poner en servicio para optimización
-	// if NovedadGET[0]["TipoNovedad"].(float64) == 8 {
-	// 	NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadAdProrroga(NovedadGET)
-	// 	fmt.Println(NovedadAdmAmazonFormatted)
-	// 	urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
-	// 	errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
-	// 	fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
-	// 	formatdata.JsonPrint(resultadoregistroadmamazon)
-	// 	fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
-	// } else if NovedadGET[0]["TipoNovedad"].(float64) == 2 {
-	// 	NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadCesion(NovedadGET)
-	// 	urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
-	// 	errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
-	// 	fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
-	// 	formatdata.JsonPrint(resultadoregistroadmamazon)
-	// 	fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
-	// }
-
 	NovedadAdmAmazonFormatted = models.FormatAdmAmazonNovedadCesion(NovedadGET)
 	urladm := beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual"
 	errRegNovedad = request.SendJson(urladm, "POST", &resultadoregistroadmamazon, NovedadAdmAmazonFormatted)
-	fmt.Println(beego.AppConfig.String("AdministrativaAmazonService") + "/novedad_postcontractual")
 	formatdata.JsonPrint(resultadoregistroadmamazon)
-	fmt.Println("Aquí se muestra el resultado del post a AdmAzamon \n", errRegNovedad, resultadoregistroadmamazon)
 
 	fmt.Println("Aqui se muestra la traducción de la novedad para replica en AdmAmazon \n", NovedadAdmAmazonFormatted, error)
 	formatdata.JsonPrint(NovedadAdmAmazonFormatted)
-	fmt.Println("Resultado registro admiamazon", resultadoregistroadmamazon["Id"])
 
 	if errRegNovedad == nil && resultadoregistroadmamazon["Id"] != nil {
 		idResultRegistroAdmAmazon := resultadoregistroadmamazon["Id"]
@@ -391,8 +361,6 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 
 		errRegNovedad = models.SendJson(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad", "POST", &resultadoregistrojbpm, registrojbpm)
 
-		fmt.Println(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad", "\n", resultadoregistrojbpm)
-
 		return 0, nil
 
 	} else {
@@ -400,25 +368,4 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 		return 0, errorRegistro
 	}
 
-}
-
-//Función que construirá la novedad a ser consultada.
-func ConstruirNovedad(idNovedad string) (novedad map[string]interface{}, outputError interface{}) {
-
-	novedadid := idNovedad
-
-	result, err1 := ConsultarNovedadID(novedadid)
-	fmt.Println(result, err1)
-
-	return nil, nil
-}
-
-//Funcion que consulta la novedad por id
-func ConsultarNovedadID(idNovedad string) (novedad map[string]interface{}, outputError interface{}) {
-
-	novedadid := idNovedad
-	var getnovedad []map[string]interface{}
-	errnovedad := request.GetJson("http://"+beego.AppConfig.String("NovedadesCrudService")+"/v1/novedades_poscontractuales/?query=ContratoId:"+novedadid, &getnovedad)
-
-	return nil, errnovedad
 }
