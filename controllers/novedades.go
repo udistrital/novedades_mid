@@ -308,6 +308,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	} else {
 		fmt.Println("\n entro al true \n")
 		formatdata.JsonPrint(resultadoRegistro)
+		fmt.Println("\n", registroNovedadPost["tiponovedad"])
 
 		return resultadoRegistro, nil
 
