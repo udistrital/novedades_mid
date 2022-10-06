@@ -19,8 +19,8 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 	numerosolicitudentero := NovedadProrroga["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
-	vigenciarp, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadProrroga["vigenciacdp"].(string), 10, 32)
+	vigenciarp, _ := strconv.ParseInt(NovedadProrroga["vigenciarp"].(string), 10, 32)
 
 	NovedadProrrogaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -157,8 +157,6 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 
 	NovedadProrrogaPost["Propiedad"] = propiedades
 
-	// fmt.Println(NovedadProrrogaPost)
-
 	return NovedadProrrogaPost
 }
 
@@ -193,7 +191,6 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrefecha == "FechaProrroga" {
 				fechaprorroga = fecha["Fecha"]
 			}
-			//fmt.Println(fechaadicion, fechasolicitud)
 
 		}
 	}
@@ -210,7 +207,6 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrepropiedad == "TiempoProrroga" {
 				tiempoprorroga = propiedad["Propiedad"]
 			}
-			//fmt.Println(cesionario, valoradicion)
 		}
 	}
 

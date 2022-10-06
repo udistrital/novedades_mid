@@ -18,7 +18,7 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 	numerosolicitudentero := NovedadReinicio["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadReinicio["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadReinicio["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadReinicio["vigenciacdp"].(string), 10, 32)
 
 	NovedadReinicioPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -189,8 +189,6 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 
 	NovedadReinicioPost["Propiedad"] = propiedades
 
-	fmt.Println(NovedadReinicioPost)
-
 	return NovedadReinicioPost
 }
 
@@ -235,8 +233,6 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrefecha == "FechaTerminacionAnticipada" {
 				fechaterminacionanticipada = fecha["Fecha"]
 			}
-
-			//fmt.Println(fechaadicion, fechasolicitud)
 		}
 	}
 	if len(propiedades[0]) != 0 {
@@ -252,7 +248,6 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrepropiedad == "PeriodoSuspension" {
 				periodosuspension = propiedad["Propiedad"]
 			}
-			//fmt.Println(cesionario, valoradicion)
 		}
 	}
 

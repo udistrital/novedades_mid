@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/astaxie/beego"
@@ -18,7 +17,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 	numerosolicitudentero := NovedadSuspension["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadSuspension["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadSuspension["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadSuspension["vigenciacdp"].(string), 10, 32)
 
 	NovedadSuspensionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -136,8 +135,6 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 
 	NovedadSuspensionPost["Propiedad"] = propiedades
 
-	fmt.Println(NovedadSuspensionPost)
-
 	return NovedadSuspensionPost
 }
 
@@ -178,7 +175,6 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 				if nombrefecha == "FechaFinSuspension" {
 					fechafinsuspension = fecha["Fecha"]
 				}
-				//fmt.Println(fechaadicion, fechasolicitud)
 			}
 		}
 	}
@@ -194,7 +190,6 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 				if nombrepropiedad == "PeriodoSuspension" {
 					periodosuspension = propiedad["Propiedad"]
 				}
-				//fmt.Println(cesionario, valoradicion)
 			}
 		}
 	}
