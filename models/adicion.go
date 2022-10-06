@@ -19,8 +19,8 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	numerosolicitudentero := NovedadAdicion["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
-	vigenciarp, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadAdicion["vigenciacdp"].(string), 10, 32)
+	vigenciarp, _ := strconv.ParseInt(NovedadAdicion["vigenciarp"].(string), 10, 32)
 
 	fmt.Println(NovedadAdicion["contrato"], NovedadAdicion["numerocdp"], NovedadAdicion["numerosolicitud"], NovedadAdicion["vigencia"], NovedadAdicion["vigencia"])
 	fmt.Println("\n", contratoid, numerocdpid, numerorp, numerosolicitud, vigencia, vigenciacdp, vigenciarp, "\n")

@@ -39,15 +39,10 @@ func (c *NovedadesController) Post() {
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
 
-	//fmt.Println(registroNovedad, alertErr, horaRegistro)
-	fmt.Println("Ingresa a la función del controlador para post \n")
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
-
-		fmt.Println("Aqui se muestra JSON de entrada \n", registroNovedad)
 
 		result, err1 := RegistrarNovedad(registroNovedad)
 
-		//fmt.Println(registroNovedadPost, horaRegistro)
 		if err1 == nil {
 			alertErr.Type = "OK"
 			alertErr.Code = "200"
@@ -91,16 +86,11 @@ func (c *NovedadesController) GetOne() {
 	vigencia := c.Ctx.Input.Param(":vigencia")
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0&sortby=FechaCreacion&order=asc", &novedades)
-	fmt.Println(beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=contrato_id:" + idStr + ",vigencia:" + vigencia + "&limit=0&sortby=FechaCreacion&order=desc")
-	fmt.Println("Novedades: ", novedades)
-	// fmt.Println("posicion 1 del vector ", novedades[0], vacio)
 
 	if len(novedades) != 0 {
 		if novedades[0]["TipoNovedad"] != nil {
-			// fmt.Println("No está vacío", len(novedades))
 			for _, novedad := range novedades {
 
-				// fmt.Println(novedad["TipoNovedad"])
 				idTipoNovedad := novedad["TipoNovedad"].(float64)
 
 				switch idTipoNovedad {
@@ -133,7 +123,6 @@ func (c *NovedadesController) GetOne() {
 					novedadformated = models.GetNovedadAdProrroga(novedad)
 					novedadesformated = append(novedadesformated, novedadformated)
 				}
-				//fmt.Println(novedadformated)
 
 			}
 		} else {
@@ -151,8 +140,6 @@ func (c *NovedadesController) GetOne() {
 		alerta.Code = "400"
 		alerta.Body = "No se ha podido realizar la petición GET"
 	}
-
-	//fmt.Println(novedades)
 
 	c.Data["json"] = alerta
 	c.ServeJSON()
@@ -199,16 +186,10 @@ func (c *NovedadesController) Put() {
 	var result map[string]interface{}
 	alertas := append([]interface{}{"Response:"})
 	idStr := c.Ctx.Input.Param(":id")
-	fmt.Println("idstr", idStr)
-	fmt.Println("objetoC", c.Ctx.Input.RequestBody)
 	url := "/novedad_postcontractual/" + idStr
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reinicio); err == nil {
-		fmt.Println("Aqui se muestra JSON de entrada \n", reinicio)
 		if err := models.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &reinicio); err == nil {
-			fmt.Println("ruta", beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &reinicio)
-			fmt.Println("objetoReinicio", reinicio)
-			fmt.Println("respuesta", result)
 			alertErr.Type = "OK"
 			alertErr.Code = "200"
 			alertErr.Body = result
@@ -253,44 +234,36 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	var NovedadPoscontractualPost map[string]interface{}
 	var resultadoRegistro map[string]interface{}
 	var errRegNovedad interface{}
-	//var resultadoRegistroMongo map[string]interface{}
 
 	switch registroNovedadPost["tiponovedad"] {
 	case "NP_SUS":
-		//suspensión
+		// suspensión
 		fmt.Println("Novedad de suspensión")
 		NovedadPoscontractualPost = models.ConstruirNovedadSuspension(registroNovedadPost)
-		fmt.Println(NovedadPoscontractualPost)
 	case "NP_CES":
-		//cesión
+		// cesión
 		fmt.Println("Novedad de cesión")
 		NovedadPoscontractualPost = models.ConstruirNovedadCesion(registroNovedadPost)
-		// fmt.Println(NovedadPoscontractualPost)
 	case "NP_REI":
-		//reinicio
+		// reinicio
 		fmt.Println("Novedad de reinicio")
 		NovedadPoscontractualPost = models.ConstruirNovedadReinicio(registroNovedadPost)
-		fmt.Println(NovedadPoscontractualPost)
 	case "NP_TER":
-		//terminacion anticipada
+		// terminacion anticipada
 		fmt.Println("Novedad de terminación anticipada")
 		NovedadPoscontractualPost = models.ConstruirNovedadTAnticipada(registroNovedadPost)
-		fmt.Println(NovedadPoscontractualPost)
 	case "NP_ADI":
-		//adición
+		// adición
 		fmt.Println("Novedad de adición")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdicionPost(registroNovedadPost)
-		fmt.Println(NovedadPoscontractualPost)
 	case "NP_PRO":
-		//prórroga
+		// prórroga
 		fmt.Println("Novedad de prorroga")
 		NovedadPoscontractualPost = models.ConstruirNovedadProrrogaPost(registroNovedadPost)
-		fmt.Println(NovedadPoscontractualPost)
 	case "NP_ADPRO":
-		//adicion/prorroga
+		// adicion/prorroga
 		fmt.Println("Novedad de adicion/prorroga")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdProrrogaPost(registroNovedadPost)
-		fmt.Println(NovedadPoscontractualPost)
 	}
 
 	if registroNovedadPost["tiponovedad"] == "NP_CES" {
@@ -300,15 +273,11 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	}
 
 	if resultadoRegistro["Status"] == "400" || errRegNovedad != nil {
-		fmt.Println("\n entro al error \n")
 		fmt.Println(errRegNovedad)
-		//fmt.Println(resultadoRegistro["Status"])
 		return nil, resultadoRegistro
 
 	} else {
-		fmt.Println("\n entro al true \n")
 		formatdata.JsonPrint(resultadoRegistro)
-
 		return resultadoRegistro, nil
 
 	}
@@ -331,7 +300,6 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 	// ID de la novedad que se acaba de guardar
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=id:"+idStr+"&limit=0", &NovedadGET)
-	fmt.Println("Aqui muestro la novedad obtenida mediante GET \n", NovedadGET)
 
 	//Para novedad de adición prorroga
 

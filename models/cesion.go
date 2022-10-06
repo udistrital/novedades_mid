@@ -19,7 +19,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 	numerosolicitudentero := NovedadCesion["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadCesion["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadCesion["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadCesion["vigenciacdp"].(string), 10, 32)
 
 	NovedadCesionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        NovedadCesion["aclaracion"],
@@ -310,8 +310,6 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 
 	NovedadCesionPost["Poliza"] = poliza
 
-	// fmt.Println(NovedadCesionPost)
-
 	return NovedadCesionPost
 }
 
@@ -349,8 +347,6 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
 	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/poliza/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &poliza)
-
-	fmt.Println("fechas: ", fechas)
 	if len(fechas[0]) > 0 {
 		for _, fecha := range fechas {
 			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
@@ -385,7 +381,6 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 			if nombrefecha == "FechaOficio" {
 				fechaoficio = fecha["Fecha"]
 			}
-			//fmt.Println(fechaadicion, fechasolicitud)
 		}
 	}
 	if len(propiedades[0]) > 0 {
@@ -419,7 +414,6 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 			if nombrepropiedad == "ValorFinalContrato" {
 				valorfinalcontrato = propiedad["Propiedad"]
 			}
-			//fmt.Println(cesionario, valoradicion)
 		}
 	}
 	if len(propiedades[0]) > 0 {
@@ -554,7 +548,6 @@ func FormatAdmAmazonNovedadCesion(novedad []map[string]interface{}) (novedadform
 				fechaoficio = fecha["Fecha"].(string)
 				fechaoficio = time_bogota.TiempoCorreccionFormato(fechaoficio)
 			}
-			//fmt.Println(fechaadicion, fechasolicitud)
 		}
 		for _, propiedad := range propiedades {
 			tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
@@ -586,11 +579,9 @@ func FormatAdmAmazonNovedadCesion(novedad []map[string]interface{}) (novedadform
 			if nombrepropiedad == "ValorFinalContrato" {
 				valorfinalcontrato = propiedad["Propiedad"]
 			}
-			//fmt.Println(cesionario, valoradicion)
 		}
 
 		for _, poliz := range poliza {
-
 			polizas = poliz["NumeroPolizaId"]
 			entidadaseguradora = poliz["EntidadAseguradoraId"]
 		}
@@ -609,20 +600,6 @@ func FormatAdmAmazonNovedadCesion(novedad []map[string]interface{}) (novedadform
 			"PlazoEjecucion":  plazoactual.(float64),
 			"UnidadEjecucion": 205,
 			"ValorNovedad":    nil,
-
-			// "Id":              503,
-			// "NumeroContrato":  "241",
-			// "Vigencia":        2017,
-			// "TipoNovedad":     219,
-			// "FechaInicio":     "2018-06-01T00:00:00Z",
-			// "FechaFin":        "2018-12-22T00:00:00Z",
-			// "FechaRegistro":   "2018-06-13T00:00:00Z",
-			// "Contratista":     11087,
-			// "NumeroCdp":       0,
-			// "VigenciaCdp":     0,
-			// "PlazoEjecucion":  202,
-			// "UnidadEjecucion": 205,
-			// "ValorNovedad":    0,
 		}
 
 		fmt.Println(error, error1, error2)

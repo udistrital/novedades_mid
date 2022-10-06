@@ -18,7 +18,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	numerosolicitudentero := NovedadTAnticipada["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadTAnticipada["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigenciacdp"].(string), 10, 32)
 
 	NovedadTAnticipadaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -156,7 +156,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
 
-	if error != nil {
+	if error == nil {
 		if len(fechas[0]) != 0 {
 			for _, fecha := range fechas {
 				tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
@@ -173,7 +173,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 			}
 		}
 	}
-	if error1 != nil {
+	if error1 == nil {
 		if len(propiedades[0]) != 0 {
 			for _, propiedad := range propiedades {
 				tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
