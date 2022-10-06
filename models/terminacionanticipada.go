@@ -18,7 +18,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	numerosolicitudentero := NovedadTAnticipada["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadTAnticipada["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigencia"].(string), 10, 32)
+	vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigenciacdp"].(string), 10, 32)
 
 	NovedadTAnticipadaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
