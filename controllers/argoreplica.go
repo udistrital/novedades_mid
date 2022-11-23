@@ -2,10 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	// "reflect"
 	"strconv"
-
-	"time"
 
 	"github.com/udistrital/utils_oas/formatdata"
 	"github.com/udistrital/utils_oas/request"
@@ -37,37 +34,19 @@ func (c *ArgoReplicaController) URLMapping() {
 // @router / [post]
 func (c *ArgoReplicaController) Post() {
 
-	currentDate := time.Now()
-	lastMonth := currentDate.AddDate(0, -3, 0)
-	// goneDayMonth := lastMonth.Day()
-	firstDay := lastMonth.AddDate(0, 0, +9)
-	fmt.Println("Fecha: ", firstDay)
-
-	var dias float64 = 150
-	fmt.Println("dias", dias)
-	meses := dias / 30
-	fmt.Println("meses", meses)
-	mesEntero := int(meses)
-	fmt.Println("mesEntero", mesEntero)
-	decimal := meses - float64(mesEntero)
-	fmt.Println("decimal", float64(decimal))
-	numDias := decimal * 30
-	fmt.Println("numDias", float64(numDias))
-	firstDay = firstDay.AddDate(0, mesEntero, int(numDias))
-	fmt.Println("Nueva Fecha: ", firstDay)
-
-	var alerta models.Alert
-
-	if err := models.ConsultarFechaNovedad(); err != nil {
-		fmt.Println("entro al error\n", err)
-		alerta.Type = "error"
-		alerta.Code = "400"
-		alerta.Body = "No se ha podido realizar la petición POST"
-		c.Data["json"] = alerta
-		//c.Abort("400")
-		c.Ctx.Output.SetStatus(400)
-	}
+	go models.Temporizador()
 	c.ServeJSON()
+
+	// if err := models.ConsultarFechaNovedad(); err != nil {
+	// 	fmt.Println("entro al error\n", err)
+	// 	alerta.Type = "error"
+	// 	alerta.Code = "400"
+	// 	alerta.Body = "No se ha podido realizar la petición POST"
+	// 	c.Data["json"] = alerta
+	// 	//c.Abort("400")
+	// 	c.Ctx.Output.SetStatus(400)
+	// }
+	// c.ServeJSON()
 }
 
 // GetOne ...

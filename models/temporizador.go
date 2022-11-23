@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"time"
 
@@ -9,7 +10,16 @@ import (
 	"github.com/udistrital/utils_oas/request"
 )
 
-func ConsultarFechaNovedad() (novedad map[string]interface{}) {
+func Temporizador() {
+	tdr := time.Tick(86400 * time.Second)
+
+	for horaActual := range tdr {
+		ConsultarFechaNovedad()
+		fmt.Println("Registro realizado en la fecha", horaActual)
+	}
+}
+
+func ConsultarFechaNovedad() {
 
 	currentDate := time.Now()
 	lastMonth := currentDate.AddDate(0, -1, 0)
@@ -18,25 +28,21 @@ func ConsultarFechaNovedad() (novedad map[string]interface{}) {
 	timeLayout := "2006-01-02"
 	fechaReferencia := currentDate.Format(timeLayout)
 
-	// tdr := time.Tick(86400 * time.Second)
-
-	// for horaActual := range tdr {
-	// 	fmt.Println("La hora es", horaActual)
-	// }
-
 	var fechasResponse []map[string]interface{}
 
 	url := "/fechas?limit=-1"
 	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &fechasResponse); err == nil {
 		for _, fechaRegistro := range fechasResponse {
-			// fmt.Println("FechaRegistro:", fechaRegistro["Fecha"])
 			fechaParse, _ := time.Parse("2006-01-02 15:04:05 +0000 +0000", fmt.Sprint(fechaRegistro["Fecha"]))
-			// fmt.Println("FechaParse:", fechaParse)
 			if fechaParse.After(firstDay) {
 				fecha := fechaParse.Format(timeLayout)
 				if fecha == fechaReferencia {
-					novedad := fechaRegistro["IdNovedadesPoscontractuales"].(map[string]interface{})
-					ConsultarTipoNovedad(novedad)
+					idTipoFecha := fechaRegistro["IdTipoFecha"].(map[string]interface{})
+					tipoFecha := idTipoFecha["Id"]
+					if tipoFecha != 3 && tipoFecha != 5 && tipoFecha != 7 && tipoFecha != 9 && tipoFecha != 10 {
+						novedad := fechaRegistro["IdNovedadesPoscontractuales"].(map[string]interface{})
+						ConsultarTipoNovedad(novedad)
+					}
 				}
 			}
 		}
@@ -44,59 +50,29 @@ func ConsultarFechaNovedad() (novedad map[string]interface{}) {
 	} else {
 		fmt.Println(err)
 	}
-	return nil
 }
 
 func ConsultarTipoNovedad(novedad map[string]interface{}) (structura map[string]interface{}) {
 
 	tipoNovedad := int(novedad["TipoNovedad"].(float64))
-	fmt.Println("TipoNovedad:", tipoNovedad)
 
 	var propiedades []map[string]interface{}
-	var fechas []map[string]interface{}
-
-	// TitanCesionPost := make(map[string]interface{})
 
 	url := "/propiedad?query=IdNovedadesPoscontractuales.Id:" + fmt.Sprintf("%v", novedad["Id"]) + "&limit=0"
 	if error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &propiedades); error == nil {
-		fmt.Println("1")
-		url = "/fechas?query=IdNovedadesPoscontractuales.Id:" + fmt.Sprintf("%v", novedad["Id"]) + "&limit=0"
-		if error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &fechas); error == nil {
-			fmt.Println("2")
-
-			switch tipoNovedad {
-			case 1:
-				ReplicaSuspension(novedad, propiedades)
-			case 2:
-				ReplicaCesion(novedad, propiedades, fechas)
-			case 3:
-			// 	ReplicaReinicio(novedad, propiedades, fechas)
-			case 6:
-				ReplicaAdicionProrroga(novedad, propiedades)
-			case 7:
-				ReplicaAdicionProrroga(novedad, propiedades)
-			case 8:
-				ReplicaAdicionProrroga(novedad, propiedades)
-			}
-
-			// TitanCesionPost["NovedadPoscontractual"] = map[string]interface{}{
-			// 	"DocumentoActual": 0,
-			// 	"DocumentoNuevo":  2022,
-			// 	"FechaInicio":     tdr,
-			// 	"NombreCompleto":  0,
-			// 	"NumeroContrato":  0,
-			// 	"Vigencia":        tdr,
-			// }
-
-			// var result map[string]interface{}
-
-			// url = ""
-			// if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &result, &ArgoCesionPost); err == nil {
-			// 	url = ""
-			// 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &result, &ArgoCesionPost); err == nil {
-			// 		fmt.Println("Registro en Titan exitoso!")
-			// 	}
-			// }
+		switch tipoNovedad {
+		case 1:
+			ReplicaSuspension(novedad, propiedades)
+		case 2:
+			ReplicaCesion(novedad, propiedades)
+		case 3:
+		// 	ReplicaReinicio(novedad, propiedades)
+		case 6:
+			ReplicaAdicionProrroga(novedad, propiedades)
+		case 7:
+			ReplicaAdicionProrroga(novedad, propiedades)
+		case 8:
+			ReplicaAdicionProrroga(novedad, propiedades)
 		}
 	}
 
@@ -145,14 +121,7 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 			if fechaInicio.Day() == 31 {
 				fechaInicio = fechaInicio.AddDate(0, 0, 1)
 			}
-			var dias float64 = periodoSuspension
-			meses := dias / 30
-			mesEntero := int(meses)
-			decimal := meses - float64(mesEntero)
-			numDias := decimal * 30
-			fechaFin = fechaInicio.AddDate(0, mesEntero, int(numDias))
-			fmt.Println("Fecha Inicio Novedad:", fechaInicio)
-			fmt.Println("Fecha Fin Novedad:", fechaFin)
+			fechaFin = CalcularFechaFin(fechaInicio, periodoSuspension)
 		}
 	}
 
@@ -160,11 +129,11 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 	ArgoSuspensionPost = map[string]interface{}{
 		"NumeroContrato":  numContrato,
 		"Vigencia":        vigencia,
-		"FechaRegistro":   time.Now(),
+		"FechaRegistro":   time.Now().Format("2006-01-02"),
 		"Contratista":     cesionario,
 		"PlazoEjecucion":  periodoSuspension,
-		"FechaInicio":     fechaInicio,
-		"FechaFin":        fechaFin,
+		"FechaInicio":     fechaInicio.Format("2006-01-02"),
+		"FechaFin":        fechaFin.Format("2006-01-02"),
 		"UnidadEjecucion": 205,
 		"TipoNovedad":     216,
 	}
@@ -173,37 +142,32 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 	TitanSuspensionPost := make(map[string]interface{})
 	TitanSuspensionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Documento":      contratistaDoc,
-		"FechaFin":       fechaFin,
-		"FechaInicio":    fechaInicio,
+		"FechaFin":       fechaFin.Format("2006-01-02 15:04:05"),
+		"FechaInicio":    fechaInicio.Format("2006-01-02 15:04:05"),
 		"NumeroContrato": strconv.Itoa(numContrato),
-		"Vigencia":       vigencia,
+		"Vigencia":       strconv.Itoa(vigencia),
 	}
 	fmt.Println("TitanOtrosiPost:", TitanSuspensionPost)
 
 }
 
-func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]interface{}, fechas []map[string]interface{}) {
+func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]interface{}) {
 
 	numContrato := int(novedad["ContratoId"].(float64))
 	vigencia := int(novedad["Vigencia"].(float64))
 
 	var cesionario float64
-	var contratistaDoc string
-	var cedente float64
+	var cesionarioDoc string
+	var nombreCesionario string
+	var cedenteDoc string
 	var contratoSuscrito []map[string]interface{}
 	var actaInicio []map[string]interface{}
 	var informacion_proveedor []map[string]interface{}
+	var fechas []map[string]interface{}
 	var fechaInicio time.Time
 	var fechaFin time.Time
+	var diasCesion float64
 	var url = ""
-
-	for _, fecha := range fechas {
-		tipoFecha := fecha["IdTipoFecha"].(map[string]interface{})
-		nombreFecha := tipoFecha["Nombre"]
-		if nombreFecha == "FechaCesion" {
-			fechaInicio = fecha["Fecha"].(time.Time)
-		}
-	}
 
 	if len(propiedades[0]) != 0 {
 		for _, propiedad := range propiedades {
@@ -213,11 +177,26 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 				cesionario = propiedad["Propiedad"].(float64)
 				url = "/informacion_proveedor?query=Id:" + fmt.Sprintf("%v", propiedad["Propiedad"])
 				if error := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+url, &informacion_proveedor); error == nil {
-					contratistaDoc = informacion_proveedor[0]["NumDocumento"].(string)
+					cesionarioDoc = informacion_proveedor[0]["NumDocumento"].(string)
+					nombreCesionario = informacion_proveedor[0]["NomProveedor"].(string)
 				}
 			}
 			if nombrepropiedad == "Cedente" {
-				cedente = propiedad["Propiedad"].(float64)
+				url = "/informacion_proveedor?query=Id:" + fmt.Sprintf("%v", propiedad["Propiedad"])
+				if error := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+url, &informacion_proveedor); error == nil {
+					cedenteDoc = informacion_proveedor[0]["NumDocumento"].(string)
+				}
+			}
+		}
+	}
+
+	url = "/fechas?query=IdNovedadesPoscontractuales.Id:" + fmt.Sprintf("%v", novedad["Id"]) + "&limit=0"
+	if error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &fechas); error == nil {
+		for _, fecha := range fechas {
+			tipoFecha := fecha["IdTipoFecha"].(map[string]interface{})
+			nombreFecha := tipoFecha["Nombre"]
+			if nombreFecha == "FechaCesion" {
+				fechaInicio = fecha["Fecha"].(time.Time)
 			}
 		}
 	}
@@ -228,8 +207,7 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 		url = "/acta_inicio?query=NumeroContrato:" + fmt.Sprintf("%v", numContratoActa["Id"])
 		if error = request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+url, &actaInicio); error == nil {
 			fechaFin, _ = time.Parse("2006-01-02T00:00:00Z", fmt.Sprint(actaInicio[0]["FechaFin"]))
-			fmt.Println("Fecha Inicio Novedad:", fechaInicio)
-			fmt.Println("Fecha Fin Novedad:", fechaFin)
+			diasCesion = fechaFin.Sub(fechaInicio).Hours() / 24
 		}
 	}
 
@@ -237,11 +215,11 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 	ArgoCesionPost = map[string]interface{}{
 		"NumeroContrato":  numContrato,
 		"Vigencia":        vigencia,
-		"FechaRegistro":   time.Now(),
+		"FechaRegistro":   time.Now().Format("2006-01-02"),
 		"Contratista":     cesionario,
-		"PlazoEjecucion":  0,
-		"FechaInicio":     fechaInicio,
-		"FechaFin":        fechaFin,
+		"PlazoEjecucion":  int(diasCesion),
+		"FechaInicio":     fechaInicio.Format("2006-01-02"),
+		"FechaFin":        fechaFin.Format("2006-01-02"),
 		"UnidadEjecucion": 205,
 		"TipoNovedad":     219,
 	}
@@ -249,12 +227,12 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 
 	TitanSuspensionPost := make(map[string]interface{})
 	TitanSuspensionPost["NovedadPoscontractual"] = map[string]interface{}{
-		"DocumentoActual": cedente,
-		"DocumentoNuevo":  contratistaDoc,
-		"FechaInicio":     fechaInicio,
-		"NombreCompleto":  "",
+		"DocumentoActual": cedenteDoc,
+		"DocumentoNuevo":  cesionarioDoc,
+		"FechaInicio":     fechaInicio.Format("2006-01-02 15:04:05"),
+		"NombreCompleto":  nombreCesionario,
 		"NumeroContrato":  strconv.Itoa(numContrato),
-		"Vigencia":        vigencia,
+		"Vigencia":        strconv.Itoa(vigencia),
 	}
 	fmt.Println("TitanOtrosiPost:", TitanSuspensionPost)
 }
@@ -275,7 +253,6 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	numeroCdp := int(novedad["NumeroCdpId"].(float64))
 	vigenciaCdp := int(novedad["VigenciaCdp"].(float64))
 
-	// var contratoGeneral map[string]interface{}
 	var tipoNovedad float64
 	if novedad["TipoNovedad"] == 6 {
 		tipoNovedad = 248
@@ -326,14 +303,7 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 			if fechaInicio.Day() == 31 {
 				fechaInicio = fechaInicio.AddDate(0, 0, 1)
 			}
-			var dias float64 = tiempoprorroga
-			meses := dias / 30
-			mesEntero := int(meses)
-			decimal := meses - float64(mesEntero)
-			numDias := decimal * 30
-			fechaFin = fechaInicio.AddDate(0, mesEntero, int(numDias))
-			fmt.Println("Fecha Inicio Novedad:", fechaInicio)
-			fmt.Println("Fecha Fin Novedad:", fechaFin)
+			fechaFin = CalcularFechaFin(fechaInicio, tiempoprorroga)
 		}
 	}
 
@@ -341,11 +311,11 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	ArgoOtrosiPost = map[string]interface{}{
 		"NumeroContrato":  numContrato,
 		"Vigencia":        vigencia,
-		"FechaRegistro":   time.Now(),
+		"FechaRegistro":   time.Now().Format("2006-01-02"),
 		"Contratista":     cesionario,
 		"PlazoEjecucion":  tiempoprorroga,
-		"FechaInicio":     fechaInicio,
-		"FechaFin":        fechaFin,
+		"FechaInicio":     fechaInicio.Format("2006-01-02"),
+		"FechaFin":        fechaFin.Format("2006-01-02"),
 		"NumeroCdp":       numeroCdp,
 		"VigenciaCdp":     vigenciaCdp,
 		"ValorNovedad":    valoradicion,
@@ -357,9 +327,9 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	TitanOtrosiPost := make(map[string]interface{})
 	TitanOtrosiPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Documento":      contratistaDoc,
-		"FechaFin":       fechaFin,
-		"NumeroContrato": numContrato,
-		"Vigencia":       vigencia,
+		"FechaFin":       fechaFin.Format("2006-01-02 15:04:05"),
+		"NumeroContrato": strconv.Itoa(numContrato),
+		"Vigencia":       strconv.Itoa(vigencia),
 	}
 	fmt.Println("TitanOtrosiPost:", TitanOtrosiPost)
 
@@ -373,4 +343,29 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	// 	}
 	// }
 
+}
+
+func CalcularFechaFin(fechaInicio time.Time, diasNovedad float64) (fechaFin time.Time) {
+	var dias float64 = diasNovedad
+	meses := dias / 30
+	mesEntero := int(meses)
+	decimal := meses - float64(mesEntero)
+	numDias := decimal * 30
+
+	if numDias+float64(fechaInicio.Day()) > 30 {
+		dias = (numDias + float64(fechaInicio.Day())) / 30
+		mesEntero += 1
+		decimal = dias - 1
+		numDias = math.Round(decimal * 30)
+		if numDias == 1 || numDias == 0 {
+			mesEntero -= 1
+			numDias = 30
+		} else {
+			numDias -= 1
+		}
+		fechaFin = time.Date(fechaInicio.Year(), fechaInicio.Month()+time.Month(mesEntero), int(numDias), 0, 0, 0, 0, fechaInicio.Location())
+	} else {
+		fechaFin = time.Date(fechaInicio.Year(), fechaInicio.Month()+time.Month(mesEntero), fechaInicio.Day()-1, 0, 0, 0, 0, fechaInicio.Location())
+	}
+	return fechaFin
 }
