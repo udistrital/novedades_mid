@@ -15,182 +15,6 @@
     },
     "basePath": "/v1",
     "paths": {
-        "/argo_replica/": {
-            "get": {
-                "tags": [
-                    "argo_replica"
-                ],
-                "description": "get ArgoReplica",
-                "operationId": "ArgoReplicaController.GetAll",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "query",
-                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "fields",
-                        "description": "Fields returned. e.g. col1,col2 ...",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "sortby",
-                        "description": "Sorted-by fields. e.g. col1,col2 ...",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "order",
-                        "description": "Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "description": "Limit the size of result set. Must be an integer",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
-                        "name": "offset",
-                        "description": "Start position of result set. Must be an integer",
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.ArgoReplica"
-                        }
-                    },
-                    "403": {
-                        "description": ""
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "argo_replica"
-                ],
-                "description": "create ArgoReplica",
-                "operationId": "ArgoReplicaController.Create",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "body for ArgoReplica content",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ArgoReplica"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.ArgoReplica"
-                        }
-                    },
-                    "403": {
-                        "description": "body is empty"
-                    }
-                }
-            }
-        },
-        "/argo_replica/{id}": {
-            "get": {
-                "tags": [
-                    "argo_replica"
-                ],
-                "description": "get ArgoReplica by id",
-                "operationId": "ArgoReplicaController.GetOne",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "The key for staticblock",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.ArgoReplica"
-                        }
-                    },
-                    "403": {
-                        "description": ":id is empty"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "argo_replica"
-                ],
-                "description": "update the ArgoReplica",
-                "operationId": "ArgoReplicaController.Put",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "The id you want to update",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "body for ArgoReplica content",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ArgoReplica"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.ArgoReplica"
-                        }
-                    },
-                    "403": {
-                        "description": ":id is not int"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "argo_replica"
-                ],
-                "description": "delete the ArgoReplica",
-                "operationId": "ArgoReplicaController.Delete",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "The id you want to delete",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{string} delete success!"
-                    },
-                    "403": {
-                        "description": "id is empty"
-                    }
-                }
-            }
-        },
         "/gestor_documental/": {
             "post": {
                 "tags": [
@@ -586,6 +410,182 @@
                 }
             }
         },
+        "/replica/": {
+            "get": {
+                "tags": [
+                    "replica"
+                ],
+                "description": "get Replica",
+                "operationId": "ReplicaController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "Fields returned. e.g. col1,col2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "Sorted-by fields. e.g. col1,col2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Limit the size of result set. Must be an integer",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Start position of result set. Must be an integer",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Replica"
+                        }
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "replica"
+                ],
+                "description": "create Replica",
+                "operationId": "ReplicaController.Create",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Replica content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Replica"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Replica"
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/replica/{id}": {
+            "get": {
+                "tags": [
+                    "replica"
+                ],
+                "description": "get Replica by id",
+                "operationId": "ReplicaController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Replica"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "replica"
+                ],
+                "description": "update the Replica",
+                "operationId": "ReplicaController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to update",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Replica content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Replica"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Replica"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is not int"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "replica"
+                ],
+                "description": "delete the Replica",
+                "operationId": "ReplicaController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} delete success!"
+                    },
+                    "403": {
+                        "description": "id is empty"
+                    }
+                }
+            }
+        },
         "/user/": {
             "get": {
                 "tags": [
@@ -798,7 +798,7 @@
         }
     },
     "definitions": {
-        "41252.0xc000431080.false": {
+        "43344.0xc0004262a0.false": {
             "title": "false",
             "type": "object"
         },
@@ -807,7 +807,7 @@
             "type": "object",
             "properties": {
                 "Body": {
-                    "$ref": "#/definitions/41252.0xc000431080.false"
+                    "$ref": "#/definitions/43344.0xc0004262a0.false"
                 },
                 "Code": {
                     "type": "string"
@@ -816,10 +816,6 @@
                     "type": "string"
                 }
             }
-        },
-        "models.ArgoReplica": {
-            "title": "ArgoReplica",
-            "type": "object"
         },
         "models.Novedades": {
             "title": "Novedades",
@@ -859,6 +855,10 @@
                     "type": "string"
                 }
             }
+        },
+        "models.Replica": {
+            "title": "Replica",
+            "type": "object"
         },
         "models.User": {
             "title": "User",
@@ -905,8 +905,8 @@
             "description": "NovedadesController operations for Novedades\n"
         },
         {
-            "name": "argo_replica",
-            "description": "ArgoReplicaController operations for ArgoReplica\n"
+            "name": "replica",
+            "description": "ReplicaController operations for Replica\n"
         },
         {
             "name": "gestor_documental",
