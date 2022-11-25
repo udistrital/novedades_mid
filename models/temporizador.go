@@ -11,10 +11,10 @@ import (
 )
 
 func Temporizador() {
-	tdr := time.Tick(3 * time.Second)
+	tdr := time.Tick(86400 * time.Second)
 
 	for horaActual := range tdr {
-		// ReplicaFechaAnterior()
+		ReplicaFechaPosterior()
 		fmt.Println("Registro realizado en la fecha", horaActual)
 	}
 }
@@ -42,7 +42,10 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputErro
 		"Vigencia":       informacionReplica["Vigencia"],
 	}
 
-	url := "novedadCPS/otrosi_contrato"
+	fmt.Println("ArgoNovedadPost:", ArgoNovedadPost)
+	fmt.Println("TitanNovedadPost:", TitanNovedadPost)
+
+	url := "novedad_postcontractual"
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPost, &ArgoNovedadPost); err == nil {
 		if informacionReplica["TipoNovedad"] == 216 {
 			TitanNovedadPost["Documento"] = informacionReplica["Documento"]
@@ -198,6 +201,15 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 	}
 	fmt.Println("TitanOtrosiPost:", TitanSuspensionPost)
 
+	var resultPost map[string]interface{}
+
+	url = "/novedad_postcontractual"
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPost, &ArgoSuspensionPost); err == nil {
+		url = "/novedadCPS/suspender_contrato"
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanSuspensionPost); err == nil {
+			fmt.Println("Registro en Titan exitoso!")
+		}
+	}
 }
 
 func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]interface{}) {
@@ -284,6 +296,16 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 		"Vigencia":        strconv.Itoa(vigencia),
 	}
 	fmt.Println("TitanOtrosiPost:", TitanSuspensionPost)
+
+	var resultPost map[string]interface{}
+
+	url = "/novedad_postcontractual"
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPost, &ArgoCesionPost); err == nil {
+		url = "/novedadCPS/ceder_contrato"
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanSuspensionPost); err == nil {
+			fmt.Println("Registro en Titan exitoso!")
+		}
+	}
 }
 
 // func ReplicaReinicio(novedad map[string]interface{}, propiedades []map[string]interface{}, fechas []map[string]interface{}) {
@@ -382,15 +404,15 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	}
 	fmt.Println("TitanOtrosiPost:", TitanOtrosiPost)
 
-	// var resultPost map[string]interface{}
+	var resultPost map[string]interface{}
 
-	// url = "/novedad_postcontractual"
-	// if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPost, &ArgoCesionPost); err == nil {
-	// 	url = "/novedadCPS/otrosi_contrato"
-	// 	if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanCesionPost); err == nil {
-	// 		fmt.Println("Registro en Titan exitoso!")
-	// 	}
-	// }
+	url = "/novedad_postcontractual"
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPost, &ArgoOtrosiPost); err == nil {
+		url = "/novedadCPS/otrosi_contrato"
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanOtrosiPost); err == nil {
+			fmt.Println("Registro en Titan exitoso!")
+		}
+	}
 
 }
 
