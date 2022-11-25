@@ -36,37 +36,38 @@ func (c *ReplicaController) URLMapping() {
 func (c *ReplicaController) Post() {
 
 	var informacionReplica map[string]interface{}
-	var alertErr models.Alert
+	var alert models.Alert
 	alertas := append([]interface{}{"Response:"})
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &informacionReplica); err == nil {
 
-		result, err1 := 
-
-		if err1 == nil {
-			alertErr.Type = "OK"
-			alertErr.Code = "200"
-			alertErr.Body = result
+		if informacionReplica["esFechaActual"] == true {
+			if err1 := models.ReplicafechaAnterior(informacionReplica); err1 == nil {
+				alert.Type = "OK"
+				alert.Code = "200"
+			} else {
+				alert.Type = "error"
+				alert.Code = "400"
+				alertas = append(alertas, err1)
+				alert.Body = alertas
+				c.Ctx.Output.SetStatus(400)
+			}
 		} else {
-			alertErr.Type = "error"
-			alertErr.Code = "400"
-			alertas = append(alertas, err1)
-			alertErr.Body = alertas
-			c.Ctx.Output.SetStatus(400)
+			alert.Type = "OK"
+			alert.Code = "200"
+			c.Ctx.Output.SetStatus(200)
+			go models.Temporizador()
 		}
 
 	} else {
-		alertErr.Type = "error"
-		alertErr.Code = "400"
+		alert.Type = "error"
+		alert.Code = "400"
 		alertas = append(alertas, err.Error())
-		alertErr.Body = alertas
+		alert.Body = alertas
 		c.Ctx.Output.SetStatus(400)
 	}
 
-	c.Data["json"] = alertErr
-	c.ServeJSON()
-
-	go models.Temporizador()
+	c.Data["json"] = alert
 	c.ServeJSON()
 
 	// if err := models.ConsultarFechaNovedad(); err != nil {
