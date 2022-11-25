@@ -11,15 +11,65 @@ import (
 )
 
 func Temporizador() {
-	tdr := time.Tick(86400 * time.Second)
+	tdr := time.Tick(3 * time.Second)
 
 	for horaActual := range tdr {
-		ConsultarFechaNovedad()
+		// ReplicaFechaAnterior()
 		fmt.Println("Registro realizado en la fecha", horaActual)
 	}
 }
 
-func ConsultarFechaNovedad() {
+func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputError map[string]interface{}) {
+
+	ArgoNovedadPost := make(map[string]interface{})
+	TitanNovedadPost := make(map[string]interface{})
+	var resultPost map[string]interface{}
+
+	ArgoNovedadPost = map[string]interface{}{
+		"NumeroContrato":  informacionReplica["NumeroContrato"],
+		"Vigencia":        informacionReplica["Vigencia"],
+		"FechaRegistro":   informacionReplica["FechaRegistro"],
+		"Contratista":     informacionReplica["Contratista"],
+		"PlazoEjecucion":  informacionReplica["PlazoEjecucion"],
+		"FechaInicio":     informacionReplica["FechaInicio"],
+		"FechaFin":        informacionReplica["FechaFin"],
+		"UnidadEjecucion": informacionReplica["UnidadEjecucion"],
+		"TipoNovedad":     informacionReplica["TipoNovedad"],
+	}
+
+	TitanNovedadPost = map[string]interface{}{
+		"NumeroContrato": informacionReplica["NumeroContrato"],
+		"Vigencia":       informacionReplica["Vigencia"],
+	}
+
+	url := "novedadCPS/otrosi_contrato"
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPost, &ArgoNovedadPost); err == nil {
+		if informacionReplica["TipoNovedad"] == 216 {
+			TitanNovedadPost["Documento"] = informacionReplica["Documento"]
+			TitanNovedadPost["FechaInicio"] = informacionReplica["FechaInicio"]
+			TitanNovedadPost["FechaFin"] = informacionReplica["FechaFin"]
+			url = "/novedad/suspender_contrato"
+		}
+		if informacionReplica["TipoNovedad"] == 219 {
+			TitanNovedadPost["DocumentoActual"] = informacionReplica["DocumentoActual"]
+			TitanNovedadPost["DocumentoNuevo"] = informacionReplica["DocumentoNuevo"]
+			TitanNovedadPost["FechaInicio"] = informacionReplica["FechaInicio"]
+			TitanNovedadPost["NombreCompleto"] = informacionReplica["NombreCompleto"]
+			url = "/novedad/ceder_contrato"
+		}
+		if informacionReplica["TipoNovedad"] == 220 {
+			TitanNovedadPost["Documento"] = informacionReplica["Documento"]
+			TitanNovedadPost["FechaFin"] = informacionReplica["FechaFin"]
+			url = "/novedadCPS/otrosi_contrato"
+		}
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanNovedadPost); err == nil {
+			fmt.Println("Registro en Titan exitoso!")
+		}
+	}
+	return outputError
+}
+
+func ReplicaFechaPosterior() {
 
 	currentDate := time.Now()
 	lastMonth := currentDate.AddDate(0, -1, 0)
@@ -46,7 +96,6 @@ func ConsultarFechaNovedad() {
 				}
 			}
 		}
-		fmt.Println("Sale del for")
 	} else {
 		fmt.Println(err)
 	}
