@@ -117,7 +117,7 @@ func ConsultarTipoNovedad(novedad map[string]interface{}) (structura map[string]
 			ReplicaSuspension(novedad, propiedades)
 		case 2:
 			ReplicaCesion(novedad, propiedades)
-		case 3:
+		// case 3:
 		// 	ReplicaReinicio(novedad, propiedades)
 		case 6:
 			ReplicaAdicionProrroga(novedad, propiedades)
@@ -308,14 +308,40 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 	}
 }
 
-// func ReplicaReinicio(novedad map[string]interface{}, propiedades []map[string]interface{}, fechas []map[string]interface{}) {
+func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[string]interface{}, outputError map[string]interface{}) {
 
-// 	numContrato, _ := strconv.ParseInt(novedad["ContratoId"].(string), 10, 32)
-// 	vigencia, _ := strconv.ParseInt(novedad["Vigencia"].(string), 10, 32)
+	// var result map[string]interface{}
 
-// 	ArgoCesionPost := make(map[string]interface{})
+	ArgoReinicioPost := make(map[string]interface{})
+	ArgoReinicioPost = map[string]interface{}{
+		"NumeroContrato":  novedad["NumeroContrato"],
+		"Vigencia":        novedad["Vigencia"],
+		"FechaRegistro":   novedad["FechaRegistro"],
+		"PlazoEjecucion":  novedad["PlazoEjecucion"],
+		"FechaInicio":     novedad["FechaInicio"],
+		"FechaFin":        novedad["FechaFin"],
+		"UnidadEjecucion": novedad["UnidadEjecucion"],
+		"TipoNovedad":     novedad["TipoNovedad"],
+	}
 
-// }
+	// TitanReinicioPost := make(map[string]interface{})
+	// TitanReinicioPost["NovedadPoscontractual"] = map[string]interface{}{
+	// 	"DocumentoActual": cedenteDoc,
+	// 	"DocumentoNuevo":  cesionarioDoc,
+	// 	"FechaInicio":     fechaInicio.Format("2006-01-02 15:04:05"),
+	// 	"NombreCompleto":  nombreCesionario,
+	// 	"NumeroContrato":  strconv.Itoa(numContrato),
+	// 	"Vigencia":        strconv.Itoa(vigencia),
+	// }
+
+	url := "/novedad_postcontractual/" + idStr
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+		return result, nil
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+		return nil, outputError
+	}
+}
 
 func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[string]interface{}) {
 
