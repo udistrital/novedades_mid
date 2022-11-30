@@ -18,7 +18,6 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 	numerosolicitudentero := NovedadReinicio["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadReinicio["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadReinicio["vigenciacdp"].(string), 10, 32)
 
 	NovedadReinicioPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -33,7 +32,6 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 		"Observacion":       NovedadReinicio["observacion"],
 		"TipoNovedad":       3,
 		"Vigencia":          vigencia,
-		"VigenciaCdp":       vigenciacdp,
 	}
 
 	fechas := make([]map[string]interface{}, 0)
