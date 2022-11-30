@@ -13,11 +13,9 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 
 	NovedadSuspensionPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadSuspension["contrato"].(string), 10, 32)
-	//numerocdpid, _ := strconv.ParseInt(NovedadSuspension["numerocdp"].(string), 10, 32)
 	numerosolicitudentero := NovedadSuspension["numerosolicitud"].(float64)
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadSuspension["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadSuspension["vigenciacdp"].(string), 10, 32)
 
 	NovedadSuspensionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -32,7 +30,6 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 		"Observacion":       nil,
 		"TipoNovedad":       1,
 		"Vigencia":          vigencia,
-		"VigenciaCdp":       vigenciacdp,
 	}
 
 	fechas := make([]map[string]interface{}, 0)

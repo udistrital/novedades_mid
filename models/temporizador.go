@@ -26,7 +26,7 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputErro
 	var resultPost map[string]interface{}
 
 	ArgoNovedadPost = map[string]interface{}{
-		"NumeroContrato":  informacionReplica["NumeroContrato"],
+		"NumeroContrato":  fmt.Sprintf("%v", informacionReplica["NumeroContrato"]),
 		"Vigencia":        informacionReplica["Vigencia"],
 		"FechaRegistro":   informacionReplica["FechaRegistro"],
 		"Contratista":     informacionReplica["Contratista"],
@@ -42,10 +42,10 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputErro
 		"Vigencia":       informacionReplica["Vigencia"],
 	}
 
-	fmt.Println("ArgoNovedadPost:", ArgoNovedadPost)
-	fmt.Println("TitanNovedadPost:", TitanNovedadPost)
+	// fmt.Println("ArgoNovedadPost:", ArgoNovedadPost)
+	// fmt.Println("TitanNovedadPost:", TitanNovedadPost)
 
-	url := "novedad_postcontractual"
+	url := "/novedad_postcontractual"
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPost, &ArgoNovedadPost); err == nil {
 		if informacionReplica["TipoNovedad"] == 216 {
 			TitanNovedadPost["Documento"] = informacionReplica["Documento"]
@@ -65,9 +65,12 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputErro
 			TitanNovedadPost["FechaFin"] = informacionReplica["FechaFin"]
 			url = "/novedadCPS/otrosi_contrato"
 		}
-		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanNovedadPost); err == nil {
-			fmt.Println("Registro en Titan exitoso!")
-		}
+		// if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanNovedadPost); err == nil {
+		// 	fmt.Println("Registro en Titan exitoso!")
+		// }
+		return nil
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicafechaAnterior", "err": err.Error(), "status": "502"}
 	}
 	return outputError
 }
@@ -179,7 +182,7 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 
 	ArgoSuspensionPost := make(map[string]interface{})
 	ArgoSuspensionPost = map[string]interface{}{
-		"NumeroContrato":  numContrato,
+		"NumeroContrato":  fmt.Sprintf("%v", numContrato),
 		"Vigencia":        vigencia,
 		"FechaRegistro":   time.Now().Format("2006-01-02"),
 		"Contratista":     cesionario,
@@ -274,7 +277,7 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 
 	ArgoCesionPost := make(map[string]interface{})
 	ArgoCesionPost = map[string]interface{}{
-		"NumeroContrato":  numContrato,
+		"NumeroContrato":  fmt.Sprintf("%v", numContrato),
 		"Vigencia":        vigencia,
 		"FechaRegistro":   time.Now().Format("2006-01-02"),
 		"Contratista":     cesionario,
@@ -406,7 +409,7 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 
 	ArgoOtrosiPost := make(map[string]interface{})
 	ArgoOtrosiPost = map[string]interface{}{
-		"NumeroContrato":  numContrato,
+		"NumeroContrato":  fmt.Sprintf("%v", numContrato),
 		"Vigencia":        vigencia,
 		"FechaRegistro":   time.Now().Format("2006-01-02"),
 		"Contratista":     cesionario,
