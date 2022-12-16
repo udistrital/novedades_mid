@@ -23,7 +23,8 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputErro
 
 	ArgoNovedadPost := make(map[string]interface{})
 	TitanNovedadPost := make(map[string]interface{})
-	var resultPost map[string]interface{}
+	var resultPostArgo map[string]interface{}
+	var resultPostTitan map[string]interface{}
 
 	ArgoNovedadPost = map[string]interface{}{
 		"NumeroContrato":  fmt.Sprintf("%v", informacionReplica["NumeroContrato"]),
@@ -42,33 +43,33 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputErro
 		"Vigencia":       informacionReplica["Vigencia"],
 	}
 
-	// fmt.Println("ArgoNovedadPost:", ArgoNovedadPost)
-	// fmt.Println("TitanNovedadPost:", TitanNovedadPost)
-
 	url := "/novedad_postcontractual"
-	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPost, &ArgoNovedadPost); err == nil {
-		if informacionReplica["TipoNovedad"] == 216 {
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "POST", &resultPostArgo, &ArgoNovedadPost); err == nil {
+		if int(informacionReplica["TipoNovedad"].(float64)) == 216 {
 			TitanNovedadPost["Documento"] = informacionReplica["Documento"]
-			TitanNovedadPost["FechaInicio"] = informacionReplica["FechaInicio"]
-			TitanNovedadPost["FechaFin"] = informacionReplica["FechaFin"]
+			TitanNovedadPost["FechaInicio"] = FormatFechaTitan(informacionReplica["FechaInicio"].(string))
+			TitanNovedadPost["FechaFin"] = FormatFechaTitan(informacionReplica["FechaFin"].(string))
 			url = "/novedad/suspender_contrato"
 		}
-		if informacionReplica["TipoNovedad"] == 219 {
+		if int(informacionReplica["TipoNovedad"].(float64)) == 219 {
 			TitanNovedadPost["DocumentoActual"] = informacionReplica["DocumentoActual"]
 			TitanNovedadPost["DocumentoNuevo"] = informacionReplica["DocumentoNuevo"]
-			TitanNovedadPost["FechaInicio"] = informacionReplica["FechaInicio"]
+			TitanNovedadPost["FechaInicio"] = FormatFechaTitan(informacionReplica["FechaInicio"].(string))
 			TitanNovedadPost["NombreCompleto"] = informacionReplica["NombreCompleto"]
 			url = "/novedad/ceder_contrato"
 		}
-		if informacionReplica["TipoNovedad"] == 220 {
+		if int(informacionReplica["TipoNovedad"].(float64)) == 220 {
 			TitanNovedadPost["Documento"] = informacionReplica["Documento"]
-			TitanNovedadPost["FechaFin"] = informacionReplica["FechaFin"]
+			TitanNovedadPost["FechaFin"] = FormatFechaTitan(informacionReplica["FechaFin"].(string))
 			url = "/novedadCPS/otrosi_contrato"
 		}
-		// if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanNovedadPost); err == nil {
-		// 	fmt.Println("Registro en Titan exitoso!")
-		// }
-		return nil
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanNovedadPost); err == nil {
+			fmt.Println("Registro en Titan exitoso!")
+			return nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/ReplicafechaAnterior", "err": err.Error(), "status": "502"}
+			fmt.Println(err)
+		}
 	} else {
 		outputError = map[string]interface{}{"funcion": "/ReplicafechaAnterior", "err": err.Error(), "status": "502"}
 	}
@@ -468,4 +469,15 @@ func CalcularFechaFin(fechaInicio time.Time, diasNovedad float64) (fechaFin time
 		fechaFin = time.Date(fechaInicio.Year(), fechaInicio.Month()+time.Month(mesEntero), fechaInicio.Day()-1, 0, 0, 0, 0, fechaInicio.Location())
 	}
 	return fechaFin
+}
+
+func FormatFechaTitan(fecha string) string {
+	var fechaTitan = ""
+	fmt.Println(fecha)
+	if fechaParse, err := time.Parse("2006-01-02T15:04:05.000Z", fecha); err == nil {
+		fechaFormat := fechaParse.Format("2006-01-02T15:04:05.000Z")
+		// ("2006-01-02T15:04:05.000Z")
+		fechaTitan = fechaFormat
+	}
+	return fechaTitan
 }
