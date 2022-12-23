@@ -36,6 +36,8 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputErro
 		"FechaFin":        informacionReplica["FechaFin"],
 		"UnidadEjecucion": informacionReplica["UnidadEjecucion"],
 		"TipoNovedad":     informacionReplica["TipoNovedad"],
+		"NumeroCdp":       informacionReplica["NumeroCdp"],
+		"VigenciaCdp":     informacionReplica["VigenciaCdp"],
 	}
 
 	TitanNovedadPost = map[string]interface{}{
@@ -49,14 +51,14 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (outputErro
 			TitanNovedadPost["Documento"] = informacionReplica["Documento"]
 			TitanNovedadPost["FechaInicio"] = FormatFechaTitan(informacionReplica["FechaInicio"].(string))
 			TitanNovedadPost["FechaFin"] = FormatFechaTitan(informacionReplica["FechaFin"].(string))
-			url = "/novedad/suspender_contrato"
+			url = "/novedadCPS/suspender_contrato"
 		}
 		if int(informacionReplica["TipoNovedad"].(float64)) == 219 {
 			TitanNovedadPost["DocumentoActual"] = informacionReplica["DocumentoActual"]
 			TitanNovedadPost["DocumentoNuevo"] = informacionReplica["DocumentoNuevo"]
 			TitanNovedadPost["FechaInicio"] = FormatFechaTitan(informacionReplica["FechaInicio"].(string))
 			TitanNovedadPost["NombreCompleto"] = informacionReplica["NombreCompleto"]
-			url = "/novedad/ceder_contrato"
+			url = "/novedadCPS/ceder_contrato"
 		}
 		if int(informacionReplica["TipoNovedad"].(float64)) == 220 {
 			TitanNovedadPost["Documento"] = informacionReplica["Documento"]
