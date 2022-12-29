@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
@@ -286,4 +287,41 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	fmt.Println(error, error1)
 
 	return NovedadAdicionGet
+}
+
+func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[string]interface{}, outputError map[string]interface{}) {
+
+	ArgoReinicioPost := make(map[string]interface{})
+	ArgoReinicioPost = map[string]interface{}{
+		"NumeroContrato":  novedad["NumeroContrato"],
+		"Vigencia":        novedad["Vigencia"],
+		"FechaRegistro":   novedad["FechaRegistro"],
+		"PlazoEjecucion":  novedad["PlazoEjecucion"],
+		"FechaInicio":     novedad["FechaInicio"],
+		"FechaFin":        novedad["FechaFin"],
+		"UnidadEjecucion": novedad["UnidadEjecucion"],
+		"TipoNovedad":     novedad["TipoNovedad"],
+	}
+
+	TitanReinicioPost := make(map[string]interface{})
+	TitanReinicioPost = map[string]interface{}{
+		"Documento":      novedad["Documento"],
+		"FechaReinicio":  novedad["FechaReinicio"].(time.Time).Format("2006-01-02 15:04:05"),
+		"NumeroContrato": novedad["NumeroContrato"],
+		"Vigencia":       novedad["Vigencia"],
+	}
+
+	url := "/novedad_postcontractual/" + idStr
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+		url = "/novedadCPS/reiniciar_contrato"
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
+			return result, nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+			return nil, outputError
+		}
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+		return nil, outputError
+	}
 }
