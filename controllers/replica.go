@@ -42,9 +42,12 @@ func (c *ReplicaController) Post() {
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &informacionReplica); err == nil {
 
 		if informacionReplica["esFechaActual"] == true {
-			if err1 := models.ReplicafechaAnterior(informacionReplica); err1 == nil {
+			if result, err1 := models.ReplicafechaAnterior(informacionReplica); err1 == nil {
 				alert.Type = "OK"
 				alert.Code = "200"
+				alertas = append(alertas, result)
+				alert.Body = alertas
+				c.Ctx.Output.SetStatus(200)
 			} else {
 				alert.Type = "error"
 				alert.Code = "400"
@@ -55,6 +58,7 @@ func (c *ReplicaController) Post() {
 		} else {
 			alert.Type = "OK"
 			alert.Code = "200"
+			alert.Body = "Temporizador para réplica ejecutándose"
 			c.Ctx.Output.SetStatus(200)
 			go models.Temporizador()
 		}

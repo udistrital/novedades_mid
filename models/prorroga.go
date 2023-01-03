@@ -81,6 +81,19 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 			"Id": 4,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadProrroga["fechafinefectiva"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 12,
+		},
+	})
 
 	NovedadProrrogaPost["Fechas"] = fechas
 
@@ -169,6 +182,7 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 	var fechaadicion interface{}
 	var fechasolicitud interface{}
 	var fechaprorroga interface{}
+	var fechafinefectiva interface{}
 	var cesionario interface{}
 	var valoradicion interface{}
 	var tiempoprorroga interface{}
@@ -190,6 +204,9 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 			}
 			if nombrefecha == "FechaProrroga" {
 				fechaprorroga = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaFinEfectiva" {
+				fechafinefectiva = fecha["Fecha"]
 			}
 
 		}
@@ -242,6 +259,7 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 		"valoradicion":               valoradicion,
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
+		"fechafinefectiva":           fechafinefectiva,
 	}
 
 	fmt.Println(error, error1)

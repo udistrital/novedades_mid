@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
@@ -99,6 +100,19 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 		},
 		"IdTipoFecha": map[string]interface{}{
 			"Id": 6,
+		},
+	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadReinicio["fechafinefectiva"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 12,
 		},
 	})
 
@@ -201,6 +215,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	var fechasolicitud interface{}
 	var fechasuspension interface{}
 	var fechaterminacionanticipada interface{}
+	var fechafinefectiva interface{}
 
 	var cesionario interface{}
 	var numerooficioestadocuentas interface{}
@@ -230,6 +245,9 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 			}
 			if nombrefecha == "FechaTerminacionAnticipada" {
 				fechaterminacionanticipada = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaFinEfectiva" {
+				fechafinefectiva = fecha["Fecha"]
 			}
 		}
 	}
@@ -281,9 +299,47 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		"valoradicion":               "",
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
+		"fechafinefectiva":           fechafinefectiva,
 	}
 
 	fmt.Println(error, error1)
 
 	return NovedadAdicionGet
+}
+
+func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[string]interface{}, outputError map[string]interface{}) {
+
+	ArgoReinicioPost := make(map[string]interface{})
+	ArgoReinicioPost = map[string]interface{}{
+		"NumeroContrato":  novedad["NumeroContrato"],
+		"Vigencia":        novedad["Vigencia"],
+		"FechaRegistro":   novedad["FechaRegistro"],
+		"PlazoEjecucion":  novedad["PlazoEjecucion"],
+		"FechaInicio":     novedad["FechaInicio"],
+		"FechaFin":        novedad["FechaFin"],
+		"UnidadEjecucion": novedad["UnidadEjecucion"],
+		"TipoNovedad":     novedad["TipoNovedad"],
+	}
+
+	TitanReinicioPost := make(map[string]interface{})
+	TitanReinicioPost = map[string]interface{}{
+		"Documento":      novedad["Documento"],
+		"FechaReinicio":  novedad["FechaReinicio"].(time.Time).Format("2006-01-02 15:04:05"),
+		"NumeroContrato": novedad["NumeroContrato"],
+		"Vigencia":       novedad["Vigencia"],
+	}
+
+	url := "/novedad_postcontractual/" + idStr
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+		url = "/novedadCPS/reiniciar_contrato"
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
+			return result, nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+			return nil, outputError
+		}
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+		return nil, outputError
+	}
 }
