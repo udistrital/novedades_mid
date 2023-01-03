@@ -71,6 +71,19 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 			"Id": 1,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadAdicion["fechafinefectiva"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 12,
+		},
+	})
 
 	NovedadAdicionPost["Fechas"] = fechas
 
@@ -146,6 +159,7 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 	NovedadAdicionGet := make(map[string]interface{})
 	var fechaadicion interface{}
 	var fechasolicitud interface{}
+	var fechafinefectiva interface{}
 	var cesionario interface{}
 	var valoradicion interface{}
 
@@ -161,6 +175,9 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 			}
 			if nombrefecha == "FechaSolicitud" {
 				fechasolicitud = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaFinEfectiva" {
+				fechafinefectiva = fecha["Fecha"]
 			}
 			//fmt.Println(fechaadicion, fechasolicitud)
 		}
@@ -211,6 +228,7 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 		"valoradicion":               valoradicion,
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
+		"fechafinefectiva":           fechafinefectiva,
 	}
 
 	fmt.Println(error, error1)

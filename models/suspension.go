@@ -99,6 +99,19 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 			"Id": 11,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadSuspension["fechafinefectiva"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 12,
+		},
+	})
 
 	NovedadSuspensionPost["Fechas"] = fechas
 
@@ -146,6 +159,7 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 	var fechasolicitud interface{}
 	var fechasuspension interface{}
 	var fechafinsuspension interface{}
+	var fechafinefectiva interface{}
 	var cesionario interface{}
 	var periodosuspension interface{}
 
@@ -171,6 +185,9 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 				}
 				if nombrefecha == "FechaFinSuspension" {
 					fechafinsuspension = fecha["Fecha"]
+				}
+				if nombrefecha == "FechaFinEfectiva" {
+					fechafinefectiva = fecha["Fecha"]
 				}
 			}
 		}
@@ -224,6 +241,7 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinsuspension":         fechafinsuspension,
+		"fechafinefectiva":           fechafinefectiva,
 	}
 
 	return NovedadAdicionGet

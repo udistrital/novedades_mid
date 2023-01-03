@@ -169,6 +169,19 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 			"Id": 5,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadCesion["fechafinefectiva"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 12,
+		},
+	})
 
 	NovedadCesionPost["Fechas"] = fechas
 
@@ -330,6 +343,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	var fechaterminacionanticipada interface{}
 	var fechasolicitud interface{}
 	var fechaoficio interface{}
+	var fechafinefectiva interface{}
 
 	var cedente interface{}
 	var cesionario interface{}
@@ -380,6 +394,9 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 			}
 			if nombrefecha == "FechaOficio" {
 				fechaoficio = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaFinEfectiva" {
+				fechafinefectiva = fecha["Fecha"]
 			}
 		}
 	}
@@ -458,6 +475,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechaoficio":                fechaoficio,
 		"entidadaseguradora":         entidadaseguradora,
+		"fechafinefectiva":           fechafinefectiva,
 	}
 
 	fmt.Println(error, error1, error2)
