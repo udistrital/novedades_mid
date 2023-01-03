@@ -102,6 +102,19 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 			"Id": 6,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadReinicio["fechafinefectiva"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 12,
+		},
+	})
 
 	NovedadReinicioPost["Fechas"] = fechas
 
@@ -202,6 +215,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	var fechasolicitud interface{}
 	var fechasuspension interface{}
 	var fechaterminacionanticipada interface{}
+	var fechafinefectiva interface{}
 
 	var cesionario interface{}
 	var numerooficioestadocuentas interface{}
@@ -231,6 +245,9 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 			}
 			if nombrefecha == "FechaTerminacionAnticipada" {
 				fechaterminacionanticipada = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaFinEfectiva" {
+				fechafinefectiva = fecha["Fecha"]
 			}
 		}
 	}
@@ -282,6 +299,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		"valoradicion":               "",
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
+		"fechafinefectiva":           fechafinefectiva,
 	}
 
 	fmt.Println(error, error1)
