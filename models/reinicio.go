@@ -309,6 +309,8 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 
 func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[string]interface{}, outputError map[string]interface{}) {
 
+	fechaReinicio, _ := time.Parse("2006-01-02 15:04:05", fmt.Sprint(novedad["FechaReinicio"]))
+
 	ArgoReinicioPost := make(map[string]interface{})
 	ArgoReinicioPost = map[string]interface{}{
 		"NumeroContrato":  novedad["NumeroContrato"],
@@ -324,7 +326,7 @@ func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[s
 	TitanReinicioPost := make(map[string]interface{})
 	TitanReinicioPost = map[string]interface{}{
 		"Documento":      novedad["Documento"],
-		"FechaReinicio":  novedad["FechaReinicio"].(time.Time).Format("2006-01-02 15:04:05"),
+		"FechaReinicio":  fechaReinicio.Format("2006-01-02T05:00:00.000Z"),
 		"NumeroContrato": novedad["NumeroContrato"],
 		"Vigencia":       novedad["Vigencia"],
 	}

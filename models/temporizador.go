@@ -69,6 +69,7 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 	if int(informacionReplica["TipoNovedad"].(float64)) == 218 {
 		TitanNovedadPost["Documento"] = informacionReplica["Documento"]
 		TitanNovedadPost["FechaCancelacion"] = FormatFechaTitan(informacionReplica["FechaFin"].(string))
+		url = "/novedadCPS/cancelar_contrato"
 	}
 	if result, err := PostReplica(url, ArgoNovedadPost, TitanNovedadPost); err == nil {
 		return result, nil

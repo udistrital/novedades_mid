@@ -187,8 +187,8 @@ func (c *NovedadesController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &novedad); err == nil {
-		if novedad["TipoNovedad"] == 216 {
-			if err, result := models.ReplicaReinicio(novedad, idStr); err == nil {
+		if novedad["TipoNovedad"] == float64(216) {
+			if result, err := models.ReplicaReinicio(novedad, idStr); err == nil {
 				alertErr.Type = "OK"
 				alertErr.Code = "200"
 				alertErr.Body = result
@@ -199,6 +199,12 @@ func (c *NovedadesController) Put() {
 				alertErr.Body = alertas
 				c.Ctx.Output.SetStatus(400)
 			}
+		} else {
+			alertErr.Type = "error"
+			alertErr.Code = "400"
+			alertas = append(alertas, err.Error())
+			alertErr.Body = "Error al validar tipo de novedad!"
+			c.Ctx.Output.SetStatus(400)
 		}
 	} else {
 		alertErr.Type = "error"
