@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
@@ -309,8 +308,6 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 
 func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[string]interface{}, outputError map[string]interface{}) {
 
-	fechaReinicio, _ := time.Parse("2006-01-02 15:04:05", fmt.Sprint(novedad["FechaReinicio"]))
-
 	ArgoReinicioPost := make(map[string]interface{})
 	ArgoReinicioPost = map[string]interface{}{
 		"NumeroContrato":  novedad["NumeroContrato"],
@@ -326,7 +323,7 @@ func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[s
 	TitanReinicioPost := make(map[string]interface{})
 	TitanReinicioPost = map[string]interface{}{
 		"Documento":      novedad["Documento"],
-		"FechaReinicio":  fechaReinicio.Format("2006-01-02T05:00:00.000Z"),
+		"FechaReinicio":  FormatFechaTitan(novedad["FechaReinicio"].(string)),
 		"NumeroContrato": novedad["NumeroContrato"],
 		"Vigencia":       novedad["Vigencia"],
 	}
