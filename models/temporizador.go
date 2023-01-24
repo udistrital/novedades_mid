@@ -587,7 +587,6 @@ func CalcularFechaFin(fechaInicio time.Time, diasNovedad float64) (fechaFin time
 
 func FormatFechaTitan(fecha string) string {
 	var fechaTitan = ""
-	fmt.Println(fecha)
 	if fechaParse, err := time.Parse("2006-01-02T15:04:05.000Z", fecha); err == nil {
 		fechaFormat := fechaParse.Format("2006-01-02T15:04:05.000Z")
 		// ("2006-01-02T15:04:05.000Z")
