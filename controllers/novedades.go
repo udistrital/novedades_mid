@@ -181,31 +181,26 @@ func (c *NovedadesController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (c *NovedadesController) Put() {
-	var novedad map[string]interface{} //[]models.NovedadSuspensionPut
+	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
-	idStr := c.Ctx.Input.Param(":id")
 
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &novedad); err == nil {
-		if novedad["TipoNovedad"] == float64(216) {
-			if result, err := models.ReplicaReinicio(novedad, idStr); err == nil {
-				alertErr.Type = "OK"
-				alertErr.Code = "200"
-				alertErr.Body = result
-			} else {
-				alertErr.Type = "error"
-				alertErr.Code = "400"
-				alertas = append(alertas, err)
-				alertErr.Body = alertas
-				c.Ctx.Output.SetStatus(400)
-			}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
+
+		result, err1 := RegistrarNovedad(registroNovedad)
+
+		if err1 == nil {
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = result
 		} else {
 			alertErr.Type = "error"
 			alertErr.Code = "400"
-			alertas = append(alertas, err.Error())
-			alertErr.Body = "Error al validar tipo de novedad!"
+			alertas = append(alertas, err1)
+			alertErr.Body = alertas
 			c.Ctx.Output.SetStatus(400)
 		}
+
 	} else {
 		alertErr.Type = "error"
 		alertErr.Code = "400"

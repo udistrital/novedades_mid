@@ -32,6 +32,7 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 		"Observacion":       NovedadReinicio["observacion"],
 		"TipoNovedad":       3,
 		"Vigencia":          vigencia,
+		"Estado":            NovedadReinicio["estado"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -86,6 +87,19 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 		},
 		"IdTipoFecha": map[string]interface{}{
 			"Id": 8,
+		},
+	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadReinicio["fechafinsuspension"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 11,
 		},
 	})
 	fechas = append(fechas, map[string]interface{}{
@@ -323,22 +337,26 @@ func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[s
 	TitanReinicioPost := make(map[string]interface{})
 	TitanReinicioPost = map[string]interface{}{
 		"Documento":      novedad["Documento"],
-		"FechaReinicio":  FormatFechaTitan(novedad["FechaReinicio"].(string)),
+		"FechaReinicio":  FormatFechaReplica(novedad["FechaReinicio"].(string), "2006-01-02T15:04:05.000Z"),
 		"NumeroContrato": novedad["NumeroContrato"],
 		"Vigencia":       novedad["Vigencia"],
 	}
 
-	url := "/novedad_postcontractual/" + idStr
-	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
-		url = "/novedadCPS/reiniciar_contrato"
-		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
-			return result, nil
-		} else {
-			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
-			return nil, outputError
-		}
-	} else {
-		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
-		return nil, outputError
-	}
+	fmt.Println("ArgoReinicioPost: ", ArgoReinicioPost)
+	fmt.Println("TitanReinicioPost: ", TitanReinicioPost)
+
+	// url := "/novedad_postcontractual/" + idStr
+	// if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+	// 	url = "/novedadCPS/reiniciar_contrato"
+	// 	if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
+	// 		return result, nil
+	// 	} else {
+	// 		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+	// 		return nil, outputError
+	// 	}
+	// } else {
+	// 	outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+	// 	return nil, outputError
+	// }
+	return nil, nil
 }

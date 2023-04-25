@@ -34,6 +34,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 		"TipoNovedad":       5,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       0,
+		"Estado":            NovedadTAnticipada["estado"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -94,6 +95,19 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	NovedadTAnticipadaPost["Fechas"] = fechas
 
 	propiedades := make([]map[string]interface{}, 0)
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 2,
+		},
+		"propiedad": NovedadTAnticipada["cesionario"],
+	})
 	propiedades = append(propiedades, map[string]interface{}{
 		"Activo":            true,
 		"FechaCreacion":     nil,

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/astaxie/beego"
@@ -17,6 +18,8 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadSuspension["vigencia"].(string), 10, 32)
 
+	fmt.Println("novedad: ", novedad)
+
 	NovedadSuspensionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
 		"Activo":            true,
@@ -30,6 +33,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 		"Observacion":       nil,
 		"TipoNovedad":       1,
 		"Vigencia":          vigencia,
+		"Estado":            NovedadSuspension["estado"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)

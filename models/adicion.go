@@ -41,6 +41,7 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 		"VigenciaCdp":       vigenciacdp,
 		"NumeroRp":          numerorp,
 		"VigenciaRp":        vigenciarp,
+		"Estado":            NovedadAdicion["estado"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
