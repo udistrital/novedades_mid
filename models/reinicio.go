@@ -33,6 +33,7 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 		"TipoNovedad":       3,
 		"Vigencia":          vigencia,
 		"Estado":            NovedadReinicio["estado"],
+		"Enlace":            NovedadReinicio["enlace"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -345,18 +346,17 @@ func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[s
 	fmt.Println("ArgoReinicioPost: ", ArgoReinicioPost)
 	fmt.Println("TitanReinicioPost: ", TitanReinicioPost)
 
-	// url := "/novedad_postcontractual/" + idStr
-	// if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
-	// 	url = "/novedadCPS/reiniciar_contrato"
-	// 	if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
-	// 		return result, nil
-	// 	} else {
-	// 		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
-	// 		return nil, outputError
-	// 	}
-	// } else {
-	// 	outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
-	// 	return nil, outputError
-	// }
-	return nil, nil
+	url := "/novedad_postcontractual/" + idStr
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+		url = "/novedadCPS/reiniciar_contrato"
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
+			return result, nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+			return nil, outputError
+		}
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+		return nil, outputError
+	}
 }

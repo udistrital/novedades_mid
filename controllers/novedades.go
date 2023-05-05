@@ -179,15 +179,17 @@ func (c *NovedadesController) GetAll() {
 // @Param	body		body 	models.Novedades	true		"body for Novedades content"
 // @Success 200 {object} models.Novedades
 // @Failure 403 :id is not int
-// @router /:id [put]
+// @router /:id/:vigencia [put]
 func (c *NovedadesController) Put() {
+
+	idStr := c.Ctx.Input.Param(":id")
 	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
 
-		result, err1 := RegistrarNovedad(registroNovedad)
+		result, err1 := ActualizarNovedad(idStr)
 
 		if err1 == nil {
 			alertErr.Type = "OK"
@@ -334,4 +336,19 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 		return 0, errorRegistro
 	}
 
+}
+
+func ActualizarNovedad(id string) (status interface{}, outputError interface{}) {
+
+	var novedad map[string]interface{}
+	var resultadoRegistro map[string]interface{}
+	err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, &novedad)
+	if err == nil {
+		novedad["Estado"] = "TERMINADA"
+		errRegNovedad := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, "PUT", &resultadoRegistro, novedad)
+		if errRegNovedad == nil {
+			fmt.Println("Novedad actualizada!!")
+		}
+	}
+	return nil, nil
 }

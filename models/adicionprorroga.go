@@ -40,6 +40,7 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 		"NumeroRp":          numerorp,
 		"VigenciaRp":        vigenciarp,
 		"Estado":            NovedadAdProrroga["estado"],
+		"Enlace":            NovedadAdProrroga["enlace"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)

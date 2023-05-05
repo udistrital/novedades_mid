@@ -36,6 +36,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
 		"Estado":            NovedadCesion["estado"],
+		"Enlace":            NovedadCesion["enlace"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
