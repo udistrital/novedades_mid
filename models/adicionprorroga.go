@@ -39,6 +39,8 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 		"VigenciaCdp":       vigenciacdp,
 		"NumeroRp":          numerorp,
 		"VigenciaRp":        vigenciarp,
+		"Estado":            NovedadAdProrroga["estado"],
+		"EnlaceDocumento":   NovedadAdProrroga["enlace"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -187,9 +189,15 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 	var cesionario interface{}
 	var valoradicion interface{}
 	var tiempoprorroga interface{}
+	var tiponovedad []map[string]interface{}
+	var tipoNovedadNombre string
+	var estadoNovedad map[string]interface{}
+	var nombreEstadoNov string
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
+	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/tipo_novedad/?query=Id:"+strconv.FormatFloat((NovedadAdicion["TipoNovedad"]).(float64), 'f', -1, 64), &tiponovedad)
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro/"+NovedadAdicion["Estado"].(string), &estadoNovedad)
 
 	if len(fechas[0]) != 0 {
 		for _, fecha := range fechas {
@@ -225,6 +233,19 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 		}
 	}
 
+	if error2 == nil {
+		if len(tiponovedad[0]) != 0 {
+			tipoNovedadNombre = tiponovedad[0]["Nombre"].(string)
+		}
+	}
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			nombreEstadoNov = data["Nombre"].(string)
+		}
+	}
+
 	NovedadAdicionGet = map[string]interface{}{
 		"id":                         NovedadAdicion["Id"].(float64),
 		"aclaracion":                 NovedadAdicion["Aclaracion"],
@@ -254,10 +275,13 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 		"poliza":                     "",
 		"tiempoprorroga":             tiempoprorroga,
 		"tiponovedad":                NovedadAdicion["TipoNovedad"],
+		"nombreTipoNovedad":          tipoNovedadNombre,
 		"valoradicion":               valoradicion,
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
+		"estado":                     nombreEstadoNov,
+		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
 	fmt.Println(error, error1)

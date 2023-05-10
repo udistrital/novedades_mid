@@ -34,6 +34,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:GestorDocumentalController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:GestorDocumentalController"],
+        beego.ControllerComments{
+            Method: "Put",
+            Router: "/:id",
+            AllowHTTPMethods: []string{"put"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"],
         beego.ControllerComments{
             Method: "Post",
@@ -54,15 +63,6 @@ func init() {
 
     beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"],
         beego.ControllerComments{
-            Method: "Put",
-            Router: "/:id",
-            AllowHTTPMethods: []string{"put"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"],
-        beego.ControllerComments{
             Method: "Delete",
             Router: "/:id",
             AllowHTTPMethods: []string{"delete"},
@@ -75,6 +75,15 @@ func init() {
             Method: "GetOne",
             Router: "/:id/:vigencia",
             AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:NovedadesController"],
+        beego.ControllerComments{
+            Method: "Put",
+            Router: "/:id/:vigencia",
+            AllowHTTPMethods: []string{"put"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

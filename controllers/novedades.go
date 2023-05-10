@@ -179,33 +179,30 @@ func (c *NovedadesController) GetAll() {
 // @Param	body		body 	models.Novedades	true		"body for Novedades content"
 // @Success 200 {object} models.Novedades
 // @Failure 403 :id is not int
-// @router /:id [put]
+// @router /:id/:vigencia [put]
 func (c *NovedadesController) Put() {
-	var novedad map[string]interface{} //[]models.NovedadSuspensionPut
+
+	idStr := c.Ctx.Input.Param(":id")
+	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
-	idStr := c.Ctx.Input.Param(":id")
 
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &novedad); err == nil {
-		if novedad["TipoNovedad"] == float64(216) {
-			if result, err := models.ReplicaReinicio(novedad, idStr); err == nil {
-				alertErr.Type = "OK"
-				alertErr.Code = "200"
-				alertErr.Body = result
-			} else {
-				alertErr.Type = "error"
-				alertErr.Code = "400"
-				alertas = append(alertas, err)
-				alertErr.Body = alertas
-				c.Ctx.Output.SetStatus(400)
-			}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
+
+		result, err1 := ActualizarNovedad(idStr)
+
+		if err1 == nil {
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = result
 		} else {
 			alertErr.Type = "error"
 			alertErr.Code = "400"
-			alertas = append(alertas, err.Error())
-			alertErr.Body = "Error al validar tipo de novedad!"
+			alertas = append(alertas, err1)
+			alertErr.Body = alertas
 			c.Ctx.Output.SetStatus(400)
 		}
+
 	} else {
 		alertErr.Type = "error"
 		alertErr.Code = "400"
@@ -260,6 +257,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		// adición
 		fmt.Println("Novedad de adición")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdicionPost(registroNovedadPost)
+		fmt.Println("2: ", NovedadPoscontractualPost)
 	case "NP_PRO":
 		// prórroga
 		fmt.Println("Novedad de prorroga")
@@ -339,4 +337,19 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 		return 0, errorRegistro
 	}
 
+}
+
+func ActualizarNovedad(id string) (status interface{}, outputError interface{}) {
+
+	var novedad map[string]interface{}
+	var resultadoRegistro map[string]interface{}
+	err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, &novedad)
+	if err == nil {
+		novedad["Estado"] = "TERMINADA"
+		errRegNovedad := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, "PUT", &resultadoRegistro, novedad)
+		if errRegNovedad == nil {
+			fmt.Println("Novedad actualizada!!")
+		}
+	}
+	return nil, nil
 }
