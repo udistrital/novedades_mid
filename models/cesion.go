@@ -36,7 +36,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
 		"Estado":            NovedadCesion["estado"],
-		"Enlace":            NovedadCesion["enlace"],
+		"EnlaceDocumento":   NovedadCesion["enlace"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -346,6 +346,10 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	var fechasolicitud interface{}
 	var fechaoficio interface{}
 	var fechafinefectiva interface{}
+	var tiponovedad []map[string]interface{}
+	var tipoNovedadNombre string
+	var estadoNovedad map[string]interface{}
+	var nombreEstadoNov string
 
 	var cedente interface{}
 	var cesionario interface{}
@@ -363,6 +367,9 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
 	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/poliza/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &poliza)
+	error3 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/tipo_novedad/?query=Id:"+strconv.FormatFloat((NovedadAdicion["TipoNovedad"]).(float64), 'f', -1, 64), &tiponovedad)
+	error4 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro/"+NovedadAdicion["Estado"].(string), &estadoNovedad)
+
 	if len(fechas[0]) > 0 {
 		for _, fecha := range fechas {
 			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
@@ -443,6 +450,19 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		}
 	}
 
+	if error3 == nil {
+		if len(tiponovedad[0]) != 0 {
+			tipoNovedadNombre = tiponovedad[0]["Nombre"].(string)
+		}
+	}
+
+	if error4 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			nombreEstadoNov = data["Nombre"].(string)
+		}
+	}
+
 	NovedadAdicionGet = map[string]interface{}{
 		"id":                         NovedadAdicion["Id"].(float64),
 		"aclaracion":                 NovedadAdicion["Aclaracion"],
@@ -472,12 +492,15 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"poliza":                     polizas,
 		"tiempoprorroga":             tiempoprorroga,
 		"tiponovedad":                NovedadAdicion["TipoNovedad"],
+		"nombreTipoNovedad":          tipoNovedadNombre,
 		"valoradicion":               valoradicion,
 		"valorfinalcontrato":         valorfinalcontrato,
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechaoficio":                fechaoficio,
 		"entidadaseguradora":         entidadaseguradora,
 		"fechafinefectiva":           fechafinefectiva,
+		"estado":                     nombreEstadoNov,
+		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
 	fmt.Println(error, error1, error2)

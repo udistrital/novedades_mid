@@ -257,6 +257,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		// adición
 		fmt.Println("Novedad de adición")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdicionPost(registroNovedadPost)
+		fmt.Println("2: ", NovedadPoscontractualPost)
 	case "NP_PRO":
 		// prórroga
 		fmt.Println("Novedad de prorroga")

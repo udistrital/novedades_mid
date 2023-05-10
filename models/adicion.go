@@ -22,8 +22,9 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdicion["vigenciacdp"].(string), 10, 32)
 	vigenciarp, _ := strconv.ParseInt(NovedadAdicion["vigenciarp"].(string), 10, 32)
 
-	fmt.Println(NovedadAdicion["contrato"], NovedadAdicion["numerocdp"], NovedadAdicion["numerosolicitud"], NovedadAdicion["vigencia"], NovedadAdicion["vigencia"])
-	fmt.Println("\n", contratoid, numerocdpid, numerorp, numerosolicitud, vigencia, vigenciacdp, vigenciarp, "\n")
+	fmt.Println("Novedad: ", NovedadAdicion)
+	// fmt.Println(NovedadAdicion["contrato"], NovedadAdicion["numerocdp"], NovedadAdicion["numerosolicitud"], NovedadAdicion["vigencia"], NovedadAdicion["vigencia"])
+	// fmt.Println("\n", contratoid, numerocdpid, numerorp, numerosolicitud, vigencia, vigenciacdp, vigenciarp, "\n")
 
 	NovedadAdicionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -42,7 +43,7 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 		"NumeroRp":          numerorp,
 		"VigenciaRp":        vigenciarp,
 		"Estado":            NovedadAdicion["estado"],
-		"Enlace":            NovedadAdicion["enlace"],
+		"EnlaceDocumento":   NovedadAdicion["enlace"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
@@ -164,9 +165,15 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 	var fechafinefectiva interface{}
 	var cesionario interface{}
 	var valoradicion interface{}
+	var tiponovedad []map[string]interface{}
+	var tipoNovedadNombre string
+	var estadoNovedad map[string]interface{}
+	var nombreEstadoNov string
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
+	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/tipo_novedad/?query=Id:"+strconv.FormatFloat((NovedadAdicion["TipoNovedad"]).(float64), 'f', -1, 64), &tiponovedad)
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro/"+NovedadAdicion["Estado"].(string), &estadoNovedad)
 
 	if len(fechas[0]) != 0 {
 		for _, fecha := range fechas {
@@ -195,6 +202,19 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 				valoradicion = propiedad["Propiedad"]
 			}
 			//fmt.Println(cesionario, valoradicion)
+		}
+	}
+
+	if error2 == nil {
+		if len(tiponovedad[0]) != 0 {
+			tipoNovedadNombre = tiponovedad[0]["Nombre"].(string)
+		}
+	}
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			nombreEstadoNov = data["Nombre"].(string)
 		}
 	}
 
@@ -227,10 +247,13 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 		"poliza":                     "",
 		"tiempoprorroga":             "",
 		"tiponovedad":                NovedadAdicion["TipoNovedad"],
+		"nombreTipoNovedad":          tipoNovedadNombre,
 		"valoradicion":               valoradicion,
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
+		"estado":                     nombreEstadoNov,
+		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
 	fmt.Println(error, error1)
