@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"fmt"
+	"log"
 	"math"
 	"reflect"
 	"strconv"
@@ -11,24 +12,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
 )
-
-func Temporizador() {
-	ReplicaFechaPosterior()
-	// tdr := time.Tick(86400 * time.Second)
-
-	// for horaActual := range tdr {
-	// 	ReplicaFechaPosterior()
-	// 	fmt.Println("Registro realizado en la fecha", horaActual)
-	// }
-	// ctx := context.Background()
-
-	// // when we want to wait till
-	// until, _ := time.Parse(time.RFC3339, "2023-06-22T15:04:05+02:00")
-
-	// // and now we wait
-	// waitUntil(ctx, until)
-
-}
 
 func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map[string]interface{}, outputError map[string]interface{}) {
 
@@ -83,16 +66,34 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 	fmt.Println("ArgoNovedadPost", ArgoNovedadPost)
 	fmt.Println("TitanNovedadPost", TitanNovedadPost)
 
-	// if result, err := PostReplica(url, ArgoNovedadPost, TitanNovedadPost); err == nil {
-	// 	return result, nil
-	// } else {
-	// 	outputError = map[string]interface{}{"funcion": "/ReplicafechaAnterior", "err": err, "status": "502"}
-	// 	return nil, outputError
-	// }
-	return nil, nil
+	if result, err := PostReplica(url, ArgoNovedadPost, TitanNovedadPost); err == nil {
+		return result, nil
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicafechaAnterior", "err": err, "status": "502"}
+		return nil, outputError
+	}
 }
 
-func ReplicaFechaPosterior() {
+func Temporizador() {
+
+	dt := time.Now()
+	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T23:45:00+00:00")
+
+	// 18000
+	tdr := time.Tick(5 * time.Minute)
+	for horaActual := range tdr {
+		log.Printf("Temporizador ejecutándose")
+		if dt.After(until) {
+			ReplicaFechaPosterior(horaActual)
+		}
+	}
+
+	// when we want to wait till
+	// until, _ := time.Parse(time.RFC3339, "2023-06-22T15:04:05+02:00")
+
+}
+
+func ReplicaFechaPosterior(horaActual time.Time) {
 
 	var novedadesResponse []map[string]interface{}
 	var replicaResult map[string]interface{}
@@ -104,6 +105,7 @@ func ReplicaFechaPosterior() {
 		for _, novedadRegistro := range novedadesResponse {
 			if replicaResult, outputError = ConsultarTipoNovedad(novedadRegistro); outputError == nil {
 				fmt.Println("Replica realizada correctamente (Temporizador)")
+				fmt.Println("Registro realizado en la fecha", horaActual)
 				fmt.Println(replicaResult)
 			} else {
 				fmt.Println("Fallo al realizar la réplica (Temporizador)")
