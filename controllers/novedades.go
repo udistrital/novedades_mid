@@ -85,6 +85,10 @@ func (c *NovedadesController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	vigencia := c.Ctx.Input.Param(":vigencia")
 
+	fmt.Println("Id: ", idStr)
+	fmt.Println("vigencia: ", vigencia)
+	fmt.Println("Endpoint: ", beego.AppConfig.String("NovedadesCrudService"))
+
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0&sortby=FechaCreacion&order=asc", &novedades)
 
 	if len(novedades) != 0 {
@@ -269,7 +273,12 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	}
 
 	if registroNovedadPost["tiponovedad"] == "NP_CES" {
-		errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+		novedad := NovedadPoscontractualPost["NovedadPoscontractual"].(map[string]interface{})
+		if novedad["Estado"] == "4518" {
+			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+		} else {
+			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+		}
 	} else {
 		errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 	}
