@@ -104,21 +104,6 @@ func RegistrarDoc(documento []map[string]interface{}) (status interface{}, outpu
 
 	var resultadoRegistro map[string]interface{}
 	var errRegDoc interface{}
-	fmt.Println("Documento1: ", documento)
-
-	registro := make(map[string]interface{})
-	registro = documento[0]
-
-	metadatos := registro["metadatos"].(map[string]interface{})
-	idEstado := metadatos["estado"].(string)
-
-	estadoString := ConsultarEstadoNovedad(idEstado)
-
-	metadatos["estado"] = estadoString
-
-	documento[0]["metadatos"] = metadatos
-
-	fmt.Println("Documento2: ", documento)
 
 	errRegDoc = models.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/upload", "POST", &resultadoRegistro, documento)
 

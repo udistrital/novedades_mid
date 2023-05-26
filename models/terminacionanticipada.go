@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
@@ -40,6 +41,9 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 
 	fechas := make([]map[string]interface{}, 0)
 
+	loc, _ := time.LoadLocation("America/Bogota")
+	f_solicitud, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadTAnticipada["fechasolicitud"].(string))
+
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
 		"Fecha":             NovedadTAnticipada["fecharegistro"],
@@ -55,7 +59,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             NovedadTAnticipada["fechasolicitud"],
+		"Fecha":             f_solicitud.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
