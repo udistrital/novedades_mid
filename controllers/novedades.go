@@ -276,7 +276,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		novedad := NovedadPoscontractualPost["NovedadPoscontractual"].(map[string]interface{})
 		if novedad["Estado"] == "4518" {
 			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
-		} else {
+		} else if novedad["Estado"] == "4519" {
 			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 		}
 	} else {

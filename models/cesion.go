@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
@@ -41,19 +42,12 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 
 	fechas := make([]map[string]interface{}, 0)
 
-	fechas = append(fechas, map[string]interface{}{
-		"Activo":            true,
-		"Fecha":             NovedadCesion["fechaadicion"],
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoFecha": map[string]interface{}{
-			"Id": 1,
-		},
-	})
+	loc, _ := time.LoadLocation("America/Bogota")
+
+	f_solicitud, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadCesion["fechasolicitud"].(string))
+	f_oficio, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadCesion["fechaoficio"].(string))
+	f_registro, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadCesion["fecharegistro"].(string))
+
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
 		"Fecha":             NovedadCesion["fechacesion"],
@@ -69,46 +63,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             NovedadCesion["fechaliquidacion"],
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoFecha": map[string]interface{}{
-			"Id": 3,
-		},
-	})
-	fechas = append(fechas, map[string]interface{}{
-		"Activo":            true,
-		"Fecha":             NovedadCesion["fechaprorroga"],
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoFecha": map[string]interface{}{
-			"Id": 4,
-		},
-	})
-	fechas = append(fechas, map[string]interface{}{
-		"Activo":            true,
-		"Fecha":             NovedadCesion["fechareinicio"],
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoFecha": map[string]interface{}{
-			"Id": 6,
-		},
-	})
-	fechas = append(fechas, map[string]interface{}{
-		"Activo":            true,
-		"Fecha":             NovedadCesion["fechasolicitud"],
+		"Fecha":             f_solicitud.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
@@ -121,33 +76,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             NovedadCesion["fechasuspension"],
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoFecha": map[string]interface{}{
-			"Id": 8,
-		},
-	})
-	fechas = append(fechas, map[string]interface{}{
-		"Activo":            true,
-		"Fecha":             NovedadCesion["fechaterminacionanticipada"],
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoFecha": map[string]interface{}{
-			"Id": 9,
-		},
-	})
-	fechas = append(fechas, map[string]interface{}{
-		"Activo":            true,
-		"Fecha":             NovedadCesion["fechaoficio"],
+		"Fecha":             f_oficio.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
@@ -160,7 +89,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             NovedadCesion["fecharegistro"],
+		"Fecha":             f_registro.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
@@ -335,14 +264,8 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	var poliza []map[string]interface{}
 	NovedadAdicion = novedad
 	NovedadAdicionGet := make(map[string]interface{})
-	var fechaadicion interface{}
 	var fechacesion interface{}
-	var fechaliquidacion interface{}
-	var fechaprorroga interface{}
 	var fecharegistro interface{}
-	var fechareinicio interface{}
-	var fechasuspension interface{}
-	var fechaterminacionanticipada interface{}
 	var fechasolicitud interface{}
 	var fechaoficio interface{}
 	var fechafinefectiva interface{}
@@ -374,32 +297,14 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		for _, fecha := range fechas {
 			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
 			nombrefecha := tipofecha["Nombre"]
-			if nombrefecha == "FechaAdicion" {
-				fechaadicion = fecha["Fecha"]
-			}
 			if nombrefecha == "FechaCesion" {
 				fechacesion = fecha["Fecha"]
-			}
-			if nombrefecha == "FechaLiquidacion" {
-				fechaliquidacion = fecha["Fecha"]
-			}
-			if nombrefecha == "FechaProrroga" {
-				fechaprorroga = fecha["Fecha"]
 			}
 			if nombrefecha == "FechaRegistro" {
 				fecharegistro = fecha["Fecha"]
 			}
-			if nombrefecha == "FechaReinicio" {
-				fechareinicio = fecha["Fecha"]
-			}
-			if nombrefecha == "FechaSuspension" {
-				fechasuspension = fecha["Fecha"]
-			}
 			if nombrefecha == "FechaSolicitud" {
 				fechasolicitud = fecha["Fecha"]
-			}
-			if nombrefecha == "FechaTerminacionAnticipada" {
-				fechaterminacionanticipada = fecha["Fecha"]
 			}
 			if nombrefecha == "FechaOficio" {
 				fechaoficio = fecha["Fecha"]
@@ -472,15 +377,15 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"cedente":                    cedente,
 		"cesionario":                 cesionario,
 		"contrato":                   NovedadAdicion["ContratoId"],
-		"fechaadicion":               fechaadicion,
+		"fechaadicion":               "",
 		"fechacesion":                fechacesion,
-		"fechaliquidacion":           fechaliquidacion,
-		"fechaprorroga":              fechaprorroga,
+		"fechaliquidacion":           "",
+		"fechaprorroga":              "",
 		"fecharegistro":              fecharegistro,
-		"fechareinicio":              fechareinicio,
+		"fechareinicio":              "",
 		"fechasolicitud":             fechasolicitud,
-		"fechasuspension":            fechasuspension,
-		"fechaterminacionanticipada": fechaterminacionanticipada,
+		"fechasuspension":            "",
+		"fechaterminacionanticipada": "",
 		"motivo":                     NovedadAdicion["Motivo"],
 		"numeroactaentrega":          numeroactaentrega,
 		"numerocdp":                  NovedadAdicion["NumeroCdpId"],

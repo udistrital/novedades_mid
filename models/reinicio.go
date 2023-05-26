@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
@@ -38,6 +39,9 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 
 	fechas := make([]map[string]interface{}, 0)
 
+	loc, _ := time.LoadLocation("America/Bogota")
+	f_solicitud, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadReinicio["fechasolicitud"].(string))
+
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
 		"Fecha":             NovedadReinicio["fecharegistro"],
@@ -53,7 +57,7 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             NovedadReinicio["fechasolicitud"],
+		"Fecha":             f_solicitud.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
