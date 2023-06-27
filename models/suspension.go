@@ -15,8 +15,8 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 
 	NovedadSuspensionPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadSuspension["contrato"].(string), 10, 32)
-	numerosolicitudentero := NovedadSuspension["numerosolicitud"].(float64)
-	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	// numerosolicitudentero := NovedadSuspension["numerosolicitud"].(float64)
+	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadSuspension["vigencia"].(string), 10, 32)
 
 	fmt.Println("novedad: ", novedad)
@@ -30,7 +30,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 		"Id":                0,
 		"Motivo":            NovedadSuspension["motivo"],
 		"NumeroCdpId":       0,
-		"NumeroSolicitud":   numerosolicitud,
+		"NumeroSolicitud":   NovedadSuspension["numerosolicitud"],
 		"Observacion":       nil,
 		"TipoNovedad":       1,
 		"Vigencia":          vigencia,
@@ -121,6 +121,32 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 			"Id": 12,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadSuspension["fechaoficiosupervisor"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 0,
+		},
+	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadSuspension["fechaoficioordenador"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 0,
+		},
+	})
 
 	NovedadSuspensionPost["Fechas"] = fechas
 
@@ -150,6 +176,32 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 			"Id": 2,
 		},
 		"propiedad": NovedadSuspension["cesionario"],
+	})
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 9,
+		},
+		"propiedad": NovedadSuspension["numerooficiosupervisor"],
+	})
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 14,
+		},
+		"propiedad": NovedadSuspension["numerooficioordenador"],
 	})
 
 	NovedadSuspensionPost["Propiedad"] = propiedades
