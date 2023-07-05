@@ -131,7 +131,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 			"Id": nil,
 		},
 		"IdTipoFecha": map[string]interface{}{
-			"Id": 0,
+			"Id": 10,
 		},
 	})
 	fechas = append(fechas, map[string]interface{}{
@@ -144,7 +144,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 			"Id": nil,
 		},
 		"IdTipoFecha": map[string]interface{}{
-			"Id": 0,
+			"Id": 13,
 		},
 	})
 
@@ -199,7 +199,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 			"Id": nil,
 		},
 		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 14,
+			"Id": 16,
 		},
 		"propiedad": NovedadSuspension["numerooficioordenador"],
 	})
