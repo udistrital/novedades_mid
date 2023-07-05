@@ -45,7 +45,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 	loc, _ := time.LoadLocation("America/Bogota")
 
 	f_solicitud, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadCesion["fechasolicitud"].(string))
-	f_oficio, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadCesion["fechaoficio"].(string))
+	// f_oficio, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadCesion["fechaoficio"].(string))
 	f_registro, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadCesion["fecharegistro"].(string))
 
 	fechas = append(fechas, map[string]interface{}{
@@ -72,19 +72,6 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 		},
 		"IdTipoFecha": map[string]interface{}{
 			"Id": 7,
-		},
-	})
-	fechas = append(fechas, map[string]interface{}{
-		"Activo":            true,
-		"Fecha":             f_oficio.In(loc),
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoFecha": map[string]interface{}{
-			"Id": 10,
 		},
 	})
 	fechas = append(fechas, map[string]interface{}{
@@ -123,7 +110,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 			"Id": nil,
 		},
 		"IdTipoFecha": map[string]interface{}{
-			"Id": 0,
+			"Id": 10,
 		},
 	})
 	fechas = append(fechas, map[string]interface{}{
@@ -136,7 +123,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 			"Id": nil,
 		},
 		"IdTipoFecha": map[string]interface{}{
-			"Id": 0,
+			"Id": 13,
 		},
 	})
 
@@ -181,19 +168,6 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 			"Id": 13,
 		},
 		"propiedad": NovedadCesion["numeroactaentrega"],
-	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 9,
-		},
-		"propiedad": NovedadCesion["numerooficioestadocuentas"],
 	})
 
 	propiedades = append(propiedades, map[string]interface{}{
@@ -283,7 +257,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 			"Id": nil,
 		},
 		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 14,
+			"Id": 16,
 		},
 		"propiedad": NovedadCesion["numerooficioordenador"],
 	})
