@@ -16,6 +16,7 @@ type AprobacionController struct {
 // URLMapping ...
 func (c *AprobacionController) URLMapping() {
 	c.Mapping("Get", c.Get)
+	c.Mapping("Put", c.Put)
 }
 
 // Get ...
@@ -27,52 +28,19 @@ func (c *AprobacionController) URLMapping() {
 // @router /:rol [get]
 func (c *AprobacionController) Get() {
 
+	var alerta models.Alert
 	rol := c.Ctx.Input.Param(":rol")
 
-	var novedades []map[string]interface{}
-	var response []map[string]interface{}
-	var response1 []map[string]interface{}
-	var response2 []map[string]interface{}
+	resultTabla, err := models.ConsultaTablaAprobacion(rol)
 
-	var alerta models.Alert
-
-	switch rol {
-	case "SUPERVISOR":
-		if errSup := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4536", &response); errSup == nil {
-			novedades = append(novedades, response...)
-		}
-		if errSup1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4537", &response1); errSup1 == nil {
-			novedades = append(novedades, response1...)
-		}
-		if errSup2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4538", &response2); errSup2 == nil {
-			novedades = append(novedades, response2...)
-		}
-	case "ORDENADOR_DEL_GASTO":
-		if err1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4539", &response); err1 == nil {
-			novedades = append(novedades, response...)
-		}
-		if err2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4540", &response1); err2 == nil {
-			novedades = append(novedades, response1...)
-		}
-	case "ASISTENTE_JURIDICA":
-		if err1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4541", &response); err1 == nil {
-			novedades = append(novedades, response...)
-		}
-		if err2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4542", &response1); err2 == nil {
-			novedades = append(novedades, response1...)
-		}
-	default:
-		fmt.Println("El rol no coincide con alguno registrado!")
-	}
-
-	if novedades != nil {
+	if err == nil {
 		alerta.Type = "OK"
 		alerta.Code = "200"
-		alerta.Body = novedades
+		alerta.Body = resultTabla
 	} else {
 		alerta.Type = "error"
 		alerta.Code = "400"
-		alerta.Body = "No se ha podido realizar la petición GET"
+		alerta.Body = err
 	}
 
 	c.Data["json"] = alerta
@@ -127,7 +95,7 @@ func ActualizarEstadoNovedad(id string, estado string) (status interface{}, outp
 
 	var novedad map[string]interface{}
 	var resultadoRegistro map[string]interface{}
-	err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, &novedad)
+	err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/nvedades_poscontractuales/"+id, &novedad)
 	if err == nil {
 		novedad["Estado"] = estado
 		errRegNovedad := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, "PUT", &resultadoRegistro, novedad)

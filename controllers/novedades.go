@@ -230,7 +230,7 @@ func (c *NovedadesController) Delete() {
 
 }
 
-//RegistrarNovedadMongo Función para registrar la novedad en postgresql
+// RegistrarNovedadMongo Función para registrar la novedad en postgresql
 func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outputError interface{}) {
 
 	registroNovedadPost := make(map[string]interface{})
@@ -295,7 +295,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 
 }
 
-//Función que duplicará los datos de registro de novedades de adición y cesión
+// Función que duplicará los datos de registro de novedades de adición y cesión
 func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdmAmazon int, outputError interface{}) {
 	NovedadAmazon := Novedad
 	var NovedadGET []map[string]interface{}
