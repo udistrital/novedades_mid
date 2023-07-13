@@ -280,6 +280,25 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 
 	NovedadCesionPost["Poliza"] = poliza
 
+	aprobacionfirma := make([]map[string]interface{}, 0)
+
+	aprobacionfirma = append(aprobacionfirma, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"Proceso":          NovedadCesion["estado"],
+		"FechaProceso":     NovedadCesion["fecharegistro"],
+		"DocumentoPersona": NovedadCesion["documentopersona"],
+		"NombrePersona":    NovedadCesion["nombrepersona"],
+		"DocumentoActa":    NovedadCesion["documentoacta"],
+	})
+
+	NovedadCesionPost["AprobacionFirma"] = aprobacionfirma
+
 	return NovedadCesionPost
 }
 

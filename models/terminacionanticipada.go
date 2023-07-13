@@ -168,6 +168,25 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 
 	NovedadTAnticipadaPost["Propiedad"] = propiedades
 
+	aprobacionfirma := make([]map[string]interface{}, 0)
+
+	aprobacionfirma = append(aprobacionfirma, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"Proceso":          NovedadTAnticipada["estado"],
+		"FechaProceso":     NovedadTAnticipada["fecharegistro"],
+		"DocumentoPersona": NovedadTAnticipada["documentopersona"],
+		"NombrePersona":    NovedadTAnticipada["nombrepersona"],
+		"DocumentoActa":    NovedadTAnticipada["documentoacta"],
+	})
+
+	NovedadTAnticipadaPost["AprobacionFirma"] = aprobacionfirma
+
 	fmt.Println(NovedadTAnticipadaPost)
 
 	return NovedadTAnticipadaPost

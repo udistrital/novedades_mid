@@ -153,6 +153,25 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 
 	NovedadAdicionPost["Propiedad"] = propiedades
 
+	aprobacionfirma := make([]map[string]interface{}, 0)
+
+	aprobacionfirma = append(aprobacionfirma, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"Proceso":          NovedadAdicion["estado"],
+		"FechaProceso":     NovedadAdicion["fecharegistro"],
+		"DocumentoPersona": NovedadAdicion["documentopersona"],
+		"NombrePersona":    NovedadAdicion["nombrepersona"],
+		"DocumentoActa":    NovedadAdicion["documentoacta"],
+	})
+
+	NovedadAdicionPost["AprobacionFirma"] = aprobacionfirma
+
 	// fmt.Println(NovedadAdicionPost)
 
 	return NovedadAdicionPost

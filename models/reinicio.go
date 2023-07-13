@@ -219,7 +219,26 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 
 	NovedadReinicioPost["Propiedad"] = propiedades
 
-	return NovedadReinicioPost
+	aprobacionfirma := make([]map[string]interface{}, 0)
+
+	aprobacionfirma = append(aprobacionfirma, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"Proceso":          NovedadReinicio["estado"],
+		"FechaProceso":     NovedadReinicio["fecharegistro"],
+		"DocumentoPersona": NovedadReinicio["documentopersona"],
+		"NombrePersona":    NovedadReinicio["nombrepersona"],
+		"DocumentoActa":    NovedadReinicio["documentoacta"],
+	})
+
+	NovedadReinicioPost["AprobacionFirma"] = aprobacionfirma
+
+	return
 }
 
 func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
