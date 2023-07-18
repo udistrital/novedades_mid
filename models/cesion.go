@@ -392,9 +392,8 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 			}
 		}
 	}
-	if len(propiedades[0]) > 0 {
+	if len(poliza[0]) > 0 {
 		for _, poliz := range poliza {
-
 			polizas = poliz["NumeroPolizaId"]
 			entidadaseguradora = poliz["EntidadAseguradoraId"]
 		}

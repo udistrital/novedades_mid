@@ -241,6 +241,8 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 	var fechasuspension interface{}
 	var fechafinsuspension interface{}
 	var fechafinefectiva interface{}
+	var numerooficiosupervisor interface{}
+	var numerooficioordenador interface{}
 	var cesionario interface{}
 	var periodosuspension interface{}
 	var tipoNovedadNombre string
@@ -290,6 +292,12 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 				if nombrepropiedad == "PeriodoSuspension" {
 					periodosuspension = propiedad["Propiedad"]
 				}
+				if nombrepropiedad == "NumeroOficioSupervisor" {
+					numerooficiosupervisor = propiedad["Propiedad"]
+				}
+				if nombrepropiedad == "NumeroOficioOrdenador" {
+					numerooficioordenador = propiedad["Propiedad"]
+				}
 			}
 		}
 	}
@@ -328,7 +336,8 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 		"motivo":                     NovedadAdicion["Motivo"],
 		"numeroactaentrega":          "",
 		"numerocdp":                  "",
-		"numerooficioestadocuentas":  "",
+		"numerooficiosupervisor":     numerooficiosupervisor,
+		"numerooficioordenador":      numerooficioordenador,
 		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
 		"observacion":                "",
 		"periodosuspension":          periodosuspension,
@@ -342,7 +351,8 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinsuspension":         fechafinsuspension,
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
+		"nombreEstado":               nombreEstadoNov,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 

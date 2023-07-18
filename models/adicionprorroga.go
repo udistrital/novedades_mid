@@ -302,7 +302,8 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"nombreEstado":               nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 

@@ -29,10 +29,10 @@ func ConsultaTablaAprobacion(rol string) (result []map[string]interface{}, outpu
 	fmt.Println("Rol: ", rol)
 	switch rol {
 	case "SUPERVISOR":
-		err1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4536", &r1)
-		if err1 == nil && len(r1[0]) > 0 {
-			novedades = append(novedades, r1...)
-		}
+		// err1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4536", &r1)
+		// if err1 == nil && len(r1[0]) > 0 {
+		// 	novedades = append(novedades, r1...)
+		// }
 		err2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales?limit=0&sortby=FechaCreacion&order=asc&query=estado:4537", &r2)
 		if err2 == nil && len(r2[0]) > 0 {
 			novedades = append(novedades, r2...)
@@ -102,7 +102,7 @@ func ConsultaTablaAprobacion(rol string) (result []map[string]interface{}, outpu
 			url := "/aprobacionfirma/?query=id_novedades_poscontractuales:" + strconv.FormatFloat((novedad["Id"]).(float64), 'f', -1, 64) + "&limit=0&sortby=FechaCreacion&order=asc"
 			error4 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &aprobFirmas)
 			if error2 == nil && len(tiponovedad[0]) > 0 {
-				novedad["TipoNovedad"] = tiponovedad[0]["Nombre"].(string)
+				novedad["TipoNovedadNombre"] = tiponovedad[0]["Nombre"].(string)
 			}
 			// fmt.Println("Novedad: ", novedad)
 			// fmt.Println("estadoNovedad", estadoNovedad)

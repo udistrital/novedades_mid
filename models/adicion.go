@@ -275,7 +275,8 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"nombreEstado":               nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
