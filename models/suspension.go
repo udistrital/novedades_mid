@@ -206,25 +206,6 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 
 	NovedadSuspensionPost["Propiedad"] = propiedades
 
-	aprobacionfirma := make([]map[string]interface{}, 0)
-
-	aprobacionfirma = append(aprobacionfirma, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"Proceso":          NovedadSuspension["estado"],
-		"FechaProceso":     NovedadSuspension["fecharegistro"],
-		"DocumentoPersona": NovedadSuspension["documentopersona"],
-		"NombrePersona":    NovedadSuspension["nombrepersona"],
-		"DocumentoActa":    NovedadSuspension["documentoacta"],
-	})
-
-	NovedadSuspensionPost["AprobacionFirma"] = aprobacionfirma
-
 	return NovedadSuspensionPost
 }
 

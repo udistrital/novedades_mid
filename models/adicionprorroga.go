@@ -176,25 +176,6 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 
 	NovedadAdProrrogaPost["Propiedad"] = propiedades
 
-	aprobacionfirma := make([]map[string]interface{}, 0)
-
-	aprobacionfirma = append(aprobacionfirma, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"Proceso":          NovedadAdProrroga["estado"],
-		"FechaProceso":     NovedadAdProrroga["fecharegistro"],
-		"DocumentoPersona": NovedadAdProrroga["documentopersona"],
-		"NombrePersona":    NovedadAdProrroga["nombrepersona"],
-		"DocumentoActa":    NovedadAdProrroga["documentoacta"],
-	})
-
-	NovedadAdProrrogaPost["AprobacionFirma"] = aprobacionfirma
-
 	return NovedadAdProrrogaPost
 }
 
