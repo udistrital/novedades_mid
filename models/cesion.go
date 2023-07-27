@@ -36,6 +36,8 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 		"TipoNovedad":       2,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
+		"OficioSupervisor":  NovedadCesion["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadCesion["numerooficioordenador"],
 		"Estado":            NovedadCesion["estado"],
 		"EnlaceDocumento":   NovedadCesion["enlace"],
 	}
@@ -235,32 +237,6 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 		},
 		"propiedad": NovedadCesion["valorfinalcontrato"],
 	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 9,
-		},
-		"propiedad": NovedadCesion["numerooficiosupervisor"],
-	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 16,
-		},
-		"propiedad": NovedadCesion["numerooficioordenador"],
-	})
 
 	NovedadCesionPost["Propiedad"] = propiedades
 
@@ -428,6 +404,8 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechaoficio":                fechaoficio,
 		"entidadaseguradora":         entidadaseguradora,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
 		"fechafinefectiva":           fechafinefectiva,
 		"estado":                     nombreEstadoNov,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],

@@ -15,9 +15,9 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 
 	NovedadReinicioPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadReinicio["contrato"].(string), 10, 32)
-	//numerocdpid, _ := strconv.ParseInt(NovedadSuspension["numerocdp"].(string), 10, 32)
-	numerosolicitudentero := NovedadReinicio["numerosolicitud"].(float64)
-	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	// umerocdpid, _ := strconv.ParseInt(NovedadSuspension["numerocdp"].(string), 10, 32)
+	// numerosolicitudentero := NovedadReinicio["numerosolicitud"].(float64)
+	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadReinicio["vigencia"].(string), 10, 32)
 
 	NovedadReinicioPost["NovedadPoscontractual"] = map[string]interface{}{
@@ -29,10 +29,12 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 		"Id":                0,
 		"Motivo":            NovedadReinicio["motivo"],
 		"NumeroCdpId":       0,
-		"NumeroSolicitud":   numerosolicitud,
+		"NumeroSolicitud":   NovedadReinicio["numerosolicitud"],
 		"Observacion":       NovedadReinicio["observacion"],
 		"TipoNovedad":       3,
 		"Vigencia":          vigencia,
+		"OficioSupervisor":  NovedadReinicio["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadReinicio["numerooficioordenador"],
 		"Estado":            NovedadReinicio["estado"],
 		"EnlaceDocumento":   NovedadReinicio["enlace"],
 	}
@@ -137,19 +139,6 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 	NovedadReinicioPost["Fechas"] = fechas
 
 	propiedades := make([]map[string]interface{}, 0)
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 9,
-		},
-		"propiedad": NovedadReinicio["numerooficioestadocuentas"],
-	})
 	propiedades = append(propiedades, map[string]interface{}{
 		"Activo":            true,
 		"FechaCreacion":     nil,
@@ -338,7 +327,10 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
+		"nombreEstado":               nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 

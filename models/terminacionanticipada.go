@@ -16,8 +16,8 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	NovedadTAnticipadaPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadTAnticipada["contrato"].(string), 10, 32)
 	//numerocdpid, _ := strconv.ParseInt(NovedadSuspension["numerocdp"].(string), 10, 32)
-	numerosolicitudentero := NovedadTAnticipada["numerosolicitud"].(float64)
-	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	// numerosolicitudentero := NovedadTAnticipada["numerosolicitud"].(float64)
+	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadTAnticipada["vigencia"].(string), 10, 32)
 	// vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigenciacdp"].(string), 10, 32)
 
@@ -30,11 +30,13 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 		"Id":                0,
 		"Motivo":            NovedadTAnticipada["motivo"],
 		"NumeroCdpId":       0,
-		"NumeroSolicitud":   numerosolicitud,
+		"NumeroSolicitud":   NovedadTAnticipada["numerosolicitud"],
 		"Observacion":       nil,
 		"TipoNovedad":       5,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       0,
+		"OficioSupervisor":  NovedadTAnticipada["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadTAnticipada["numerooficioordenador"],
 		"Estado":            NovedadTAnticipada["estado"],
 		"EnlaceDocumento":   NovedadTAnticipada["enlace"],
 	}
@@ -94,6 +96,34 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 		},
 		"IdTipoFecha": map[string]interface{}{
 			"Id": 12,
+		},
+	})
+
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadTAnticipada["fechaoficiosupervisor"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 10,
+		},
+	})
+
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadTAnticipada["fechaoficioordenador"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 13,
 		},
 	})
 
@@ -274,7 +304,10 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
+		"nombreEstado":               nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 

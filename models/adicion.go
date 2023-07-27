@@ -17,8 +17,8 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	contratoid, _ := strconv.ParseInt(NovedadAdicion["contrato"].(string), 10, 32)
 	numerocdpid, _ := strconv.ParseInt(NovedadAdicion["numerocdp"].(string), 10, 32)
 	numerorp, _ := strconv.ParseInt(NovedadAdicion["numerorp"].(string), 10, 32)
-	numerosolicitudentero := NovedadAdicion["numerosolicitud"].(float64)
-	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	// numerosolicitudentero := NovedadAdicion["numerosolicitud"].(float64)
+	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadAdicion["vigencia"].(string), 10, 32)
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdicion["vigenciacdp"].(string), 10, 32)
 	vigenciarp, _ := strconv.ParseInt(NovedadAdicion["vigenciarp"].(string), 10, 32)
@@ -36,13 +36,15 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 		"Id":                0,
 		"Motivo":            NovedadAdicion["motivo"],
 		"NumeroCdpId":       numerocdpid,
-		"NumeroSolicitud":   numerosolicitud,
+		"NumeroSolicitud":   NovedadAdicion["numerosolicitud"],
 		"Observacion":       nil,
 		"TipoNovedad":       6,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
 		"NumeroRp":          numerorp,
 		"VigenciaRp":        vigenciarp,
+		"OficioSupervisor":  NovedadAdicion["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadAdicion["numerooficioordenador"],
 		"Estado":            NovedadAdicion["estado"],
 		"EnlaceDocumento":   NovedadAdicion["enlace"],
 	}
@@ -243,7 +245,6 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 		"motivo":                     NovedadAdicion["Motivo"],
 		"numeroactaentrega":          "",
 		"numerocdp":                  NovedadAdicion["NumeroCdpId"],
-		"numerooficioestadocuentas":  "",
 		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
 		"observacion":                NovedadAdicion["Observacion"],
 		"periodosuspension":          "",
@@ -257,6 +258,8 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
 		"nombreEstado":               nombreEstadoNov,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
 		"estado":                     NovedadAdicion["Estado"],
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
