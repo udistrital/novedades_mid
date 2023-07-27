@@ -50,10 +50,6 @@ func init() {
 				&controllers.GestorDocumentalController{},
 			),
 		),
-		beego.NSNamespace("/aprobacion",
-			beego.NSInclude(
-				&controllers.AprobacionController{},
-			)),
 	)
 	beego.AddNamespace(ns)
 }

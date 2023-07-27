@@ -12,27 +12,6 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
-  /aprobacion/{id}/{vigencia}:
-    get:
-      tags:
-      - aprobacion
-      description: |-
-        get Novedades by id
-        <br>
-      operationId: AprobacionController.GetOne
-      parameters:
-      - in: path
-        name: id
-        description: The key for staticblock
-        required: true
-        type: string
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/models.Novedades'
-        "403":
-          description: :id is empty
   /gestor_documental/:
     post:
       tags:
@@ -72,7 +51,7 @@ paths:
           description: '{}'
         "403":
           description: :enlace is empty
-  /gestor_documental/{id}:
+  /gestor_documental/{url}:
     put:
       tags:
       - gestor_documental

@@ -17,8 +17,8 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 	contratoid, _ := strconv.ParseInt(NovedadProrroga["contrato"].(string), 10, 32)
 	numerocdpid, _ := strconv.ParseInt(NovedadProrroga["numerocdp"].(string), 10, 32)
 	numerorp, _ := strconv.ParseInt(NovedadProrroga["numerorp"].(string), 10, 32)
-	numerosolicitudentero := NovedadProrroga["numerosolicitud"].(float64)
-	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	// numerosolicitudentero := NovedadProrroga["numerosolicitud"].(float64)
+	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadProrroga["vigencia"].(string), 10, 32)
 	vigenciacdp, _ := strconv.ParseInt(NovedadProrroga["vigenciacdp"].(string), 10, 32)
 	vigenciarp, _ := strconv.ParseInt(NovedadProrroga["vigenciarp"].(string), 10, 32)
@@ -32,13 +32,15 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 		"Id":                0,
 		"Motivo":            NovedadProrroga["motivo"],
 		"NumeroCdpId":       numerocdpid,
-		"NumeroSolicitud":   numerosolicitud,
+		"NumeroSolicitud":   NovedadProrroga["numerosolicitud"],
 		"Observacion":       nil,
 		"TipoNovedad":       7,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
 		"NumeroRp":          numerorp,
 		"VigenciaRp":        vigenciarp,
+		"OficioSupervisor":  NovedadProrroga["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadProrroga["numerooficioordenador"],
 		"Estado":            NovedadProrroga["estado"],
 		"EnlaceDocumento":   NovedadProrroga["enlace"],
 	}
@@ -287,7 +289,10 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
+		"nombreEstado":               nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 

@@ -77,14 +77,15 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 func Temporizador() {
 
 	dt := time.Now()
-	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T23:45:00+00:00")
-
+	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T17:29:00+00:00")
+	fmt.Println("Until: ", until)
 	// 18000
-	tdr := time.Tick(5 * time.Minute)
+	tdr := time.Tick(5 * time.Second)
 	for horaActual := range tdr {
 		log.Printf("Temporizador ejecutándose")
 		if dt.After(until) {
-			ReplicaFechaPosterior(horaActual)
+			fmt.Println(horaActual)
+			// ReplicaFechaPosterior(horaActual)
 		}
 	}
 
@@ -99,7 +100,7 @@ func ReplicaFechaPosterior(horaActual time.Time) {
 	var replicaResult map[string]interface{}
 	var outputError map[string]interface{}
 
-	url := "/novedades_poscontractuales?query=Estado:EN_TRAMITE&limit=0"
+	url := "/novedades_poscontractuales?query=Estado:4518&limit=0"
 
 	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesResponse); err == nil {
 		for _, novedadRegistro := range novedadesResponse {
@@ -431,19 +432,18 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 	fmt.Println("ArgoReinicioPost: ", ArgoReinicioPost)
 	fmt.Println("TitanReinicioPost: ", TitanReinicioPost)
 
-	// url = "/novedad_postcontractual/" + idStr
-	// if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
-	// 	if err = SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
-	// 		return result, nil
-	// 	} else {
-	// 		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
-	// 		return nil, outputError
-	// 	}
-	// } else {
-	// 	outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
-	// 	return nil, outputError
-	// }
-	return nil, nil
+	url = "/novedad_postcontractual/" + idStr
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+		if err = SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
+			return result, nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+			return nil, outputError
+		}
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+		return nil, outputError
+	}
 }
 
 func ReplicaTerminacion(novedad map[string]interface{}, propiedades []map[string]interface{}, fechas []map[string]interface{}) (result map[string]interface{}, outputError map[string]interface{}) {
@@ -500,14 +500,13 @@ func ReplicaTerminacion(novedad map[string]interface{}, propiedades []map[string
 	fmt.Println("ArgoTerminacionPost: ", ArgoTerminacionPost)
 	fmt.Println("TitanTerminacionPost: ", TitanTerminacionPost)
 
-	// url = "/novedadCPS/cancelar_contrato"
-	// if result, err := PostReplica(url, ArgoTerminacionPost, TitanTerminacionPost); err == nil {
-	// 	return result, nil
-	// } else {
-	// 	outputError = map[string]interface{}{"funcion": "/ReplicaTerminacion", "err": err}
-	// 	return nil, err
-	// }
-	return nil, nil
+	url = "/novedadCPS/cancelar_contrato"
+	if result, err := PostReplica(url, ArgoTerminacionPost, TitanTerminacionPost); err == nil {
+		return result, nil
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicaTerminacion", "err": err}
+		return nil, err
+	}
 }
 
 func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[string]interface{}, fechas []map[string]interface{}) (result map[string]interface{}, outputError map[string]interface{}) {
@@ -601,14 +600,13 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	fmt.Println("ArgoOtrosiPost: ", ArgoOtrosiPost)
 	fmt.Println("TitanOtrosiPost: ", TitanOtrosiPost)
 
-	// url = "/novedadCPS/otrosi_contrato"
-	// if result, err := PostReplica(url, ArgoOtrosiPost, TitanOtrosiPost); err == nil {
-	// 	return result, nil
-	// } else {
-	// 	outputError = map[string]interface{}{"funcion": "/ReplicaAdicionProrroga", "err": err}
-	// 	return nil, err
-	// }
-	return nil, nil
+	url = "/novedadCPS/otrosi_contrato"
+	if result, err := PostReplica(url, ArgoOtrosiPost, TitanOtrosiPost); err == nil {
+		return result, nil
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicaAdicionProrroga", "err": err}
+		return nil, err
+	}
 }
 
 func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiPost map[string]interface{}) (resultPost map[string]interface{}, outputError map[string]interface{}) {

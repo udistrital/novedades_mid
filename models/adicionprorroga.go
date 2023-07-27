@@ -18,8 +18,8 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 	contratoid, _ := strconv.ParseInt(NovedadAdProrroga["contrato"].(string), 10, 32)
 	numerocdpid, _ := strconv.ParseInt(NovedadAdProrroga["numerocdp"].(string), 10, 32)
 	numerorp, _ := strconv.ParseInt(NovedadAdProrroga["numerorp"].(string), 10, 32)
-	numerosolicitudentero := NovedadAdProrroga["numerosolicitud"].(float64)
-	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	// numerosolicitudentero := NovedadAdProrroga["numerosolicitud"].(float64)
+	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadAdProrroga["vigencia"].(string), 10, 32)
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdProrroga["vigenciacdp"].(string), 10, 32)
 	vigenciarp, _ := strconv.ParseInt(NovedadAdProrroga["vigenciarp"].(string), 10, 32)
@@ -33,13 +33,15 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 		"Id":                0,
 		"Motivo":            NovedadAdProrroga["motivo"],
 		"NumeroCdpId":       numerocdpid,
-		"NumeroSolicitud":   numerosolicitud,
+		"NumeroSolicitud":   NovedadAdProrroga["numerosolicitud"],
 		"Observacion":       nil,
 		"TipoNovedad":       8,
 		"Vigencia":          vigencia,
 		"VigenciaCdp":       vigenciacdp,
 		"NumeroRp":          numerorp,
 		"VigenciaRp":        vigenciarp,
+		"OficioSupervisor":  NovedadAdProrroga["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadAdProrroga["numerooficioordenador"],
 		"Estado":            NovedadAdProrroga["estado"],
 		"EnlaceDocumento":   NovedadAdProrroga["enlace"],
 	}
@@ -87,6 +89,7 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 			"Id": 4,
 		},
 	})
+	fmt.Println("FechaFinEfectiva: ", NovedadAdProrroga["fechafinefectiva"])
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
 		"Fecha":             NovedadAdProrroga["fechafinefectiva"],
@@ -176,7 +179,9 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 
 	NovedadAdProrrogaPost["Propiedad"] = propiedades
 
-	return NovedadAdProrrogaPost
+	fmt.Println("Estructura: ", NovedadAdProrrogaPost)
+
+	return nil
 }
 
 func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
@@ -283,7 +288,10 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
+		"nombreEstado":               nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
