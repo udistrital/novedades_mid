@@ -74,7 +74,7 @@ func (c *GestorDocumentalController) Post() {
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroDoc); err == nil {
 
-		result, err1 := RegistrarDoc(registroDoc)
+		result, err1 := RegistrarDoc(registroDoc, "upload")
 
 		if err1 == nil {
 			alertErr.Type = "OK"
@@ -100,21 +100,25 @@ func (c *GestorDocumentalController) Post() {
 	c.ServeJSON()
 }
 
-func RegistrarDoc(documento []map[string]interface{}) (status interface{}, outputError interface{}) {
+func RegistrarDoc(documento []map[string]interface{}, url string) (status interface{}, outputError interface{}) {
 
 	var resultadoRegistro map[string]interface{}
 	var errRegDoc interface{}
-
-	errRegDoc = models.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/upload", "POST", &resultadoRegistro, documento)
-
-	if resultadoRegistro["Status"].(string) == "200" && errRegDoc == nil {
-
-		// jsonString, _ := json.Marshal(resultadoRegistro["res"])
+	fmt.Println("Endpoint: ", beego.AppConfig.String("GestorDocumentalMid")+"/document/"+url)
+	errRegDoc = models.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/"+url, "POST", &resultadoRegistro, documento)
+	fmt.Println("Result", resultadoRegistro)
+	if resultadoRegistro != nil {
 		return resultadoRegistro["res"], nil
-
 	} else {
-		return nil, resultadoRegistro["Error"].(string)
+		return nil, errRegDoc
 	}
+	// if resultadoRegistro["Status"].(string) == "200" && errRegDoc == nil {
+
+	// 	// jsonString, _ := json.Marshal(resultadoRegistro["res"])
+
+	// } else {
+
+	// }
 }
 
 // Post ...
@@ -123,16 +127,16 @@ func RegistrarDoc(documento []map[string]interface{}) (status interface{}, outpu
 // @Param   body        body    {}  true        "Crear documento en Nuxeo"
 // @Success 200 {}
 // @Failure 403 body is empty
-// @router /:id [put]
+// @router /:url [put]
 func (c *GestorDocumentalController) Put() {
 
 	var registroDoc []map[string]interface{}
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
-
+	url := c.Ctx.Input.Param(":url")
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroDoc); err == nil {
-
-		result, err1 := RegistrarDoc(registroDoc)
+		fmt.Println("url: ", url)
+		result, err1 := RegistrarDoc(registroDoc, "firma_electronica")
 
 		if err1 == nil {
 			alertErr.Type = "OK"

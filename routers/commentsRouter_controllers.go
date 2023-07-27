@@ -249,13 +249,4 @@ func init() {
 			MethodParams:     param.Make(),
 			Filters:          nil,
 			Params:           nil})
-	beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:AprobacionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/novedades_mid/controllers:AprobacionController"],
-		beego.ControllerComments{
-			Method:           "Get",
-			Router:           "/:rol",
-			AllowHTTPMethods: []string{"get"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
 }

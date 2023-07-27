@@ -34,6 +34,8 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 		"Observacion":       nil,
 		"TipoNovedad":       1,
 		"Vigencia":          vigencia,
+		"OficioSupervisor":  NovedadSuspension["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadSuspension["numerooficioordenador"],
 		"Estado":            NovedadSuspension["estado"],
 		"EnlaceDocumento":   NovedadSuspension["enlace"],
 	}
@@ -177,32 +179,6 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 		},
 		"propiedad": NovedadSuspension["cesionario"],
 	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 9,
-		},
-		"propiedad": NovedadSuspension["numerooficiosupervisor"],
-	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 16,
-		},
-		"propiedad": NovedadSuspension["numerooficioordenador"],
-	})
 
 	NovedadSuspensionPost["Propiedad"] = propiedades
 
@@ -222,6 +198,8 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 	var fechasuspension interface{}
 	var fechafinsuspension interface{}
 	var fechafinefectiva interface{}
+	// var numerooficiosupervisor interface{}
+	// var numerooficioordenador interface{}
 	var cesionario interface{}
 	var periodosuspension interface{}
 	var tipoNovedadNombre string
@@ -271,6 +249,12 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 				if nombrepropiedad == "PeriodoSuspension" {
 					periodosuspension = propiedad["Propiedad"]
 				}
+				// if nombrepropiedad == "NumeroOficioSupervisor" {
+				// 	numerooficiosupervisor = propiedad["Propiedad"]
+				// }
+				// if nombrepropiedad == "NumeroOficioOrdenador" {
+				// 	numerooficioordenador = propiedad["Propiedad"]
+				// }
 			}
 		}
 	}
@@ -309,7 +293,6 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 		"motivo":                     NovedadAdicion["Motivo"],
 		"numeroactaentrega":          "",
 		"numerocdp":                  "",
-		"numerooficioestadocuentas":  "",
 		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
 		"observacion":                "",
 		"periodosuspension":          periodosuspension,
@@ -323,7 +306,10 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechafinsuspension":         fechafinsuspension,
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
+		"estado":                     NovedadAdicion["Estado"],
+		"nombreEstado":               nombreEstadoNov,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
