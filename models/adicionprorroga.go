@@ -179,9 +179,7 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 
 	NovedadAdProrrogaPost["Propiedad"] = propiedades
 
-	fmt.Println("Estructura: ", NovedadAdProrrogaPost)
-
-	return nil
+	return NovedadAdProrrogaPost
 }
 
 func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
