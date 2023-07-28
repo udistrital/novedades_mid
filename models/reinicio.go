@@ -208,7 +208,7 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 
 	NovedadReinicioPost["Propiedad"] = propiedades
 
-	return
+	return NovedadReinicioPost
 }
 
 func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
