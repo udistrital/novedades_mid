@@ -407,7 +407,8 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
 		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
+		"nombreEstado":               nombreEstadoNov,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
