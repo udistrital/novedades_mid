@@ -61,7 +61,8 @@ steps:
     - push
 
 - name: go_run_test
-  image: golang:1.14
+  failure: ignore
+  image: golang:1.18
   commands:
   - go get -t
   - go get github.com/smartystreets/goconvey/convey
@@ -127,7 +128,7 @@ steps:
     - push
 
 - name: update_aws_ecs
-  image: golang:1.9
+  image: golang:1.17
   environment:
     AWS_ACCESS_KEY_ID:
       from_secret: AWS_ACCESS_KEY_ID

@@ -85,6 +85,10 @@ func (c *NovedadesController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	vigencia := c.Ctx.Input.Param(":vigencia")
 
+	fmt.Println("Id: ", idStr)
+	fmt.Println("vigencia: ", vigencia)
+	fmt.Println("Endpoint: ", beego.AppConfig.String("NovedadesCrudService"))
+
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0&sortby=FechaCreacion&order=asc", &novedades)
 
 	if len(novedades) != 0 {
@@ -179,25 +183,26 @@ func (c *NovedadesController) GetAll() {
 // @Param	body		body 	models.Novedades	true		"body for Novedades content"
 // @Success 200 {object} models.Novedades
 // @Failure 403 :id is not int
-// @router /:id [put]
+// @router /:id/:vigencia [put]
 func (c *NovedadesController) Put() {
-	var reinicio map[string]interface{} //[]models.NovedadSuspensionPut
-	var alertErr models.Alert
-	var result map[string]interface{}
-	alertas := append([]interface{}{"Response:"})
-	idStr := c.Ctx.Input.Param(":id")
-	url := "/novedad_postcontractual/" + idStr
 
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &reinicio); err == nil {
-		if err := models.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &reinicio); err == nil {
+	idStr := c.Ctx.Input.Param(":id")
+	var registroNovedad map[string]interface{}
+	var alertErr models.Alert
+	alertas := append([]interface{}{"Response:"})
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
+
+		result, err1 := ActualizarNovedad(idStr)
+
+		if err1 == nil {
 			alertErr.Type = "OK"
 			alertErr.Code = "200"
 			alertErr.Body = result
-
 		} else {
 			alertErr.Type = "error"
 			alertErr.Code = "400"
-			alertas = append(alertas, err)
+			alertas = append(alertas, err1)
 			alertErr.Body = alertas
 			c.Ctx.Output.SetStatus(400)
 		}
@@ -225,7 +230,7 @@ func (c *NovedadesController) Delete() {
 
 }
 
-//RegistrarNovedadMongo Función para registrar la novedad en postgresql
+// RegistrarNovedadMongo Función para registrar la novedad en postgresql
 func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outputError interface{}) {
 
 	registroNovedadPost := make(map[string]interface{})
@@ -256,6 +261,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		// adición
 		fmt.Println("Novedad de adición")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdicionPost(registroNovedadPost)
+		fmt.Println("2: ", NovedadPoscontractualPost)
 	case "NP_PRO":
 		// prórroga
 		fmt.Println("Novedad de prorroga")
@@ -267,7 +273,12 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 	}
 
 	if registroNovedadPost["tiponovedad"] == "NP_CES" {
-		errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+		novedad := NovedadPoscontractualPost["NovedadPoscontractual"].(map[string]interface{})
+		if novedad["Estado"] == "4518" {
+			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+		} else if novedad["Estado"] == "4519" {
+			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
+		}
 	} else {
 		errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 	}
@@ -284,7 +295,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 
 }
 
-//Función que duplicará los datos de registro de novedades de adición y cesión
+// Función que duplicará los datos de registro de novedades de adición y cesión
 func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdmAmazon int, outputError interface{}) {
 	NovedadAmazon := Novedad
 	var NovedadGET []map[string]interface{}
@@ -335,4 +346,19 @@ func RegistroAdministrativaAmazon(Novedad map[string]interface{}) (idRegistroAdm
 		return 0, errorRegistro
 	}
 
+}
+
+func ActualizarNovedad(id string) (status interface{}, outputError interface{}) {
+
+	var novedad map[string]interface{}
+	var resultadoRegistro map[string]interface{}
+	err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, &novedad)
+	if err == nil {
+		novedad["Estado"] = "TERMINADA"
+		errRegNovedad := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, "PUT", &resultadoRegistro, novedad)
+		if errRegNovedad == nil {
+			fmt.Println("Novedad actualizada!!")
+		}
+	}
+	return nil, nil
 }

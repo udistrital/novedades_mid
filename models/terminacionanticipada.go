@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
@@ -15,10 +16,10 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	NovedadTAnticipadaPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadTAnticipada["contrato"].(string), 10, 32)
 	//numerocdpid, _ := strconv.ParseInt(NovedadSuspension["numerocdp"].(string), 10, 32)
-	numerosolicitudentero := NovedadTAnticipada["numerosolicitud"].(float64)
-	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	// numerosolicitudentero := NovedadTAnticipada["numerosolicitud"].(float64)
+	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadTAnticipada["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigenciacdp"].(string), 10, 32)
+	// vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigenciacdp"].(string), 10, 32)
 
 	NovedadTAnticipadaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -29,14 +30,21 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 		"Id":                0,
 		"Motivo":            NovedadTAnticipada["motivo"],
 		"NumeroCdpId":       0,
-		"NumeroSolicitud":   numerosolicitud,
+		"NumeroSolicitud":   NovedadTAnticipada["numerosolicitud"],
 		"Observacion":       nil,
 		"TipoNovedad":       5,
 		"Vigencia":          vigencia,
-		"VigenciaCdp":       vigenciacdp,
+		"VigenciaCdp":       0,
+		"OficioSupervisor":  NovedadTAnticipada["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadTAnticipada["numerooficioordenador"],
+		"Estado":            NovedadTAnticipada["estado"],
+		"EnlaceDocumento":   NovedadTAnticipada["enlace"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
+
+	loc, _ := time.LoadLocation("America/Bogota")
+	f_solicitud, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadTAnticipada["fechasolicitud"].(string))
 
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
@@ -53,7 +61,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             NovedadTAnticipada["fechasolicitud"],
+		"Fecha":             f_solicitud.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
@@ -77,10 +85,64 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 			"Id": 9,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadTAnticipada["fechafinefectiva"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 12,
+		},
+	})
+
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadTAnticipada["fechaoficiosupervisor"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 10,
+		},
+	})
+
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadTAnticipada["fechaoficioordenador"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 13,
+		},
+	})
 
 	NovedadTAnticipadaPost["Fechas"] = fechas
 
 	propiedades := make([]map[string]interface{}, 0)
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 2,
+		},
+		"propiedad": NovedadTAnticipada["cesionario"],
+	})
 	propiedades = append(propiedades, map[string]interface{}{
 		"Activo":            true,
 		"FechaCreacion":     nil,
@@ -150,11 +212,18 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 	var fecharegistro interface{}
 	var fechaterminacionanticipada interface{}
 	var fechasolicitud interface{}
+	var fechafinefectiva interface{}
+	var tiponovedad []map[string]interface{}
+	var tipoNovedadNombre string
+	var estadoNovedad map[string]interface{}
+	var nombreEstadoNov string
 
 	var numerooficioestadocuentas interface{}
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
+	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/tipo_novedad/?query=Id:"+strconv.FormatFloat((NovedadAdicion["TipoNovedad"]).(float64), 'f', -1, 64), &tiponovedad)
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro/"+NovedadAdicion["Estado"].(string), &estadoNovedad)
 
 	if error == nil {
 		if len(fechas[0]) != 0 {
@@ -170,6 +239,9 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 				if nombrefecha == "FechaTerminacionAnticipada" {
 					fechaterminacionanticipada = fecha["Fecha"]
 				}
+				if nombrefecha == "FechaFinEfectiva" {
+					fechafinefectiva = fecha["Fecha"]
+				}
 			}
 		}
 	}
@@ -182,6 +254,19 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 					numerooficioestadocuentas = propiedad["Propiedad"]
 				}
 			}
+		}
+	}
+
+	if error2 == nil {
+		if len(tiponovedad[0]) != 0 {
+			tipoNovedadNombre = tiponovedad[0]["Nombre"].(string)
+		}
+	}
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			nombreEstadoNov = data["Nombre"].(string)
 		}
 	}
 
@@ -214,9 +299,16 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 		"poliza":                     "",
 		"tiempoprorroga":             "",
 		"tiponovedad":                NovedadAdicion["TipoNovedad"],
+		"nombreTipoNovedad":          tipoNovedadNombre,
 		"valoradicion":               "",
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
+		"fechafinefectiva":           fechafinefectiva,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
+		"nombreEstado":               nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
+		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
 	return NovedadAdicionGet

@@ -1,7 +1,8 @@
 swagger: "2.0"
 info:
   title: beego Test API
-  description: beego has a very cool tools to autogenerate documents for your API
+  description: |
+    beego has a very cool tools to autogenerate documents for your API
   version: 1.0.0
   termsOfService: http://beego.me/
   contact:
@@ -11,128 +12,13 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
-  /argo_replica/:
-    get:
-      tags:
-      - argo_replica
-      description: get ArgoReplica
-      operationId: ArgoReplicaController.GetAll
-      parameters:
-      - in: query
-        name: query
-        description: Filter. e.g. col1:v1,col2:v2 ...
-        type: string
-      - in: query
-        name: fields
-        description: Fields returned. e.g. col1,col2 ...
-        type: string
-      - in: query
-        name: sortby
-        description: Sorted-by fields. e.g. col1,col2 ...
-        type: string
-      - in: query
-        name: order
-        description: Order corresponding to each sortby field, if single value, apply
-          to all sortby fields. e.g. desc,asc ...
-        type: string
-      - in: query
-        name: limit
-        description: Limit the size of result set. Must be an integer
-        type: string
-      - in: query
-        name: offset
-        description: Start position of result set. Must be an integer
-        type: string
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/models.ArgoReplica'
-        "403":
-          description: ""
-    post:
-      tags:
-      - argo_replica
-      description: create ArgoReplica
-      operationId: ArgoReplicaController.Create
-      parameters:
-      - in: body
-        name: body
-        description: body for ArgoReplica content
-        required: true
-        schema:
-          $ref: '#/definitions/models.ArgoReplica'
-      responses:
-        "201":
-          description: ""
-          schema:
-            $ref: '#/definitions/models.ArgoReplica'
-        "403":
-          description: body is empty
-  /argo_replica/{id}:
-    get:
-      tags:
-      - argo_replica
-      description: get ArgoReplica by id
-      operationId: ArgoReplicaController.GetOne
-      parameters:
-      - in: path
-        name: id
-        description: The key for staticblock
-        required: true
-        type: string
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/models.ArgoReplica'
-        "403":
-          description: :id is empty
-    put:
-      tags:
-      - argo_replica
-      description: update the ArgoReplica
-      operationId: ArgoReplicaController.Put
-      parameters:
-      - in: path
-        name: id
-        description: The id you want to update
-        required: true
-        type: string
-      - in: body
-        name: body
-        description: body for ArgoReplica content
-        required: true
-        schema:
-          $ref: '#/definitions/models.ArgoReplica'
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/models.ArgoReplica'
-        "403":
-          description: :id is not int
-    delete:
-      tags:
-      - argo_replica
-      description: delete the ArgoReplica
-      operationId: ArgoReplicaController.Delete
-      parameters:
-      - in: path
-        name: id
-        description: The id you want to delete
-        required: true
-        type: string
-      responses:
-        "200":
-          description: '{string} delete success!'
-        "403":
-          description: id is empty
   /gestor_documental/:
     post:
       tags:
       - gestor_documental
-      description: Crear documento en Nuxeo
+      description: |-
+        Crear documento en Nuxeo
+        <br>
       operationId: GestorDocumentalController.PostGestorDocumental
       parameters:
       - in: body
@@ -150,7 +36,9 @@ paths:
     get:
       tags:
       - gestor_documental
-      description: obtener documento por enlace
+      description: |-
+        obtener documento por enlace
+        <br>
       operationId: GestorDocumentalController.GetGestorDocumental
       parameters:
       - in: path
@@ -163,11 +51,33 @@ paths:
           description: '{}'
         "403":
           description: :enlace is empty
+  /gestor_documental/{url}:
+    put:
+      tags:
+      - gestor_documental
+      description: |-
+        Crear documento en Nuxeo
+        <br>
+      operationId: GestorDocumentalController.PostGestorDocumental
+      parameters:
+      - in: body
+        name: body
+        description: Crear documento en Nuxeo
+        required: true
+        schema:
+          $ref: '#/definitions/{}'
+      responses:
+        "200":
+          description: '{}'
+        "403":
+          description: body is empty
   /novedad/:
     get:
       tags:
       - novedad
-      description: get Novedades
+      description: |-
+        get Novedades
+        <br>
       operationId: NovedadesController.GetAll
       parameters:
       - in: query
@@ -205,7 +115,9 @@ paths:
     post:
       tags:
       - novedad
-      description: create Novedades
+      description: |-
+        create Novedades
+        <br>
       operationId: NovedadesController.Create
       parameters:
       - in: body
@@ -222,10 +134,51 @@ paths:
         "403":
           description: body is empty
   /novedad/{id}:
+    delete:
+      tags:
+      - novedad
+      description: |-
+        delete the Novedades
+        <br>
+      operationId: NovedadesController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /novedad/{id}/{vigencia}:
+    get:
+      tags:
+      - novedad
+      description: |-
+        get Novedades by id
+        <br>
+      operationId: NovedadesController.GetOne
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Novedades'
+        "403":
+          description: :id is empty
     put:
       tags:
       - novedad
-      description: update the Novedades
+      description: |-
+        update the Novedades
+        <br>
       operationId: NovedadesController.Put
       parameters:
       - in: path
@@ -246,46 +199,13 @@ paths:
             $ref: '#/definitions/models.Novedades'
         "403":
           description: :id is not int
-    delete:
-      tags:
-      - novedad
-      description: delete the Novedades
-      operationId: NovedadesController.Delete
-      parameters:
-      - in: path
-        name: id
-        description: The id you want to delete
-        required: true
-        type: string
-      responses:
-        "200":
-          description: '{string} delete success!'
-        "403":
-          description: id is empty
-  /novedad/{id}/{vigencia}:
-    get:
-      tags:
-      - novedad
-      description: get Novedades by id
-      operationId: NovedadesController.GetOne
-      parameters:
-      - in: path
-        name: id
-        description: The key for staticblock
-        required: true
-        type: string
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/models.Novedades'
-        "403":
-          description: :id is empty
   /object/:
     get:
       tags:
       - object
-      description: get all objects
+      description: |-
+        get all objects
+        <br>
       operationId: ObjectController.GetAll
       responses:
         "200":
@@ -297,7 +217,9 @@ paths:
     post:
       tags:
       - object
-      description: create object
+      description: |-
+        create object
+        <br>
       operationId: ObjectController.Create
       parameters:
       - in: body
@@ -315,7 +237,9 @@ paths:
     get:
       tags:
       - object
-      description: find object by objectid
+      description: |-
+        find object by objectid
+        <br>
       operationId: ObjectController.Get
       parameters:
       - in: path
@@ -333,7 +257,9 @@ paths:
     put:
       tags:
       - object
-      description: update the object
+      description: |-
+        update the object
+        <br>
       operationId: ObjectController.Update
       parameters:
       - in: path
@@ -357,7 +283,9 @@ paths:
     delete:
       tags:
       - object
-      description: delete the object
+      description: |-
+        delete the object
+        <br>
       operationId: ObjectController.Delete
       parameters:
       - in: path
@@ -374,7 +302,9 @@ paths:
     post:
       tags:
       - registro_novedad
-      description: Agregar RegistroNovedad
+      description: |-
+        Agregar RegistroNovedad
+        <br>
       operationId: RegistroNovedadController.PostRegistroNovedad
       parameters:
       - in: body
@@ -388,11 +318,140 @@ paths:
           description: '{}'
         "403":
           description: body is empty
+  /replica/:
+    get:
+      tags:
+      - replica
+      description: |-
+        get Replica
+        <br>
+      operationId: ReplicaController.GetAll
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Replica'
+        "403":
+          description: ""
+    post:
+      tags:
+      - replica
+      description: |-
+        create Replica
+        <br>
+      operationId: ReplicaController.Create
+      parameters:
+      - in: body
+        name: body
+        description: body for Replica content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Replica'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Replica'
+        "403":
+          description: body is empty
+  /replica/{id}:
+    get:
+      tags:
+      - replica
+      description: |-
+        get Replica by id
+        <br>
+      operationId: ReplicaController.GetOne
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Replica'
+        "403":
+          description: :id is empty
+    put:
+      tags:
+      - replica
+      description: |-
+        update the Replica
+        <br>
+      operationId: ReplicaController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Replica content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Replica'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Replica'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - replica
+      description: |-
+        delete the Replica
+        <br>
+      operationId: ReplicaController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
   /user/:
     get:
       tags:
       - user
-      description: get all Users
+      description: |-
+        get all Users
+        <br>
       operationId: UserController.GetAll
       responses:
         "200":
@@ -402,7 +461,9 @@ paths:
     post:
       tags:
       - user
-      description: create users
+      description: |-
+        create users
+        <br>
       operationId: UserController.CreateUser
       parameters:
       - in: body
@@ -420,7 +481,9 @@ paths:
     get:
       tags:
       - user
-      description: get user by uid
+      description: |-
+        get user by uid
+        <br>
       operationId: UserController.Get
       parameters:
       - in: path
@@ -438,7 +501,9 @@ paths:
     put:
       tags:
       - user
-      description: update the user
+      description: |-
+        update the user
+        <br>
       operationId: UserController.Update
       parameters:
       - in: path
@@ -462,7 +527,9 @@ paths:
     delete:
       tags:
       - user
-      description: delete the user
+      description: |-
+        delete the user
+        <br>
       operationId: UserController.Delete
       parameters:
       - in: path
@@ -479,7 +546,9 @@ paths:
     get:
       tags:
       - user
-      description: Logs user into the system
+      description: |-
+        Logs user into the system
+        <br>
       operationId: UserController.Login
       parameters:
       - in: query
@@ -501,7 +570,9 @@ paths:
     get:
       tags:
       - user
-      description: Logs out current logged in user session
+      description: |-
+        Logs out current logged in user session
+        <br>
       operationId: UserController.logout
       responses:
         "200":
@@ -510,7 +581,9 @@ paths:
     post:
       tags:
       - validarCambioEstado
-      description: create ValidarCambiosEstado
+      description: |-
+        create ValidarCambiosEstado
+        <br>
       operationId: CambioEstadoContratoValidoController.ValidarCambiosEstado
       parameters:
       - in: body
@@ -530,22 +603,16 @@ definitions:
   '{}':
     title: '{}'
     type: object
-  41252.0xc000431080.false:
-    title: "false"
-    type: object
   models.Alert:
     title: Alert
     type: object
     properties:
       Body:
-        $ref: '#/definitions/41252.0xc000431080.false'
+        $ref: '#/definitions/models.interface'
       Code:
         type: string
       Type:
         type: string
-  models.ArgoReplica:
-    title: ArgoReplica
-    type: object
   models.Novedades:
     title: Novedades
     type: object
@@ -573,6 +640,9 @@ definitions:
         type: string
       Gender:
         type: string
+  models.Replica:
+    title: Replica
+    type: object
   models.User:
     title: User
     type: object
@@ -585,6 +655,9 @@ definitions:
         $ref: '#/definitions/models.Profile'
       Username:
         type: string
+  models.interface:
+    title: interface
+    type: object
 tags:
 - name: object
   description: |
@@ -601,9 +674,9 @@ tags:
 - name: novedad
   description: |
     NovedadesController operations for Novedades
-- name: argo_replica
+- name: replica
   description: |
-    ArgoReplicaController operations for ArgoReplica
+    ReplicaController operations for Replica
 - name: gestor_documental
   description: |
     GestorDocumentalController operations for Nuxeo

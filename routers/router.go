@@ -40,9 +40,9 @@ func init() {
 				&controllers.NovedadesController{},
 			),
 		),
-		beego.NSNamespace("/argo_replica",
+		beego.NSNamespace("/replica",
 			beego.NSInclude(
-				&controllers.ArgoReplicaController{},
+				&controllers.ReplicaController{},
 			),
 		),
 		beego.NSNamespace("/gestor_documental",

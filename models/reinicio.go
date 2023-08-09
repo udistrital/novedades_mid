@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
@@ -14,11 +15,10 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 
 	NovedadReinicioPost := make(map[string]interface{})
 	contratoid, _ := strconv.ParseInt(NovedadReinicio["contrato"].(string), 10, 32)
-	//numerocdpid, _ := strconv.ParseInt(NovedadSuspension["numerocdp"].(string), 10, 32)
-	numerosolicitudentero := NovedadReinicio["numerosolicitud"].(float64)
-	numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
+	// umerocdpid, _ := strconv.ParseInt(NovedadSuspension["numerocdp"].(string), 10, 32)
+	// numerosolicitudentero := NovedadReinicio["numerosolicitud"].(float64)
+	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadReinicio["vigencia"].(string), 10, 32)
-	vigenciacdp, _ := strconv.ParseInt(NovedadReinicio["vigenciacdp"].(string), 10, 32)
 
 	NovedadReinicioPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -29,14 +29,20 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 		"Id":                0,
 		"Motivo":            NovedadReinicio["motivo"],
 		"NumeroCdpId":       0,
-		"NumeroSolicitud":   numerosolicitud,
+		"NumeroSolicitud":   NovedadReinicio["numerosolicitud"],
 		"Observacion":       NovedadReinicio["observacion"],
 		"TipoNovedad":       3,
 		"Vigencia":          vigencia,
-		"VigenciaCdp":       vigenciacdp,
+		"OficioSupervisor":  NovedadReinicio["numerooficiosupervisor"],
+		"OficioOrdenador":   NovedadReinicio["numerooficioordenador"],
+		"Estado":            NovedadReinicio["estado"],
+		"EnlaceDocumento":   NovedadReinicio["enlace"],
 	}
 
 	fechas := make([]map[string]interface{}, 0)
+
+	loc, _ := time.LoadLocation("America/Bogota")
+	f_solicitud, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadReinicio["fechasolicitud"].(string))
 
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
@@ -53,7 +59,7 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             NovedadReinicio["fechasolicitud"],
+		"Fecha":             f_solicitud.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
@@ -92,6 +98,19 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
+		"Fecha":             NovedadReinicio["fechafinsuspension"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 11,
+		},
+	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
 		"Fecha":             NovedadReinicio["fechareinicio"],
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
@@ -103,23 +122,23 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 			"Id": 6,
 		},
 	})
-
-	NovedadReinicioPost["Fechas"] = fechas
-
-	propiedades := make([]map[string]interface{}, 0)
-	propiedades = append(propiedades, map[string]interface{}{
+	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
+		"Fecha":             NovedadReinicio["fechafinefectiva"],
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
 		"IdNovedadesPoscontractuales": map[string]interface{}{
 			"Id": nil,
 		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 9,
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 12,
 		},
-		"propiedad": NovedadReinicio["numerooficioestadocuentas"],
 	})
+
+	NovedadReinicioPost["Fechas"] = fechas
+
+	propiedades := make([]map[string]interface{}, 0)
 	propiedades = append(propiedades, map[string]interface{}{
 		"Activo":            true,
 		"FechaCreacion":     nil,
@@ -203,6 +222,11 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	var fechasolicitud interface{}
 	var fechasuspension interface{}
 	var fechaterminacionanticipada interface{}
+	var fechafinefectiva interface{}
+	var tiponovedad []map[string]interface{}
+	var tipoNovedadNombre string
+	var estadoNovedad map[string]interface{}
+	var nombreEstadoNov string
 
 	var cesionario interface{}
 	var numerooficioestadocuentas interface{}
@@ -210,6 +234,8 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
+	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/tipo_novedad/?query=Id:"+strconv.FormatFloat((NovedadAdicion["TipoNovedad"]).(float64), 'f', -1, 64), &tiponovedad)
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro/"+NovedadAdicion["Estado"].(string), &estadoNovedad)
 
 	if len(fechas[0]) != 0 {
 		for _, fecha := range fechas {
@@ -233,6 +259,9 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrefecha == "FechaTerminacionAnticipada" {
 				fechaterminacionanticipada = fecha["Fecha"]
 			}
+			if nombrefecha == "FechaFinEfectiva" {
+				fechafinefectiva = fecha["Fecha"]
+			}
 		}
 	}
 	if len(propiedades[0]) != 0 {
@@ -248,6 +277,19 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrepropiedad == "PeriodoSuspension" {
 				periodosuspension = propiedad["Propiedad"]
 			}
+		}
+	}
+
+	if error2 == nil {
+		if len(tiponovedad[0]) != 0 {
+			tipoNovedadNombre = tiponovedad[0]["Nombre"].(string)
+		}
+	}
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			nombreEstadoNov = data["Nombre"].(string)
 		}
 	}
 
@@ -280,12 +322,59 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		"poliza":                     "",
 		"tiempoprorroga":             "",
 		"tiponovedad":                NovedadAdicion["TipoNovedad"],
+		"nombreTipoNovedad":          tipoNovedadNombre,
 		"valoradicion":               "",
 		"valorfinalcontrato":         "",
 		"vigencia":                   NovedadAdicion["Vigencia"],
+		"fechafinefectiva":           fechafinefectiva,
+		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
+		"nombreEstado":               nombreEstadoNov,
+		"estado":                     NovedadAdicion["Estado"],
+		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
 	fmt.Println(error, error1)
 
 	return NovedadAdicionGet
+}
+
+func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[string]interface{}, outputError map[string]interface{}) {
+
+	ArgoReinicioPost := make(map[string]interface{})
+	ArgoReinicioPost = map[string]interface{}{
+		"NumeroContrato":  novedad["NumeroContrato"],
+		"Vigencia":        novedad["Vigencia"],
+		"FechaRegistro":   novedad["FechaRegistro"],
+		"PlazoEjecucion":  novedad["PlazoEjecucion"],
+		"FechaInicio":     novedad["FechaInicio"],
+		"FechaFin":        novedad["FechaFin"],
+		"UnidadEjecucion": novedad["UnidadEjecucion"],
+		"TipoNovedad":     novedad["TipoNovedad"],
+	}
+
+	TitanReinicioPost := make(map[string]interface{})
+	TitanReinicioPost = map[string]interface{}{
+		"Documento":      novedad["Documento"],
+		"FechaReinicio":  FormatFechaReplica(novedad["FechaReinicio"].(string), "2006-01-02T15:04:05.000Z"),
+		"NumeroContrato": novedad["NumeroContrato"],
+		"Vigencia":       novedad["Vigencia"],
+	}
+
+	fmt.Println("ArgoReinicioPost: ", ArgoReinicioPost)
+	fmt.Println("TitanReinicioPost: ", TitanReinicioPost)
+
+	url := "/novedad_postcontractual/" + idStr
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+		url = "/novedadCPS/reiniciar_contrato"
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
+			return result, nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+			return nil, outputError
+		}
+	} else {
+		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+		return nil, outputError
+	}
 }
