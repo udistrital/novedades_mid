@@ -104,9 +104,7 @@ func RegistrarDoc(documento []map[string]interface{}, url string) (status interf
 
 	var resultadoRegistro map[string]interface{}
 	var errRegDoc interface{}
-	fmt.Println("Endpoint: ", beego.AppConfig.String("GestorDocumentalMid")+"/document/"+url)
 	errRegDoc = models.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/"+url, "POST", &resultadoRegistro, documento)
-	fmt.Println("Result", resultadoRegistro)
 	if resultadoRegistro != nil {
 		return resultadoRegistro["res"], nil
 	} else {
@@ -133,9 +131,7 @@ func (c *GestorDocumentalController) Put() {
 	var registroDoc []map[string]interface{}
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
-	url := c.Ctx.Input.Param(":url")
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroDoc); err == nil {
-		fmt.Println("url: ", url)
 		result, err1 := RegistrarDoc(registroDoc, "firma_electronica")
 
 		if err1 == nil {

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -19,7 +18,12 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadSuspension["vigencia"].(string), 10, 32)
 
-	fmt.Println("novedad: ", novedad)
+	codEstado := ""
+	if NovedadSuspension["estado"] == "ENTR" {
+		codEstado = "4518"
+	} else if NovedadSuspension["estado"] == "TERM" {
+		codEstado = "4519"
+	}
 
 	NovedadSuspensionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
@@ -36,7 +40,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 		"Vigencia":          vigencia,
 		"OficioSupervisor":  NovedadSuspension["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadSuspension["numerooficioordenador"],
-		"Estado":            NovedadSuspension["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadSuspension["enlace"],
 	}
 

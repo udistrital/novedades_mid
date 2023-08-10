@@ -22,6 +22,13 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 	vigencia, _ := strconv.ParseInt(NovedadCesion["vigencia"].(string), 10, 32)
 	vigenciacdp, _ := strconv.ParseInt(NovedadCesion["vigenciacdp"].(string), 10, 32)
 
+	codEstado := ""
+	if NovedadCesion["estado"] == "ENTR" {
+		codEstado = "4518"
+	} else if NovedadCesion["estado"] == "TERM" {
+		codEstado = "4519"
+	}
+
 	NovedadCesionPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        NovedadCesion["aclaracion"],
 		"Activo":            true,
@@ -38,7 +45,7 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 		"VigenciaCdp":       vigenciacdp,
 		"OficioSupervisor":  NovedadCesion["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadCesion["numerooficioordenador"],
-		"Estado":            NovedadCesion["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadCesion["enlace"],
 	}
 

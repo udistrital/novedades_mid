@@ -23,7 +23,13 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdicion["vigenciacdp"].(string), 10, 32)
 	vigenciarp, _ := strconv.ParseInt(NovedadAdicion["vigenciarp"].(string), 10, 32)
 
-	fmt.Println("Novedad: ", NovedadAdicion)
+	codEstado := ""
+	if NovedadAdicion["estado"] == "ENTR" {
+		codEstado = "4518"
+	} else if NovedadAdicion["estado"] == "TERM" {
+		codEstado = "4519"
+	}
+
 	// fmt.Println(NovedadAdicion["contrato"], NovedadAdicion["numerocdp"], NovedadAdicion["numerosolicitud"], NovedadAdicion["vigencia"], NovedadAdicion["vigencia"])
 	// fmt.Println("\n", contratoid, numerocdpid, numerorp, numerosolicitud, vigencia, vigenciacdp, vigenciarp, "\n")
 
@@ -45,7 +51,7 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 		"VigenciaRp":        vigenciarp,
 		"OficioSupervisor":  NovedadAdicion["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadAdicion["numerooficioordenador"],
-		"Estado":            NovedadAdicion["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadAdicion["enlace"],
 	}
 
