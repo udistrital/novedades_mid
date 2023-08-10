@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -21,6 +20,13 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	vigencia, _ := strconv.ParseInt(NovedadTAnticipada["vigencia"].(string), 10, 32)
 	// vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigenciacdp"].(string), 10, 32)
 
+	codEstado := ""
+	if NovedadTAnticipada["estado"] == "ENTR" {
+		codEstado = "4518"
+	} else if NovedadTAnticipada["estado"] == "TERM" {
+		codEstado = "4519"
+	}
+
 	NovedadTAnticipadaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
 		"Activo":            true,
@@ -37,7 +43,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 		"VigenciaCdp":       0,
 		"OficioSupervisor":  NovedadTAnticipada["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadTAnticipada["numerooficioordenador"],
-		"Estado":            NovedadTAnticipada["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadTAnticipada["enlace"],
 	}
 
@@ -198,7 +204,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 
 	NovedadTAnticipadaPost["Propiedad"] = propiedades
 
-	fmt.Println(NovedadTAnticipadaPost)
+	// fmt.Println(NovedadTAnticipadaPost)
 
 	return NovedadTAnticipadaPost
 }
