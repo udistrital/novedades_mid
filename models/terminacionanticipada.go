@@ -21,10 +21,15 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	// vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigenciacdp"].(string), 10, 32)
 
 	codEstado := ""
-	if NovedadTAnticipada["estado"] == "ENTR" {
-		codEstado = "4518"
-	} else if NovedadTAnticipada["estado"] == "TERM" {
-		codEstado = "4519"
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadTAnticipada["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
 	}
 
 	NovedadTAnticipadaPost["NovedadPoscontractual"] = map[string]interface{}{

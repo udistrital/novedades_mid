@@ -19,10 +19,15 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 	vigencia, _ := strconv.ParseInt(NovedadSuspension["vigencia"].(string), 10, 32)
 
 	codEstado := ""
-	if NovedadSuspension["estado"] == "ENTR" {
-		codEstado = "4518"
-	} else if NovedadSuspension["estado"] == "TERM" {
-		codEstado = "4519"
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadSuspension["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
 	}
 
 	NovedadSuspensionPost["NovedadPoscontractual"] = map[string]interface{}{
@@ -186,7 +191,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 
 	NovedadSuspensionPost["Propiedad"] = propiedades
 
-	return NovedadSuspensionPost
+	return nil
 }
 
 func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
