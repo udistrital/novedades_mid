@@ -23,10 +23,15 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 	vigenciacdp, _ := strconv.ParseInt(NovedadCesion["vigenciacdp"].(string), 10, 32)
 
 	codEstado := ""
-	if NovedadCesion["estado"] == "ENTR" {
-		codEstado = "4518"
-	} else if NovedadCesion["estado"] == "TERM" {
-		codEstado = "4519"
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadCesion["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
 	}
 
 	NovedadCesionPost["NovedadPoscontractual"] = map[string]interface{}{

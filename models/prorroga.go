@@ -24,10 +24,15 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 	vigenciarp, _ := strconv.ParseInt(NovedadProrroga["vigenciarp"].(string), 10, 32)
 
 	codEstado := ""
-	if NovedadProrroga["estado"] == "ENTR" {
-		codEstado = "4518"
-	} else if NovedadProrroga["estado"] == "TERM" {
-		codEstado = "4519"
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadProrroga["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
 	}
 
 	NovedadProrrogaPost["NovedadPoscontractual"] = map[string]interface{}{
