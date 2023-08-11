@@ -85,10 +85,6 @@ func (c *NovedadesController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	vigencia := c.Ctx.Input.Param(":vigencia")
 
-	fmt.Println("Id: ", idStr)
-	fmt.Println("vigencia: ", vigencia)
-	fmt.Println("Endpoint: ", beego.AppConfig.String("NovedadesCrudService"))
-
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0&sortby=FechaCreacion&order=asc", &novedades)
 
 	if len(novedades) != 0 {

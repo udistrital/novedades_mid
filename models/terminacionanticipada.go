@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -21,6 +20,18 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 	vigencia, _ := strconv.ParseInt(NovedadTAnticipada["vigencia"].(string), 10, 32)
 	// vigenciacdp, _ := strconv.ParseInt(NovedadTAnticipada["vigenciacdp"].(string), 10, 32)
 
+	codEstado := ""
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadTAnticipada["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
+	}
+
 	NovedadTAnticipadaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
 		"Activo":            true,
@@ -37,7 +48,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 		"VigenciaCdp":       0,
 		"OficioSupervisor":  NovedadTAnticipada["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadTAnticipada["numerooficioordenador"],
-		"Estado":            NovedadTAnticipada["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadTAnticipada["enlace"],
 	}
 
@@ -198,7 +209,7 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 
 	NovedadTAnticipadaPost["Propiedad"] = propiedades
 
-	fmt.Println(NovedadTAnticipadaPost)
+	// fmt.Println(NovedadTAnticipadaPost)
 
 	return NovedadTAnticipadaPost
 }

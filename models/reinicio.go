@@ -20,6 +20,18 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 	// numerosolicitud := strconv.FormatFloat(numerosolicitudentero, 'f', -1, 64)
 	vigencia, _ := strconv.ParseInt(NovedadReinicio["vigencia"].(string), 10, 32)
 
+	codEstado := ""
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadReinicio["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
+	}
+
 	NovedadReinicioPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
 		"Activo":            true,
@@ -35,7 +47,7 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 		"Vigencia":          vigencia,
 		"OficioSupervisor":  NovedadReinicio["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadReinicio["numerooficioordenador"],
-		"Estado":            NovedadReinicio["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadReinicio["enlace"],
 	}
 
@@ -361,8 +373,8 @@ func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[s
 		"Vigencia":       novedad["Vigencia"],
 	}
 
-	fmt.Println("ArgoReinicioPost: ", ArgoReinicioPost)
-	fmt.Println("TitanReinicioPost: ", TitanReinicioPost)
+	// fmt.Println("ArgoReinicioPost: ", ArgoReinicioPost)
+	// fmt.Println("TitanReinicioPost: ", TitanReinicioPost)
 
 	url := "/novedad_postcontractual/" + idStr
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
