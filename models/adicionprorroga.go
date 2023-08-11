@@ -24,6 +24,18 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdProrroga["vigenciacdp"].(string), 10, 32)
 	vigenciarp, _ := strconv.ParseInt(NovedadAdProrroga["vigenciarp"].(string), 10, 32)
 
+	codEstado := ""
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadAdProrroga["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
+	}
+
 	NovedadAdProrrogaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
 		"Activo":            true,
@@ -42,7 +54,7 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 		"VigenciaRp":        vigenciarp,
 		"OficioSupervisor":  NovedadAdProrroga["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadAdProrroga["numerooficioordenador"],
-		"Estado":            NovedadAdProrroga["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadAdProrroga["enlace"],
 	}
 
@@ -89,7 +101,7 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 			"Id": 4,
 		},
 	})
-	fmt.Println("FechaFinEfectiva: ", NovedadAdProrroga["fechafinefectiva"])
+	// fmt.Println("FechaFinEfectiva: ", NovedadAdProrroga["fechafinefectiva"])
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
 		"Fecha":             NovedadAdProrroga["fechafinefectiva"],

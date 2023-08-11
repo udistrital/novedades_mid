@@ -23,7 +23,18 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 	vigenciacdp, _ := strconv.ParseInt(NovedadAdicion["vigenciacdp"].(string), 10, 32)
 	vigenciarp, _ := strconv.ParseInt(NovedadAdicion["vigenciarp"].(string), 10, 32)
 
-	fmt.Println("Novedad: ", NovedadAdicion)
+	codEstado := ""
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadAdicion["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
+	}
+
 	// fmt.Println(NovedadAdicion["contrato"], NovedadAdicion["numerocdp"], NovedadAdicion["numerosolicitud"], NovedadAdicion["vigencia"], NovedadAdicion["vigencia"])
 	// fmt.Println("\n", contratoid, numerocdpid, numerorp, numerosolicitud, vigencia, vigenciacdp, vigenciarp, "\n")
 
@@ -45,7 +56,7 @@ func ConstruirNovedadAdicionPost(novedad map[string]interface{}) (novedadformatt
 		"VigenciaRp":        vigenciarp,
 		"OficioSupervisor":  NovedadAdicion["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadAdicion["numerooficioordenador"],
-		"Estado":            NovedadAdicion["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadAdicion["enlace"],
 	}
 

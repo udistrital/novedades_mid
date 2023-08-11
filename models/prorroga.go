@@ -23,6 +23,18 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 	vigenciacdp, _ := strconv.ParseInt(NovedadProrroga["vigenciacdp"].(string), 10, 32)
 	vigenciarp, _ := strconv.ParseInt(NovedadProrroga["vigenciarp"].(string), 10, 32)
 
+	codEstado := ""
+
+	var estadoNovedad map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+NovedadProrroga["estado"].(string), &estadoNovedad)
+
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			data := estadoNovedad["Data"].(map[string]interface{})
+			codEstado = data["Id"].(string)
+		}
+	}
+
 	NovedadProrrogaPost["NovedadPoscontractual"] = map[string]interface{}{
 		"Aclaracion":        nil,
 		"Activo":            true,
@@ -41,7 +53,7 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 		"VigenciaRp":        vigenciarp,
 		"OficioSupervisor":  NovedadProrroga["numerooficiosupervisor"],
 		"OficioOrdenador":   NovedadProrroga["numerooficioordenador"],
-		"Estado":            NovedadProrroga["estado"],
+		"Estado":            codEstado,
 		"EnlaceDocumento":   NovedadProrroga["enlace"],
 	}
 
@@ -182,7 +194,6 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 }
 
 func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
-	fmt.Println("Olanda: ", novedad)
 	NovedadAdicion := make(map[string]interface{})
 	var fechas []map[string]interface{}
 	var propiedades []map[string]interface{}
@@ -205,10 +216,9 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 	error2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/tipo_novedad/?query=Id:"+strconv.FormatFloat((NovedadAdicion["TipoNovedad"]).(float64), 'f', -1, 64), &tiponovedad)
 	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro/"+NovedadAdicion["Estado"].(string), &estadoNovedad)
 
-	fmt.Println(fechas[0]["TipoFecha"])
+	// fmt.Println(fechas[0]["TipoFecha"])
 	if len(fechas[0]) != 0 {
 		for _, fecha := range fechas {
-			fmt.Println("fecha: ", fecha)
 			tipofecha := fecha["IdTipoFecha"].(map[string]interface{})
 			nombrefecha := tipofecha["Nombre"]
 			if nombrefecha == "FechaAdicion" {
