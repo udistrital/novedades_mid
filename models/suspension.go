@@ -193,7 +193,7 @@ func ConstruirNovedadSuspension(novedad map[string]interface{}) (novedadformatte
 
 	NovedadSuspensionPost["Propiedad"] = propiedades
 
-	return nil
+	return NovedadSuspensionPost
 }
 
 func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[string]interface{}) {
