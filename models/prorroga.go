@@ -30,8 +30,10 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 
 	if error3 == nil {
 		if len(estadoNovedad) != 0 {
-			data := estadoNovedad["Data"].(map[string]interface{})
-			codEstado = data["Id"].(string)
+			inter := estadoNovedad["Data"].([]interface{})
+			data := inter[0].(map[string]interface{})
+			idEstado, _ := data["Id"].(float64)
+			codEstado = strconv.FormatFloat(idEstado, 'f', -1, 64)
 		}
 	}
 
