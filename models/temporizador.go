@@ -54,6 +54,7 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 	if int(informacionReplica["TipoNovedad"].(float64)) == 220 {
 		TitanNovedadPost["Documento"] = informacionReplica["Documento"]
 		TitanNovedadPost["FechaFin"] = FormatFechaReplica(informacionReplica["FechaFin"].(string), "2006-01-02T15:04:05.000Z")
+		ArgoNovedadPost["ValorNovedad"] = informacionReplica["ValorNovedad"]
 		url = "/novedadCPS/otrosi_contrato"
 	}
 	if int(informacionReplica["TipoNovedad"].(float64)) == 218 {
