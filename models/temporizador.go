@@ -63,8 +63,8 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 		url = "/novedadCPS/cancelar_contrato"
 	}
 
-	fmt.Println("ArgoNovedadPost", ArgoNovedadPost)
-	fmt.Println("TitanNovedadPost", TitanNovedadPost)
+	// fmt.Println("ArgoNovedadPost", ArgoNovedadPost)
+	// fmt.Println("TitanNovedadPost", TitanNovedadPost)
 
 	if result, err := PostReplica(url, ArgoNovedadPost, TitanNovedadPost); err == nil {
 		return result, nil
@@ -147,7 +147,7 @@ func ConsultarTipoNovedad(novedad map[string]interface{}) (result map[string]int
 					}
 				case 2:
 					if tipoFecha == 2 {
-						if 1 < 2 {
+						if fecha == fechaReferencia || fechaParse.Before(currentDate) {
 							return ReplicaCesion(novedad, propiedades, fechasResponse)
 						}
 					}
@@ -608,7 +608,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	// fmt.Println("TitanPost: ", TitanOtrosiPost)
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPost, &ArgoOtrosiPost); err == nil {
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanOtrosiPost); err == nil {
-			fmt.Println("Registro en Titan exitoso!")
+			// fmt.Println("Registro en Titan exitoso!")
 			// fmt.Println(resultPost)
 			return resultPost, nil
 		} else {
