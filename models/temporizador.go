@@ -63,6 +63,9 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 		url = "/novedadCPS/cancelar_contrato"
 	}
 
+	fmt.Println("ArgoNovedadPost", ArgoNovedadPost)
+	fmt.Println("TitanNovedadPost", TitanNovedadPost)
+
 	if result, err := PostReplica(url, ArgoNovedadPost, TitanNovedadPost); err == nil {
 		return result, nil
 	} else {
@@ -74,9 +77,9 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 func Temporizador() {
 
 	dt := time.Now()
-	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T23:45:00+00:00")
+	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T11:45:00+00:00")
 	// 18000
-	tdr := time.Tick(5 * time.Minute)
+	tdr := time.Tick(5 * time.Second)
 	for horaActual := range tdr {
 		log.Printf("Temporizador ejecutándose")
 		if dt.After(until) {
@@ -144,7 +147,7 @@ func ConsultarTipoNovedad(novedad map[string]interface{}) (result map[string]int
 					}
 				case 2:
 					if tipoFecha == 2 {
-						if fecha == fechaReferencia || fechaParse.Before(currentDate) {
+						if 1 < 2 {
 							return ReplicaCesion(novedad, propiedades, fechasResponse)
 						}
 					}
@@ -581,7 +584,7 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	}
 
 	TitanOtrosiPost := make(map[string]interface{})
-	TitanOtrosiPost["NovedadPoscontractual"] = map[string]interface{}{
+	TitanOtrosiPost = map[string]interface{}{
 		"NumeroContrato": strconv.Itoa(numContrato),
 		"Documento":      contratistaDoc,
 		"FechaFin":       FormatFechaReplica(fechaFin, "2006-01-02 15:04:05 +0000 +0000"),
@@ -601,11 +604,12 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 }
 
 func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiPost map[string]interface{}) (resultPost map[string]interface{}, outputError map[string]interface{}) {
-	// fmt.Println("ArgoPost: ", ArgoOtrosiPost)
-	// fmt.Println("TitanPost: ", TitanOtrosiPost)
+	fmt.Println("ArgoPost: ", ArgoOtrosiPost)
+	fmt.Println("TitanPost: ", TitanOtrosiPost)
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPost, &ArgoOtrosiPost); err == nil {
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanOtrosiPost); err == nil {
 			fmt.Println("Registro en Titan exitoso!")
+			fmt.Println(resultPost)
 			return resultPost, nil
 		} else {
 			outputError = map[string]interface{}{"funcion": "/PostReplica", "err": err.Error()}
