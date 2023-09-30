@@ -63,6 +63,9 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 		url = "/novedadCPS/cancelar_contrato"
 	}
 
+	fmt.Println("ArgoNovedadPost", ArgoNovedadPost)
+	fmt.Println("TitanNovedadPost", TitanNovedadPost)
+
 	if result, err := PostReplica(url, ArgoNovedadPost, TitanNovedadPost); err == nil {
 		return result, nil
 	} else {
@@ -74,9 +77,9 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 func Temporizador() {
 
 	dt := time.Now()
-	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T23:45:00+00:00")
+	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T11:45:00+00:00")
 	// 18000
-	tdr := time.Tick(5 * time.Minute)
+	tdr := time.Tick(5 * time.Second)
 	for horaActual := range tdr {
 		log.Printf("Temporizador ejecutándose")
 		if dt.After(until) {
@@ -144,7 +147,7 @@ func ConsultarTipoNovedad(novedad map[string]interface{}) (result map[string]int
 					}
 				case 2:
 					if tipoFecha == 2 {
-						if fecha == fechaReferencia || fechaParse.Before(currentDate) {
+						if 1 < 2 {
 							return ReplicaCesion(novedad, propiedades, fechasResponse)
 						}
 					}
@@ -358,6 +361,8 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 
 	var contratistaDoc string
 	var informacion_proveedor []map[string]interface{}
+	var novedadesArgo []map[string]interface{}
+	var idNovedadArgo float64
 	var fechasuspension string
 	var FechaFinSuspension string
 	var fechaReinicio string
@@ -419,7 +424,18 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 		"Vigencia":       vigencia,
 	}
 
-	url = "/novedad_postcontractual/" + idStr
+	url = "/novedad_postcontractual?query=NumeroContrato:" + fmt.Sprintf("%v", numContrato) + ",Vigencia:" + strconv.Itoa(vigencia) + ",TipoNovedad:216&sortby=Id&order=desc&limit=1"
+
+	if err := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+url, &novedadesArgo); err == nil {
+		if len(novedadesArgo) > 0 {
+			idNovedadArgo = novedadesArgo[0]["Id"].(float64)
+		}
+	}
+
+	idNovedadString := strconv.FormatFloat(idNovedadArgo, 'f', -1, 64)
+
+	url = "/novedad_postcontractual/" + idNovedadString
+
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
 		if err = SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
 			return result, nil
@@ -568,7 +584,7 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	}
 
 	TitanOtrosiPost := make(map[string]interface{})
-	TitanOtrosiPost["NovedadPoscontractual"] = map[string]interface{}{
+	TitanOtrosiPost = map[string]interface{}{
 		"NumeroContrato": strconv.Itoa(numContrato),
 		"Documento":      contratistaDoc,
 		"FechaFin":       FormatFechaReplica(fechaFin, "2006-01-02 15:04:05 +0000 +0000"),
@@ -593,6 +609,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPost, &ArgoOtrosiPost); err == nil {
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanOtrosiPost); err == nil {
 			fmt.Println("Registro en Titan exitoso!")
+			// fmt.Println(resultPost)
 			return resultPost, nil
 		} else {
 			outputError = map[string]interface{}{"funcion": "/PostReplica", "err": err.Error()}
