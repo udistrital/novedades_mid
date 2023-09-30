@@ -604,12 +604,12 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 }
 
 func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiPost map[string]interface{}) (resultPost map[string]interface{}, outputError map[string]interface{}) {
-	fmt.Println("ArgoPost: ", ArgoOtrosiPost)
-	fmt.Println("TitanPost: ", TitanOtrosiPost)
+	// fmt.Println("ArgoPost: ", ArgoOtrosiPost)
+	// fmt.Println("TitanPost: ", TitanOtrosiPost)
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPost, &ArgoOtrosiPost); err == nil {
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPost, &TitanOtrosiPost); err == nil {
 			fmt.Println("Registro en Titan exitoso!")
-			fmt.Println(resultPost)
+			// fmt.Println(resultPost)
 			return resultPost, nil
 		} else {
 			outputError = map[string]interface{}{"funcion": "/PostReplica", "err": err.Error()}
