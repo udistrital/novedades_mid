@@ -119,10 +119,12 @@ func ReplicaFechaPosterior(horaActual time.Time) {
 
 	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesResponse); err == nil {
 		for _, novedadRegistro := range novedadesResponse {
-			if replicaResult, outputError = ConsultarTipoNovedad(novedadRegistro); outputError == nil {
+			replicaResult, outputError = ConsultarTipoNovedad(novedadRegistro)
+			if outputError == nil {
 				fmt.Println("Replica realizada correctamente (Temporizador)")
-				fmt.Println("Registro realizado en la fecha", horaActual)
+				fmt.Println("Registro realizado en la fecha", time.Now())
 				fmt.Println(replicaResult)
+				// if replicaResult, outputError = ConsultarTipoNovedad(novedadRegistro); outputError == nil {
 			} else {
 				fmt.Println("Fallo al realizar la réplica (Temporizador)")
 				fmt.Println(outputError)
@@ -284,7 +286,7 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 			fmt.Println(resultEstado)
 			return result, nil
 		} else {
-			outputError = map[string]interface{}{"funcion": "/ReplicaSuspension1", "err": errEstado}
+			outputError = map[string]interface{}{"funcion": "/CambioEstadoReplica", "err": errEstado}
 			return nil, outputError
 		}
 	} else {
@@ -383,6 +385,7 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 
 	numContrato := int(novedad["ContratoId"].(float64))
 	vigencia := int(novedad["Vigencia"].(float64))
+	var idNovedad = fmt.Sprintf("%v", novedad["Id"])
 
 	var contratistaDoc string
 	var informacion_proveedor []map[string]interface{}
@@ -463,7 +466,14 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
 		if err = SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
-			return result, nil
+			resultEstado, errEstado := CambioEstadoReplica(strconv.Itoa(numContrato), 2, idNovedad)
+			if errEstado == nil {
+				fmt.Println(resultEstado)
+				return result, nil
+			} else {
+				outputError = map[string]interface{}{"funcion": "/ReplicaCesion1", "err": errEstado}
+				return nil, outputError
+			}
 		} else {
 			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
 			return nil, outputError
@@ -478,6 +488,7 @@ func ReplicaTerminacion(novedad map[string]interface{}, propiedades []map[string
 
 	numContrato := int(novedad["ContratoId"].(float64))
 	vigencia := int(novedad["Vigencia"].(float64))
+	var idNovedad = fmt.Sprintf("%v", novedad["Id"])
 
 	var contratistaDoc string
 	var informacion_proveedor []map[string]interface{}
@@ -526,7 +537,14 @@ func ReplicaTerminacion(novedad map[string]interface{}, propiedades []map[string
 
 	url = "/novedadCPS/cancelar_contrato"
 	if result, err := PostReplica(url, ArgoTerminacionPost, TitanTerminacionPost); err == nil {
-		return result, nil
+		resultEstado, errEstado := CambioEstadoReplica(strconv.Itoa(numContrato), 2, idNovedad)
+		if errEstado == nil {
+			fmt.Println(resultEstado)
+			return result, nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/ReplicaCesion1", "err": errEstado}
+			return nil, outputError
+		}
 	} else {
 		outputError = map[string]interface{}{"funcion": "/ReplicaTerminacion", "err": err}
 		return nil, err
@@ -641,15 +659,15 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 				fmt.Println("Registro en Titan exitoso!")
 				return resultPostTitan, nil
 			} else {
-				outputError = map[string]interface{}{"funcion": "/PostReplica", "err": err}
+				outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
 				return nil, outputError
 			}
 		} else {
-			outputError = map[string]interface{}{"funcion": "/PostReplica", "err": err.Error()}
+			outputError = map[string]interface{}{"funcion": "/PostReplica2_Titan", "err": err.Error()}
 			return nil, outputError
 		}
 	} else {
-		outputError = map[string]interface{}{"funcion": "/PostReplica", "err": err.Error()}
+		outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": err.Error()}
 		return nil, outputError
 	}
 }
@@ -728,7 +746,7 @@ func CambioEstadoReplica(numContrato string, estado int, idNovedad string) (map[
 		result := resultContrato[0]
 		numeroContrato := result["NumeroContrato"].(map[string]interface{})
 		num_contrato_id := numeroContrato["Id"].(string)
-		vigencia := result["Vigencia"].(string)
+		vigencia := result["Vigencia"].(float64)
 		usuario := result["Usuario"].(string)
 
 		body := make(map[string]interface{})
