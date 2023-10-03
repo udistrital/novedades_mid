@@ -728,6 +728,7 @@ func CambioEstadoReplica(numContrato string, estado int, idNovedad string) (map[
 		result := resultContrato[0]
 		numeroContrato := result["NumeroContrato"].(map[string]interface{})
 		num_contrato_id := numeroContrato["Id"].(string)
+		vigencia := result["Vigencia"].(string)
 		usuario := result["Usuario"].(string)
 
 		body := make(map[string]interface{})
@@ -735,7 +736,7 @@ func CambioEstadoReplica(numContrato string, estado int, idNovedad string) (map[
 			"FechaRegistro":  time.Now().Format("2006-01-02T15:04:05.000Z"),
 			"NumeroContrato": num_contrato_id,
 			"Usuario":        usuario,
-			"Vigencia":       2023,
+			"Vigencia":       vigencia,
 		}
 
 		body["Estado"] = map[string]interface{}{
