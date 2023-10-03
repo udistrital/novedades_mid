@@ -241,6 +241,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	var tipoNovedadNombre string
 	var estadoNovedad map[string]interface{}
 	var nombreEstadoNov string
+	var codEstado string
 
 	var cesionario interface{}
 	var numerooficioestadocuentas interface{}
@@ -304,6 +305,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		if len(estadoNovedad) != 0 {
 			data := estadoNovedad["Data"].(map[string]interface{})
 			nombreEstadoNov = data["Nombre"].(string)
+			codEstado = data["CodigoAbreviacion"].(string)
 		}
 	}
 
@@ -344,7 +346,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
 		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
 		"nombreEstado":               nombreEstadoNov,
-		"estado":                     NovedadAdicion["Estado"],
+		"estado":                     codEstado,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
