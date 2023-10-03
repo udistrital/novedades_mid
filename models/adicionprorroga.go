@@ -213,6 +213,7 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 	var tipoNovedadNombre string
 	var estadoNovedad map[string]interface{}
 	var nombreEstadoNov string
+	var codEstado string
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
@@ -263,6 +264,7 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 		if len(estadoNovedad) != 0 {
 			data := estadoNovedad["Data"].(map[string]interface{})
 			nombreEstadoNov = data["Nombre"].(string)
+			codEstado = data["CodigoAbreviacion"].(string)
 		}
 	}
 
@@ -303,7 +305,7 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
 		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
 		"nombreEstado":               nombreEstadoNov,
-		"estado":                     NovedadAdicion["Estado"],
+		"estado":                     codEstado,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 

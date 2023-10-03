@@ -289,6 +289,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	var tipoNovedadNombre string
 	var estadoNovedad map[string]interface{}
 	var nombreEstadoNov string
+	var codEstado string
 
 	var cedente interface{}
 	var cesionario interface{}
@@ -380,6 +381,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		if len(estadoNovedad) != 0 {
 			data := estadoNovedad["Data"].(map[string]interface{})
 			nombreEstadoNov = data["Nombre"].(string)
+			codEstado = data["CodigoAbreviacion"].(string)
 		}
 	}
 
@@ -421,7 +423,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
 		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
 		"fechafinefectiva":           fechafinefectiva,
-		"estado":                     NovedadAdicion["Estado"],
+		"estado":                     codEstado,
 		"nombreEstado":               nombreEstadoNov,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}

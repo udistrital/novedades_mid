@@ -230,6 +230,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 	var tipoNovedadNombre string
 	var estadoNovedad map[string]interface{}
 	var nombreEstadoNov string
+	var codEstado string
 
 	var numerooficioestadocuentas interface{}
 
@@ -280,6 +281,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 		if len(estadoNovedad) != 0 {
 			data := estadoNovedad["Data"].(map[string]interface{})
 			nombreEstadoNov = data["Nombre"].(string)
+			codEstado = data["CodigoAbreviacion"].(string)
 		}
 	}
 
@@ -320,7 +322,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
 		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
 		"nombreEstado":               nombreEstadoNov,
-		"estado":                     NovedadAdicion["Estado"],
+		"estado":                     codEstado,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
