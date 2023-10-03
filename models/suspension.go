@@ -215,6 +215,7 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 	var periodosuspension interface{}
 	var tipoNovedadNombre string
 	var estadoNovedad map[string]interface{}
+	var codEstado string
 	var nombreEstadoNov string
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
@@ -280,6 +281,7 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 		if len(estadoNovedad) != 0 {
 			data := estadoNovedad["Data"].(map[string]interface{})
 			nombreEstadoNov = data["Nombre"].(string)
+			codEstado = data["CodigoAbreviacion"].(string)
 		}
 	}
 
@@ -319,7 +321,7 @@ func GetNovedadSuspension(novedad map[string]interface{}) (novedadformatted map[
 		"fechafinefectiva":           fechafinefectiva,
 		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
 		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
-		"estado":                     NovedadAdicion["Estado"],
+		"estado":                     codEstado,
 		"nombreEstado":               nombreEstadoNov,
 		"enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
