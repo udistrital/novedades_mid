@@ -158,8 +158,7 @@ func ConsultarTipoNovedad(novedad map[string]interface{}) (result map[string]int
 				switch tipoNovedad {
 				case 1:
 					if tipoFecha == 8 {
-						// if fecha == fechaReferencia || fechaParse.Before(currentDate) {
-						if 1 < 2 {
+						if fecha == fechaReferencia || fechaParse.Before(currentDate) {
 							return ReplicaSuspension(novedad, propiedades, fechasResponse)
 						}
 					}
