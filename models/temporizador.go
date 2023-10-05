@@ -118,16 +118,17 @@ func ReplicaFechaPosterior(horaActual time.Time) {
 	url := "/novedades_poscontractuales?query=Estado:" + codEstado + "&limit=0"
 
 	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesResponse); err == nil {
-		for _, novedadRegistro := range novedadesResponse {
-			replicaResult, outputError = ConsultarTipoNovedad(novedadRegistro)
-			if outputError == nil {
-				fmt.Println("Replica realizada correctamente (Temporizador)")
-				fmt.Println("Registro realizado en la fecha", time.Now())
-				fmt.Println(replicaResult)
-				// if replicaResult, outputError = ConsultarTipoNovedad(novedadRegistro); outputError == nil {
-			} else {
-				fmt.Println("Fallo al realizar la réplica (Temporizador)")
-				fmt.Println(outputError)
+		if len(novedadesResponse[0]) > 0 {
+			for _, novedadRegistro := range novedadesResponse {
+				replicaResult, outputError = ConsultarTipoNovedad(novedadRegistro)
+				if outputError == nil {
+					fmt.Println("Replica realizada correctamente (Temporizador)")
+					fmt.Println("Registro realizado en la fecha", time.Now())
+					fmt.Println(replicaResult)
+				} else {
+					fmt.Println("Fallo al realizar la réplica (Temporizador)")
+					fmt.Println(outputError)
+				}
 			}
 		}
 	} else {
@@ -141,7 +142,6 @@ func ConsultarTipoNovedad(novedad map[string]interface{}) (result map[string]int
 	timeLayout := "2006-01-02"
 	fechaReferencia := currentDate.Format(timeLayout)
 	// fmt.Println("fechaReferencia: ", fechaReferencia)
-
 	tipoNovedad := int(novedad["TipoNovedad"].(float64))
 
 	var fechasResponse []map[string]interface{}
@@ -686,8 +686,14 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
 			if len(resultPostTitan) > 0 {
-				fmt.Println("Registro en Titan exitoso!")
-				return resultPostTitan, nil
+				status := resultPostTitan["Status"]
+				if status == "201" {
+					fmt.Println("Registro en Titan exitoso!")
+					return resultPostTitan, nil
+				} else {
+					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+					return nil, outputError
+				}
 			} else {
 				outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
 				return nil, outputError
