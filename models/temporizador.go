@@ -83,7 +83,7 @@ func Temporizador() {
 	dt := time.Now()
 	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T23:45:00+00:00")
 	// 18000
-	tdr := time.Tick(5 * time.Minute)
+	tdr := time.Tick(10 * time.Minute)
 	for horaActual := range tdr {
 		log.Printf("Temporizador ejecutándose")
 		if dt.After(until) {
@@ -281,16 +281,21 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 
 	url = "/novedadCPS/suspender_contrato"
 	if result, err := PostReplica(url, ArgoSuspensionPost, TitanSuspensionPost); err == nil {
-		resultEstado, errEstado := CambioEstadoReplica(strconv.Itoa(numContrato), 2, idNovedad)
+		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), 2)
 		if errEstado == nil {
-			fmt.Println(resultEstado)
-			return result, nil
+			errEstadoNov := CambioEstadoNovedad(idNovedad)
+			if errEstadoNov == nil {
+				return result, nil
+			} else {
+				outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedadSus", "err": errEstadoNov}
+				return nil, outputError
+			}
 		} else {
-			outputError = map[string]interface{}{"funcion": "/CambioEstadoReplica", "err": errEstado}
+			outputError = map[string]interface{}{"funcion": "/CambioEstadoContratoSus", "err": errEstado}
 			return nil, outputError
 		}
 	} else {
-		outputError = map[string]interface{}{"funcion": "/ReplicaSuspension", "err": err}
+		outputError = map[string]interface{}{"funcion": "/PostReplicaSuspension", "err": err}
 		return nil, err
 	}
 }
@@ -299,6 +304,7 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 
 	numContrato := int(novedad["ContratoId"].(float64))
 	vigencia := int(novedad["Vigencia"].(float64))
+	var idNovedad = fmt.Sprintf("%v", novedad["Id"])
 
 	var cesionario float64
 	var cesionarioDoc string
@@ -374,9 +380,15 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 
 	url = "/novedadCPS/ceder_contrato"
 	if result, err := PostReplica(url, ArgoCesionPost, TitanCesionPost); err == nil {
-		return result, nil
+		errEstadoNov := CambioEstadoNovedad(idNovedad)
+		if errEstadoNov == nil {
+			return result, nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedadCesion", "err": errEstadoNov}
+			return nil, err
+		}
 	} else {
-		outputError = map[string]interface{}{"funcion": "/ReplicaCesion", "err": err}
+		outputError = map[string]interface{}{"funcion": "/PostReplicaCesion", "err": err}
 		return nil, err
 	}
 }
@@ -466,20 +478,25 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
 		if err = SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
-			resultEstado, errEstado := CambioEstadoReplica(strconv.Itoa(numContrato), 2, idNovedad)
+			errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), 4)
 			if errEstado == nil {
-				fmt.Println(resultEstado)
-				return result, nil
+				errEstadoNov := CambioEstadoNovedad(idNovedad)
+				if errEstadoNov == nil {
+					return result, nil
+				} else {
+					outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedadReinicio", "err": errEstadoNov}
+					return nil, outputError
+				}
 			} else {
-				outputError = map[string]interface{}{"funcion": "/ReplicaCesion1", "err": errEstado}
+				outputError = map[string]interface{}{"funcion": "/CambioEstadoContratoReinicio", "err": errEstado}
 				return nil, outputError
 			}
 		} else {
-			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+			outputError = map[string]interface{}{"funcion": "/PostReplicaReinicio", "err": err.Error()}
 			return nil, outputError
 		}
 	} else {
-		outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
+		outputError = map[string]interface{}{"funcion": "/PutNovedadReinicio", "err": err.Error()}
 		return nil, outputError
 	}
 }
@@ -537,12 +554,18 @@ func ReplicaTerminacion(novedad map[string]interface{}, propiedades []map[string
 
 	url = "/novedadCPS/cancelar_contrato"
 	if result, err := PostReplica(url, ArgoTerminacionPost, TitanTerminacionPost); err == nil {
-		resultEstado, errEstado := CambioEstadoReplica(strconv.Itoa(numContrato), 2, idNovedad)
+		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), 8)
 		if errEstado == nil {
-			fmt.Println(resultEstado)
-			return result, nil
+
+			errEstadoNov := CambioEstadoNovedad(idNovedad)
+			if errEstadoNov == nil {
+				return result, nil
+			} else {
+				outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedad", "err": errEstadoNov}
+				return nil, outputError
+			}
 		} else {
-			outputError = map[string]interface{}{"funcion": "/ReplicaCesion1", "err": errEstado}
+			outputError = map[string]interface{}{"funcion": "/CambioEstadoContratoTer", "err": errEstado}
 			return nil, outputError
 		}
 	} else {
@@ -557,6 +580,7 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	vigencia := int(novedad["Vigencia"].(float64))
 	numeroCdp := int(novedad["NumeroCdpId"].(float64))
 	vigenciaCdp := int(novedad["VigenciaCdp"].(float64))
+	var idNovedad = fmt.Sprintf("%v", novedad["Id"])
 
 	var tipoNovedad int
 	if int(novedad["TipoNovedad"].(float64)) == 6 {
@@ -639,9 +663,15 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 
 	url = "/novedadCPS/otrosi_contrato"
 	if result, err := PostReplica(url, ArgoOtrosiPost, TitanOtrosiPost); err == nil {
-		return result, nil
+		errEstadoNov := CambioEstadoNovedad(idNovedad)
+		if errEstadoNov == nil {
+			return result, nil
+		} else {
+			outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedadAdiPro", "err": errEstadoNov}
+			return nil, outputError
+		}
 	} else {
-		outputError = map[string]interface{}{"funcion": "/ReplicaAdicionProrroga", "err": err}
+		outputError = map[string]interface{}{"funcion": "/PostReplicaAdicionProrroga", "err": err}
 		return nil, err
 	}
 }
@@ -721,27 +751,13 @@ func FormatFechaReplica(fecha string, format string) string {
 // 	}
 // }
 
-func CambioEstadoReplica(numContrato string, estado int, idNovedad string) (map[string]interface{}, error) {
+func CambioEstadoContrato(numContrato string, estado int) error {
 
 	var resultContrato []map[string]interface{}
 	var resultadoEstadoAdmamazon map[string]interface{}
-	var estadoNovedad map[string]interface{}
-	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:TERM", &estadoNovedad)
-	var codEstado string
-	if error3 == nil {
-		if len(estadoNovedad) != 0 {
-			inter := estadoNovedad["Data"].([]interface{})
-			data := inter[0].(map[string]interface{})
-			idEstado, _ := data["Id"].(float64)
-			codEstado = strconv.FormatFloat(idEstado, 'f', -1, 64)
-		}
-	}
 
 	errContrato := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+"/contrato_suscrito?query=NumeroContratoSuscrito:"+numContrato, &resultContrato)
 	if errContrato == nil {
-
-		var novedad map[string]interface{}
-		var resultadoRegistro map[string]interface{}
 
 		result := resultContrato[0]
 		numeroContrato := result["NumeroContrato"].(map[string]interface{})
@@ -764,19 +780,47 @@ func CambioEstadoReplica(numContrato string, estado int, idNovedad string) (map[
 		url := beego.AppConfig.String("AdministrativaAmazonService") + "/contrato_estado"
 		errEstado := request.SendJson(url, "POST", &resultadoEstadoAdmamazon, &body)
 		if errEstado == nil {
-			err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+idNovedad, &novedad)
-			if err == nil {
-				novedad["Estado"] = codEstado
-				errRegNovedad := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+idNovedad, "PUT", &resultadoRegistro, novedad)
-				if errRegNovedad == nil {
-					fmt.Println("Estado de novedad actualizado!!")
-				}
-			}
-			return resultadoEstadoAdmamazon, nil
+			fmt.Println("Estado del contrato actualizado!!")
+			return nil
 		} else {
-			return nil, errEstado
+			return errEstado
 		}
 	} else {
-		return nil, errContrato
+		return errContrato
+	}
+}
+
+func CambioEstadoNovedad(idNovedad string) error {
+	var estadoNovedad map[string]interface{}
+	var novedad map[string]interface{}
+	var resultadoRegistro map[string]interface{}
+
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:TERM", &estadoNovedad)
+	var codEstado string
+	if error3 == nil {
+		if len(estadoNovedad) != 0 {
+			inter := estadoNovedad["Data"].([]interface{})
+			data := inter[0].(map[string]interface{})
+			idEstado, _ := data["Id"].(float64)
+			codEstado = strconv.FormatFloat(idEstado, 'f', -1, 64)
+		}
+		err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+idNovedad, &novedad)
+		if err == nil {
+			fechaParse, _ := time.Parse("2006-01-02 15:04:05 +0000 +0000", fmt.Sprint(novedad["FechaCreacion"]))
+			novedad["FechaCreacion"] = fechaParse.Format("2006-01-02 15:04:05.999999")
+			novedad["FechaModificacion"] = time.Now().Format("2006-01-02 15:04:05.999999")
+			novedad["Estado"] = codEstado
+			errRegNovedad := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+idNovedad, "PUT", &resultadoRegistro, novedad)
+			if errRegNovedad == nil {
+				fmt.Println("Estado de novedad actualizado!!")
+				return nil
+			} else {
+				return errRegNovedad
+			}
+		} else {
+			return err
+		}
+	} else {
+		return error3
 	}
 }
