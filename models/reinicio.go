@@ -384,7 +384,13 @@ func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[s
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
 		url = "/novedadCPS/reiniciar_contrato"
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
-			return result, nil
+			if len(result) > 0 {
+				fmt.Println("Replica de reinicio realizada!")
+				return result, nil
+			} else {
+				outputError = map[string]interface{}{"funcion": "/TitanPostReinicio", "err": err.Error()}
+				return nil, outputError
+			}
 		} else {
 			outputError = map[string]interface{}{"funcion": "/ReplicaReinicio", "err": err.Error()}
 			return nil, outputError
