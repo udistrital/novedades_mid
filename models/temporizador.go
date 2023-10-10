@@ -79,13 +79,12 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 }
 
 func Temporizador() {
-
-	dt := time.Now()
-	until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T23:45:00+00:00")
 	// 18000
 	tdr := time.Tick(10 * time.Minute)
 	for horaActual := range tdr {
 		log.Printf("Temporizador ejecutándose")
+		dt := time.Now()
+		until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T23:45:00+00:00")
 		if dt.After(until) {
 			ReplicaFechaPosterior(horaActual)
 		}
@@ -685,15 +684,15 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	var outputError map[string]interface{}
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
-			if len(resultPostTitan) > 0 {
-				status := resultPostTitan["Status"]
-				if status == "201" {
-					fmt.Println("Registro en Titan exitoso!")
-					return resultPostTitan, nil
-				} else {
-					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
-					return nil, outputError
-				}
+			if len(resultPostTitan) == 0 {
+				// status := resultPostTitan["Status"]
+				// if status == "201" {
+				fmt.Println("Registro en Titan exitoso!")
+				return resultPostTitan, nil
+				// } else {
+				// 	outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+				// 	return nil, outputError
+				// }
 			} else {
 				outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
 				return nil, outputError
