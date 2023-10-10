@@ -84,7 +84,7 @@ func Temporizador() {
 	for horaActual := range tdr {
 		log.Printf("Temporizador ejecutándose")
 		dt := time.Now()
-		until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T23:45:00+00:00")
+		until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T10:45:00+00:00")
 		if dt.After(until) {
 			ReplicaFechaPosterior(horaActual)
 		}
