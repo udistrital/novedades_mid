@@ -684,15 +684,15 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	var outputError map[string]interface{}
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
-			if len(resultPostTitan) == 0 {
-				// status := resultPostTitan["Status"]
-				// if status == "201" {
-				fmt.Println("Registro en Titan exitoso!")
-				return resultPostTitan, nil
-				// } else {
-				// 	outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
-				// 	return nil, outputError
-				// }
+			if len(resultPostTitan) > 0 {
+				status := resultPostTitan["Status"]
+				if status == "201" {
+					fmt.Println("Registro en Titan exitoso!")
+					return resultPostTitan, nil
+				} else {
+					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+					return nil, outputError
+				}
 			} else {
 				outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
 				return nil, outputError
