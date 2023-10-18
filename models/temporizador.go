@@ -662,11 +662,17 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 
 	url = "/novedadCPS/otrosi_contrato"
 	if result, err := PostReplica(url, ArgoOtrosiPost, TitanOtrosiPost); err == nil {
-		errEstadoNov := CambioEstadoNovedad(idNovedad)
-		if errEstadoNov == nil {
-			return result, nil
+		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), 4)
+		if errEstado == nil {
+			errEstadoNov := CambioEstadoNovedad(idNovedad)
+			if errEstadoNov == nil {
+				return result, nil
+			} else {
+				outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedadAdiPro", "err": errEstadoNov}
+				return nil, outputError
+			}
 		} else {
-			outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedadAdiPro", "err": errEstadoNov}
+			outputError = map[string]interface{}{"funcion": "/CambioEstadoContratoAdiPro", "err": errEstado}
 			return nil, outputError
 		}
 	} else {
@@ -768,13 +774,12 @@ func CambioEstadoContrato(numContrato string, estado int) error {
 		numeroContrato := result["NumeroContrato"].(map[string]interface{})
 		num_contrato_id := numeroContrato["Id"].(string)
 		vigencia := result["Vigencia"].(float64)
-		usuario := result["Usuario"].(string)
 
 		body := make(map[string]interface{})
 		body = map[string]interface{}{
 			"FechaRegistro":  time.Now().Format("2006-01-02T15:04:05.000Z"),
 			"NumeroContrato": num_contrato_id,
-			"Usuario":        usuario,
+			"Usuario":        "NOVEDADES",
 			"Vigencia":       vigencia,
 		}
 
