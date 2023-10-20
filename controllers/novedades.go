@@ -267,34 +267,45 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		fmt.Println("Novedad de adicion/prorroga")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdProrrogaPost(registroNovedadPost)
 	}
-	codTer := ""
-	codEtr := ""
-	var estadoNovedadTer map[string]interface{}
-	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:TERM", &estadoNovedadTer)
+	codTerminada := ""
+	codEntramite := ""
+	// codEnejecuion := ""
+	var estadoTerminada map[string]interface{}
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:TERM", &estadoTerminada)
 	if error3 == nil {
-		if len(estadoNovedadTer) != 0 {
-			inter := estadoNovedadTer["Data"].([]interface{})
+		if len(estadoTerminada) != 0 {
+			inter := estadoTerminada["Data"].([]interface{})
 			data := inter[0].(map[string]interface{})
 			idEstado, _ := data["Id"].(float64)
-			codTer = strconv.FormatFloat(idEstado, 'f', -1, 64)
+			codTerminada = strconv.FormatFloat(idEstado, 'f', -1, 64)
 		}
 	}
-	var estadoNovedadEtr map[string]interface{}
-	error4 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:TERM", &estadoNovedadEtr)
+	var estadoEntramite map[string]interface{}
+	error4 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENTR", &estadoEntramite)
 	if error4 == nil {
-		if len(estadoNovedadEtr) != 0 {
-			inter := estadoNovedadEtr["Data"].([]interface{})
+		if len(estadoEntramite) != 0 {
+			inter := estadoEntramite["Data"].([]interface{})
 			data := inter[0].(map[string]interface{})
 			idEstado, _ := data["Id"].(float64)
-			codEtr = strconv.FormatFloat(idEstado, 'f', -1, 64)
+			codEntramite = strconv.FormatFloat(idEstado, 'f', -1, 64)
 		}
 	}
+	// var estadoEnejecucion map[string]interface{}
+	// error5 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENEJ", &estadoEnejecucion)
+	// if error5 == nil {
+	// 	if len(estadoEnejecucion) != 0 {
+	// 		inter := estadoEnejecucion["Data"].([]interface{})
+	// 		data := inter[0].(map[string]interface{})
+	// 		idEstado, _ := data["Id"].(float64)
+	// 		codEnejecuion = strconv.FormatFloat(idEstado, 'f', -1, 64)
+	// 	}
+	// }
 
 	if registroNovedadPost["tiponovedad"] == "NP_CES" {
 		novedad := NovedadPoscontractualPost["NovedadPoscontractual"].(map[string]interface{})
-		if novedad["Estado"] == codEtr {
+		if novedad["Estado"] == codEntramite {
 			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
-		} else if novedad["Estado"] == codTer {
+		} else if novedad["Estado"] == codTerminada {
 			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 		}
 	} else {

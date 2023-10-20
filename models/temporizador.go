@@ -280,7 +280,7 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 
 	url = "/novedadCPS/suspender_contrato"
 	if result, err := PostReplica(url, ArgoSuspensionPost, TitanSuspensionPost); err == nil {
-		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), 2)
+		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 2)
 		if errEstado == nil {
 			errEstadoNov := CambioEstadoNovedad(idNovedad)
 			if errEstadoNov == nil {
@@ -477,7 +477,7 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
 		if err = SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
-			errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), 4)
+			errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 4)
 			if errEstado == nil {
 				errEstadoNov := CambioEstadoNovedad(idNovedad)
 				if errEstadoNov == nil {
@@ -553,7 +553,7 @@ func ReplicaTerminacion(novedad map[string]interface{}, propiedades []map[string
 
 	url = "/novedadCPS/cancelar_contrato"
 	if result, err := PostReplica(url, ArgoTerminacionPost, TitanTerminacionPost); err == nil {
-		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), 8)
+		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 8)
 		if errEstado == nil {
 
 			errEstadoNov := CambioEstadoNovedad(idNovedad)
@@ -662,11 +662,17 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 
 	url = "/novedadCPS/otrosi_contrato"
 	if result, err := PostReplica(url, ArgoOtrosiPost, TitanOtrosiPost); err == nil {
-		errEstadoNov := CambioEstadoNovedad(idNovedad)
-		if errEstadoNov == nil {
-			return result, nil
+		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 4)
+		if errEstado == nil {
+			errEstadoNov := CambioEstadoNovedad(idNovedad)
+			if errEstadoNov == nil {
+				return result, nil
+			} else {
+				outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedadAdiPro", "err": errEstadoNov}
+				return nil, outputError
+			}
 		} else {
-			outputError = map[string]interface{}{"funcion": "/CambioEstadoNovedadAdiPro", "err": errEstadoNov}
+			outputError = map[string]interface{}{"funcion": "/CambioEstadoContratoAdiPro", "err": errEstado}
 			return nil, outputError
 		}
 	} else {
@@ -682,15 +688,22 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	var resultPostArgo map[string]interface{}
 	var resultPostTitan map[string]interface{}
 	var outputError map[string]interface{}
+	var fecha string
+	fecha = time.Now().Format("2006-01-02 15:04:05")
+	log.Printf("HoraReplica1: " + fecha)
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
+		fecha = time.Now().Format("2006-01-02 15:04:05")
+		log.Printf("HoraReplica2: " + fecha)
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+			fecha = time.Now().Format("2006-01-02 15:04:05")
+			log.Printf("HoraReplica3: " + fecha)
 			if len(resultPostTitan) > 0 {
 				status := resultPostTitan["Status"]
 				if status == "201" {
 					fmt.Println("Registro en Titan exitoso!")
 					return resultPostTitan, nil
 				} else {
-					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
 					return nil, outputError
 				}
 			} else {
@@ -756,25 +769,24 @@ func FormatFechaReplica(fecha string, format string) string {
 // 	}
 // }
 
-func CambioEstadoContrato(numContrato string, estado int) error {
+func CambioEstadoContrato(numContrato string, vigencia string, estado int) error {
 
 	var resultContrato []map[string]interface{}
 	var resultadoEstadoAdmamazon map[string]interface{}
 
-	errContrato := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+"/contrato_suscrito?query=NumeroContratoSuscrito:"+numContrato, &resultContrato)
+	errContrato := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+"/contrato_suscrito?query=NumeroContratoSuscrito:"+numContrato+",Vigencia:"+vigencia, &resultContrato)
 	if errContrato == nil {
 
 		result := resultContrato[0]
 		numeroContrato := result["NumeroContrato"].(map[string]interface{})
 		num_contrato_id := numeroContrato["Id"].(string)
 		vigencia := result["Vigencia"].(float64)
-		usuario := result["Usuario"].(string)
 
 		body := make(map[string]interface{})
 		body = map[string]interface{}{
 			"FechaRegistro":  time.Now().Format("2006-01-02T15:04:05.000Z"),
 			"NumeroContrato": num_contrato_id,
-			"Usuario":        usuario,
+			"Usuario":        "NOVEDADES",
 			"Vigencia":       vigencia,
 		}
 
@@ -800,7 +812,7 @@ func CambioEstadoNovedad(idNovedad string) error {
 	var novedad map[string]interface{}
 	var resultadoRegistro map[string]interface{}
 
-	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:TERM", &estadoNovedad)
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENEJ", &estadoNovedad)
 	var codEstado string
 	if error3 == nil {
 		if len(estadoNovedad) != 0 {
