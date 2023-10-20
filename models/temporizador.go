@@ -688,8 +688,15 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	var resultPostArgo map[string]interface{}
 	var resultPostTitan map[string]interface{}
 	var outputError map[string]interface{}
+	var fecha string
+	fecha = time.Now().Format("2006-01-02 15:04:05")
+	log.Printf("HoraReplica1: " + fecha)
 	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
+		fecha = time.Now().Format("2006-01-02 15:04:05")
+		log.Printf("HoraReplica2: " + fecha)
 		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+			fecha = time.Now().Format("2006-01-02 15:04:05")
+			log.Printf("HoraReplica3: " + fecha)
 			if len(resultPostTitan) > 0 {
 				status := resultPostTitan["Status"]
 				if status == "201" {
