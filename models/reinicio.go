@@ -149,6 +149,19 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 			"Id": 12,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadReinicio["fechaexpedicion"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 14,
+		},
+	})
 
 	NovedadReinicioPost["Fechas"] = fechas
 
@@ -235,6 +248,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	var fechareinicio interface{}
 	var fechasolicitud interface{}
 	var fechasuspension interface{}
+	var fechaexpedicion interface{}
 	var fechaterminacionanticipada interface{}
 	var fechafinefectiva interface{}
 	var tiponovedad []map[string]interface{}
@@ -276,6 +290,9 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 			}
 			if nombrefecha == "FechaFinEfectiva" {
 				fechafinefectiva = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaExpedicion" {
+				fechaexpedicion = fecha["Fecha"]
 			}
 		}
 	}
@@ -327,6 +344,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		"fechasolicitud":             fechasolicitud,
 		"fechasuspension":            fechasuspension,
 		"fechaterminacionanticipada": fechaterminacionanticipada,
+		"fechaexpedicion":            fechaexpedicion,
 		"motivo":                     NovedadAdicion["Motivo"],
 		"numeroactaentrega":          "",
 		"numerocdp":                  "",
