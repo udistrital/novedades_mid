@@ -116,6 +116,19 @@ func ConstruirNovedadProrrogaPost(novedad map[string]interface{}) (novedadformat
 			"Id": 12,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadProrroga["fechaexpedicion"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 14,
+		},
+	})
 
 	NovedadProrrogaPost["Fechas"] = fechas
 
@@ -205,6 +218,7 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 	var fechasolicitud interface{}
 	var fechaprorroga interface{}
 	var fechafinefectiva interface{}
+	var fechaexpedicion interface{}
 	var cesionario interface{}
 	var valoradicion interface{}
 	var tiempoprorroga interface{}
@@ -236,7 +250,9 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrefecha == "FechaFinEfectiva" {
 				fechafinefectiva = fecha["Fecha"]
 			}
-
+			if nombrefecha == "FechaExpedicion" {
+				fechaexpedicion = fecha["Fecha"]
+			}
 		}
 	}
 	if len(propiedades[0]) != 0 {
@@ -287,6 +303,7 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 		"fechasolicitud":             fechasolicitud,
 		"fechasuspension":            "",
 		"fechaterminacionanticipada": "",
+		"fechaexpedicion":            fechaexpedicion,
 		"motivo":                     NovedadAdicion["Motivo"],
 		"numeroactaentrega":          "",
 		"numerocdp":                  NovedadAdicion["NumeroCdpId"],

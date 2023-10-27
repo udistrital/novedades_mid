@@ -139,6 +139,19 @@ func ConstruirNovedadTAnticipada(novedad map[string]interface{}) (novedadformatt
 			"Id": 13,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadTAnticipada["fechaexpedicion"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 14,
+		},
+	})
 
 	NovedadTAnticipadaPost["Fechas"] = fechas
 
@@ -226,6 +239,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 	var fechaterminacionanticipada interface{}
 	var fechasolicitud interface{}
 	var fechafinefectiva interface{}
+	var fechaexpedicion interface{}
 	var tiponovedad []map[string]interface{}
 	var tipoNovedadNombre string
 	var estadoNovedad map[string]interface{}
@@ -255,6 +269,9 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 				}
 				if nombrefecha == "FechaFinEfectiva" {
 					fechafinefectiva = fecha["Fecha"]
+				}
+				if nombrefecha == "FechaExpedicion" {
+					fechaexpedicion = fecha["Fecha"]
 				}
 			}
 		}
@@ -302,6 +319,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 		"fechareinicio":              "",
 		"fechasolicitud":             fechasolicitud,
 		"fechasuspension":            "",
+		"fechaexpedicion":            fechaexpedicion,
 		"fechaterminacionanticipada": fechaterminacionanticipada,
 		"motivo":                     NovedadAdicion["Motivo"],
 		"numeroactaentrega":          "",

@@ -142,6 +142,19 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 			"Id": 13,
 		},
 	})
+	fechas = append(fechas, map[string]interface{}{
+		"Activo":            true,
+		"Fecha":             NovedadCesion["fechaexpedicion"],
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoFecha": map[string]interface{}{
+			"Id": 14,
+		},
+	})
 
 	NovedadCesionPost["Fechas"] = fechas
 
@@ -285,6 +298,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	var fechasolicitud interface{}
 	var fechaoficio interface{}
 	var fechafinefectiva interface{}
+	var fechaexpedicion interface{}
 	var tiponovedad []map[string]interface{}
 	var tipoNovedadNombre string
 	var estadoNovedad map[string]interface{}
@@ -328,6 +342,9 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 			}
 			if nombrefecha == "FechaFinEfectiva" {
 				fechafinefectiva = fecha["Fecha"]
+			}
+			if nombrefecha == "FechaExpedicion" {
+				fechaexpedicion = fecha["Fecha"]
 			}
 		}
 	}
@@ -403,6 +420,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"fechasolicitud":             fechasolicitud,
 		"fechasuspension":            "",
 		"fechaterminacionanticipada": "",
+		"fechaexpedicion":            fechaexpedicion,
 		"motivo":                     NovedadAdicion["Motivo"],
 		"numeroactaentrega":          numeroactaentrega,
 		"numerocdp":                  NovedadAdicion["NumeroCdpId"],
