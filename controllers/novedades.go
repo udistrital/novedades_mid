@@ -223,7 +223,26 @@ func (c *NovedadesController) Put() {
 // @Failure 403 id is empty
 // @router /:id [delete]
 func (c *NovedadesController) Delete() {
+	idStr := c.Ctx.Input.Param(":id")
+	// var registroNovedad map[string]interface{}
+	var alertErr models.Alert
+	alertas := append([]interface{}{"Response:"})
 
+	result, err1 := EliminarNovedad(idStr)
+	if err1 == nil {
+		alertErr.Type = "OK"
+		alertErr.Code = "200"
+		alertErr.Body = result
+	} else {
+		alertErr.Type = "error"
+		alertErr.Code = "400"
+		alertas = append(alertas, err1)
+		alertErr.Body = alertas
+		c.Ctx.Output.SetStatus(400)
+	}
+
+	c.Data["json"] = alertErr
+	c.ServeJSON()
 }
 
 // RegistrarNovedadMongo Función para registrar la novedad en postgresql
@@ -388,6 +407,64 @@ func ActualizarNovedad(id string) (status interface{}, outputError interface{}) 
 		if errRegNovedad == nil {
 			fmt.Println("Novedad actualizada!!")
 		}
+	}
+	return nil, nil
+}
+
+func EliminarNovedad(id string) (status interface{}, outputError interface{}) {
+	var result map[string]interface{}
+	var resultadoNov map[string]interface{}
+	var resultPropiedades []map[string]interface{}
+	var resultFechas []map[string]interface{}
+	var delFechas bool
+	var delPropiedad bool
+	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, &resultadoNov); err == nil {
+		err1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad?query=IdNovedadesPoscontractuales.Id:"+id, &resultPropiedades)
+		if err1 == nil {
+			err2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas?query=IdNovedadesPoscontractuales.Id:"+id, &resultFechas)
+			if err2 == nil {
+				for _, fecha := range resultFechas {
+					delFechas = false
+					idFecha, _ := fecha["Id"].(float64)
+					idstr := strconv.FormatFloat(idFecha, 'f', -1, 64)
+					err3 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/"+idstr, "DELETE", &result, nil)
+					if err3 == nil {
+						delFechas = true
+						// fmt.Println("Registro de Fecha Eliminado")
+					} else {
+						return nil, result
+					}
+				}
+				for _, propiedad := range resultPropiedades {
+					delPropiedad = false
+					idPropiedad := propiedad["Id"].(float64)
+					idstr := strconv.FormatFloat(idPropiedad, 'f', -1, 64)
+					err3 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/"+idstr, "DELETE", &result, nil)
+					if err3 == nil {
+						delPropiedad = true
+						// fmt.Println("Registro de Propiedad Eliminado")
+					} else {
+						return nil, result
+					}
+				}
+				if delFechas && delPropiedad {
+					err4 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, "DELETE", &result, nil)
+					if err4 == nil {
+						fmt.Println("Registro de novedad eliminado, Id: ", id)
+						return result, nil
+					}
+				} else {
+					fmt.Println("Error al eliminar")
+					return nil, result
+				}
+			} else {
+				return nil, resultFechas
+			}
+		} else {
+			return nil, resultPropiedades
+		}
+	} else {
+		return nil, resultadoNov
 	}
 	return nil, nil
 }
