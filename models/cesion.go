@@ -185,86 +185,6 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 		},
 		"propiedad": NovedadCesion["cesionario"],
 	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 13,
-		},
-		"propiedad": NovedadCesion["numeroactaentrega"],
-	})
-
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 3,
-		},
-		"propiedad": NovedadCesion["periodosuspension"],
-	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 4,
-		},
-		"propiedad": NovedadCesion["plazoactual"],
-	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 5,
-		},
-		"propiedad": NovedadCesion["tiempoprorroga"],
-	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 6,
-		},
-		"propiedad": NovedadCesion["valoradicion"],
-	})
-	propiedades = append(propiedades, map[string]interface{}{
-		"Activo":            true,
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoPropiedad": map[string]interface{}{
-			"Id": 8,
-		},
-		"propiedad": NovedadCesion["valorfinalcontrato"],
-	})
-
 	NovedadCesionPost["Propiedad"] = propiedades
 
 	poliza := make([]map[string]interface{}, 0)
@@ -309,11 +229,6 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	var cesionario interface{}
 	var numeroactaentrega interface{}
 	var numerooficioestadocuentas interface{}
-	var periodosuspension interface{}
-	var plazoactual interface{}
-	var tiempoprorroga interface{}
-	var valoradicion interface{}
-	var valorfinalcontrato interface{}
 
 	var polizas interface{}
 	var entidadaseguradora interface{}
@@ -364,21 +279,6 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 			if nombrepropiedad == "NumeroOficioEstadoCuentas" {
 				numerooficioestadocuentas = propiedad["Propiedad"]
 			}
-			if nombrepropiedad == "PeriodoSuspension" {
-				periodosuspension = propiedad["Propiedad"]
-			}
-			if nombrepropiedad == "PlazoActual" {
-				plazoactual = propiedad["Propiedad"]
-			}
-			if nombrepropiedad == "TiempoProrroga" {
-				tiempoprorroga = propiedad["Propiedad"]
-			}
-			if nombrepropiedad == "ValorAdicion" {
-				valoradicion = propiedad["Propiedad"]
-			}
-			if nombrepropiedad == "ValorFinalContrato" {
-				valorfinalcontrato = propiedad["Propiedad"]
-			}
 		}
 	}
 	if len(poliza[0]) > 0 {
@@ -427,14 +327,9 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"numerooficioestadocuentas":  numerooficioestadocuentas,
 		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
 		"observacion":                NovedadAdicion["Observacion"],
-		"periodosuspension":          periodosuspension,
-		"plazoactual":                plazoactual,
 		"poliza":                     polizas,
-		"tiempoprorroga":             tiempoprorroga,
 		"tiponovedad":                NovedadAdicion["TipoNovedad"],
 		"nombreTipoNovedad":          tipoNovedadNombre,
-		"valoradicion":               valoradicion,
-		"valorfinalcontrato":         valorfinalcontrato,
 		"vigencia":                   NovedadAdicion["Vigencia"],
 		"fechaoficio":                fechaoficio,
 		"entidadaseguradora":         entidadaseguradora,
