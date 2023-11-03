@@ -685,37 +685,101 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	// fmt.Println("url: ", url)
 	// fmt.Println("ArgoPost: ", ArgoOtrosiPost)
 	// fmt.Println("TitanPost: ", TitanOtrosiPost)
+
+	num_contrato := ArgoOtrosiPost["NumeroContrato"].(string)
+	vigencia := strconv.FormatFloat(ArgoOtrosiPost["Vigencia"].(float64), 'f', -1, 64)
+	argo_tipo_novedad := strconv.FormatFloat(ArgoOtrosiPost["TipoNovedad"].(float64), 'f', -1, 64)
+
 	var resultPostArgo map[string]interface{}
 	var resultPostTitan map[string]interface{}
 	var outputError map[string]interface{}
+	var resultQuery []map[string]interface{}
 	var fecha string
 	fecha = time.Now().Format("2006-01-02 15:04:05")
 	log.Printf("HoraReplica1: " + fecha)
-	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
-		fecha = time.Now().Format("2006-01-02 15:04:05")
-		log.Printf("HoraReplica2: " + fecha)
-		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
-			fecha = time.Now().Format("2006-01-02 15:04:05")
-			log.Printf("HoraReplica3: " + fecha)
-			if len(resultPostTitan) > 0 {
-				status := resultPostTitan["Status"]
-				if status == "201" {
-					fmt.Println("Registro en Titan exitoso!")
-					return resultPostTitan, nil
+
+	query := "/novedad_postcontractual?query=NumeroContrato:" + num_contrato + ",Vigencia:" + vigencia + ",TipoNovedad:" + argo_tipo_novedad + "&sortby=Id&order=desc"
+	if errArgo := GetJson(beego.AppConfig.String("AdministrativaAmazonService")+query, &resultQuery); errArgo == nil {
+		if len(resultQuery) > 0 {
+			var novArgo = resultQuery[0]
+			var fechaInicio = FormatFechaReplica(novArgo["FechaInicio"].(string), time.RFC3339)
+			var fechaFin = FormatFechaReplica(novArgo["FechaFin"].(string), time.RFC3339)
+			if (fechaInicio[0:10] != ArgoOtrosiPost["FechaInicio"].(string)[0:10]) || (fechaFin[0:10] != ArgoOtrosiPost["FechaFin"].(string)[0:10]) {
+				// if errTitan := GetJson(beego.AppConfig.String("TitanMidService")+query, &result); errTitan == nil {
+				if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
+					idArgo := resultPostArgo["Id"].(float64)
+					fmt.Println("Ress: ", idArgo)
+					fecha = time.Now().Format("2006-01-02 15:04:05")
+					log.Printf("HoraReplica2: " + fecha)
+					if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+						fecha = time.Now().Format("2006-01-02 15:04:05")
+						log.Printf("HoraReplica3: " + fecha)
+						if len(resultPostTitan) > 0 {
+							status := resultPostTitan["Status"]
+							if status == "201" {
+								fmt.Println("Registro en Titan exitoso!")
+								return resultPostTitan, nil
+							} else {
+								res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
+								fmt.Println(res, errEl)
+								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+								return nil, outputError
+							}
+						} else {
+							res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
+							fmt.Println(res, errEl)
+							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+							return nil, outputError
+						}
+					} else {
+						outputError = map[string]interface{}{"funcion": "/PostReplica2_Titan", "err": err.Error()}
+						return nil, outputError
+					}
 				} else {
-					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+					outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": err.Error()}
 					return nil, outputError
 				}
+				// } else {
+
+				// }
 			} else {
-				outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+				outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "La novedad ya existe en argo"}
 				return nil, outputError
 			}
 		} else {
-			outputError = map[string]interface{}{"funcion": "/PostReplica2_Titan", "err": err.Error()}
-			return nil, outputError
+			if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
+				idArgo := resultPostArgo["Id"].(float64)
+				fecha = time.Now().Format("2006-01-02 15:04:05")
+				log.Printf("HoraReplica2: " + fecha)
+				if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+					fecha = time.Now().Format("2006-01-02 15:04:05")
+					log.Printf("HoraReplica3: " + fecha)
+					if len(resultPostTitan) > 0 {
+						status := resultPostTitan["Status"]
+						if status == "201" {
+							fmt.Println("Registro en Titan exitoso!")
+							return resultPostTitan, nil
+						} else {
+							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+							return nil, outputError
+						}
+					} else {
+						res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
+						fmt.Println(res, errEl)
+						outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+						return nil, outputError
+					}
+				} else {
+					outputError = map[string]interface{}{"funcion": "/PostReplica2_Titan", "err": err.Error()}
+					return nil, outputError
+				}
+			} else {
+				outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": err.Error()}
+				return nil, outputError
+			}
 		}
 	} else {
-		outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": err.Error()}
+		outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "Error al consultar novedades en argo!"}
 		return nil, outputError
 	}
 }
@@ -768,6 +832,17 @@ func FormatFechaReplica(fecha string, format string) string {
 // 		return
 // 	}
 // }
+
+func EliminarRegistroArgo(idArgo string) (map[string]interface{}, map[string]interface{}) {
+	var result map[string]interface{}
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual/"+idArgo, "DELETE", &result, ""); err == nil {
+		fmt.Println("Registro eliminado!!")
+		return result, nil
+	} else {
+		outputError := map[string]interface{}{"funcion": "/EliminarRegistroArgo", "err": err.Error()}
+		return nil, outputError
+	}
+}
 
 func CambioEstadoContrato(numContrato string, vigencia string, estado int) error {
 
