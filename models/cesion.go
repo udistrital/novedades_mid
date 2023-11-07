@@ -185,6 +185,32 @@ func ConstruirNovedadCesion(novedad map[string]interface{}) (novedadformatted ma
 		},
 		"propiedad": NovedadCesion["cesionario"],
 	})
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 10,
+		},
+		"propiedad": NovedadCesion["valor_desembolsado"],
+	})
+	propiedades = append(propiedades, map[string]interface{}{
+		"Activo":            true,
+		"FechaCreacion":     nil,
+		"FechaModificacion": nil,
+		"Id":                0,
+		"IdNovedadesPoscontractuales": map[string]interface{}{
+			"Id": nil,
+		},
+		"IdTipoPropiedad": map[string]interface{}{
+			"Id": 16,
+		},
+		"propiedad": NovedadCesion["valor_a_favor"],
+	})
 	NovedadCesionPost["Propiedad"] = propiedades
 
 	poliza := make([]map[string]interface{}, 0)

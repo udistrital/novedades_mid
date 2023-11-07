@@ -411,43 +411,75 @@ func ActualizarNovedad(id string) (status interface{}, outputError interface{}) 
 	return nil, nil
 }
 
-func EliminarNovedad(id string) (status interface{}, outputError interface{}) {
+func EliminarNovedad(id string) (status map[string]interface{}, outputError interface{}) {
 	var result map[string]interface{}
 	var resultadoNov map[string]interface{}
 	var resultPropiedades []map[string]interface{}
 	var resultFechas []map[string]interface{}
+	var resultPolizas []map[string]interface{}
 	var delFechas bool
 	var delPropiedad bool
+	var delPoliza bool
 	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, &resultadoNov); err == nil {
+		idTipo, _ := resultadoNov["TipoNovedad"].(float64)
+		codTipo := strconv.FormatFloat(idTipo, 'f', -1, 64)
 		err1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad?query=IdNovedadesPoscontractuales.Id:"+id, &resultPropiedades)
 		if err1 == nil {
 			err2 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas?query=IdNovedadesPoscontractuales.Id:"+id, &resultFechas)
 			if err2 == nil {
-				for _, fecha := range resultFechas {
-					delFechas = false
-					idFecha, _ := fecha["Id"].(float64)
-					idstr := strconv.FormatFloat(idFecha, 'f', -1, 64)
-					err3 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/"+idstr, "DELETE", &result, nil)
-					if err3 == nil {
-						delFechas = true
-						// fmt.Println("Registro de Fecha Eliminado")
-					} else {
-						return nil, result
+				if len(resultFechas[0]) > 0 {
+					for _, fecha := range resultFechas {
+						delFechas = false
+						idFecha, _ := fecha["Id"].(float64)
+						idstr := strconv.FormatFloat(idFecha, 'f', -1, 64)
+						err3 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/"+idstr, "DELETE", &result, nil)
+						if err3 == nil {
+							delFechas = true
+							// fmt.Println("Registro de Fecha Eliminado")
+						} else {
+							return nil, result
+						}
 					}
+				} else {
+					delFechas = true
 				}
-				for _, propiedad := range resultPropiedades {
-					delPropiedad = false
-					idPropiedad := propiedad["Id"].(float64)
-					idstr := strconv.FormatFloat(idPropiedad, 'f', -1, 64)
-					err3 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/"+idstr, "DELETE", &result, nil)
-					if err3 == nil {
-						delPropiedad = true
-						// fmt.Println("Registro de Propiedad Eliminado")
-					} else {
-						return nil, result
+				if len(resultPropiedades[0]) > 0 {
+					for _, propiedad := range resultPropiedades {
+						delPropiedad = false
+						idPropiedad := propiedad["Id"].(float64)
+						idstr := strconv.FormatFloat(idPropiedad, 'f', -1, 64)
+						err3 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/"+idstr, "DELETE", &result, nil)
+						if err3 == nil {
+							delPropiedad = true
+							// fmt.Println("Registro de Propiedad Eliminado")
+						} else {
+							return nil, result
+						}
 					}
+				} else {
+					delPropiedad = true
 				}
-				if delFechas && delPropiedad {
+				if codTipo == "2" {
+					err3 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/poliza?query=IdNovedadesPoscontractuales.Id:"+id, &resultPolizas)
+					if err3 == nil && len(resultPolizas[0]) > 0 {
+						for _, poliza := range resultPolizas {
+							delPoliza = false
+							idPoliza, _ := poliza["Id"].(float64)
+							idstr := strconv.FormatFloat(idPoliza, 'f', -1, 64)
+							err4 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/poliza/"+idstr, "DELETE", &result, nil)
+							if err4 == nil {
+								delPoliza = true
+							} else {
+								return nil, result
+							}
+						}
+					} else {
+						delPoliza = true
+					}
+				} else {
+					delPoliza = true
+				}
+				if delFechas && delPropiedad && delPoliza {
 					err4 := request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/"+id, "DELETE", &result, nil)
 					if err4 == nil {
 						fmt.Println("Registro de novedad eliminado, Id: ", id)
@@ -466,5 +498,6 @@ func EliminarNovedad(id string) (status interface{}, outputError interface{}) {
 	} else {
 		return nil, resultadoNov
 	}
-	return nil, nil
+	errorMap := map[string]interface{}{"funcion": "/EliminarNovedad", "err": "La función de borrado no hizo nada (else sin return)"}
+	return nil, errorMap
 }
