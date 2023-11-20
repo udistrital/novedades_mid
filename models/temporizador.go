@@ -80,7 +80,7 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 
 func Temporizador() {
 	// 18000
-	tdr := time.Tick(10 * time.Second)
+	tdr := time.Tick(10 * time.Minute)
 	for horaActual := range tdr {
 		log.Printf("Temporizador ejecutándose")
 		dt := time.Now()
