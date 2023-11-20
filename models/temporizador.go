@@ -19,14 +19,14 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 
 	ArgoNovedadPost = map[string]interface{}{
 		"NumeroContrato":  fmt.Sprintf("%v", informacionReplica["NumeroContrato"]),
-		"Vigencia":        informacionReplica["Vigencia"],
+		"Vigencia":        int(informacionReplica["Vigencia"].(float64)),
 		"FechaRegistro":   informacionReplica["FechaRegistro"],
 		"Contratista":     informacionReplica["Contratista"],
 		"PlazoEjecucion":  informacionReplica["PlazoEjecucion"],
 		"FechaInicio":     informacionReplica["FechaInicio"],
 		"FechaFin":        informacionReplica["FechaFin"],
 		"UnidadEjecucion": informacionReplica["UnidadEjecucion"],
-		"TipoNovedad":     informacionReplica["TipoNovedad"],
+		"TipoNovedad":     int(informacionReplica["TipoNovedad"].(float64)),
 		"NumeroCdp":       informacionReplica["NumeroCdp"],
 		"VigenciaCdp":     informacionReplica["VigenciaCdp"],
 		"ValorNovedad":    informacionReplica["ValorNovedad"],
@@ -80,7 +80,7 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 
 func Temporizador() {
 	// 18000
-	tdr := time.Tick(10 * time.Minute)
+	tdr := time.Tick(10 * time.Second)
 	for horaActual := range tdr {
 		log.Printf("Temporizador ejecutándose")
 		dt := time.Now()
@@ -687,8 +687,9 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	// fmt.Println("TitanPost: ", TitanOtrosiPost)
 
 	num_contrato := ArgoOtrosiPost["NumeroContrato"].(string)
-	vigencia := strconv.FormatFloat(ArgoOtrosiPost["Vigencia"].(float64), 'f', -1, 64)
-	argo_tipo_novedad := strconv.FormatFloat(ArgoOtrosiPost["TipoNovedad"].(float64), 'f', -1, 64)
+	vigencia := strconv.Itoa(ArgoOtrosiPost["Vigencia"].(int))
+	argo_tipo_novedad := strconv.Itoa(ArgoOtrosiPost["TipoNovedad"].(int))
+	//	argo_tipo_novedad := strconv.FormatFloat(ArgoOtrosiPost["TipoNovedad"].(float64), 'f', -1, 64)
 
 	var resultPostArgo map[string]interface{}
 	var resultPostTitan map[string]interface{}
@@ -707,32 +708,36 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 			if (fechaInicio[0:10] != ArgoOtrosiPost["FechaInicio"].(string)[0:10]) || (fechaFin[0:10] != ArgoOtrosiPost["FechaFin"].(string)[0:10]) {
 				// if errTitan := GetJson(beego.AppConfig.String("TitanMidService")+query, &result); errTitan == nil {
 				if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
-					idArgo := resultPostArgo["Id"].(float64)
-					fmt.Println("Ress: ", idArgo)
-					fecha = time.Now().Format("2006-01-02 15:04:05")
-					log.Printf("HoraReplica2: " + fecha)
-					if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+					if len(resultPostArgo) > 0 {
+						idArgo := resultPostArgo["Id"].(float64)
 						fecha = time.Now().Format("2006-01-02 15:04:05")
-						log.Printf("HoraReplica3: " + fecha)
-						if len(resultPostTitan) > 0 {
-							status := resultPostTitan["Status"]
-							if status == "201" {
-								fmt.Println("Registro en Titan exitoso!")
-								return resultPostTitan, nil
+						log.Printf("HoraReplica2: " + fecha)
+						if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+							fecha = time.Now().Format("2006-01-02 15:04:05")
+							log.Printf("HoraReplica3: " + fecha)
+							if len(resultPostTitan) > 0 {
+								status := resultPostTitan["Status"]
+								if status == "201" {
+									fmt.Println("Registro en Titan exitoso!")
+									return resultPostTitan, nil
+								} else {
+									res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
+									fmt.Println(res, errEl)
+									outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+									return nil, outputError
+								}
 							} else {
 								res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
 								fmt.Println(res, errEl)
-								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
 								return nil, outputError
 							}
 						} else {
-							res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
-							fmt.Println(res, errEl)
-							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+							outputError = map[string]interface{}{"funcion": "/PostReplica2_Titan", "err": err.Error()}
 							return nil, outputError
 						}
 					} else {
-						outputError = map[string]interface{}{"funcion": "/PostReplica2_Titan", "err": err.Error()}
+						outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Error desconocido al registrar la novedad en Argo"}
 						return nil, outputError
 					}
 				} else {
@@ -748,29 +753,34 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 			}
 		} else {
 			if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
-				idArgo := resultPostArgo["Id"].(float64)
-				fecha = time.Now().Format("2006-01-02 15:04:05")
-				log.Printf("HoraReplica2: " + fecha)
-				if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+				if len(resultPostArgo) > 0 {
+					idArgo := resultPostArgo["Id"].(float64)
 					fecha = time.Now().Format("2006-01-02 15:04:05")
-					log.Printf("HoraReplica3: " + fecha)
-					if len(resultPostTitan) > 0 {
-						status := resultPostTitan["Status"]
-						if status == "201" {
-							fmt.Println("Registro en Titan exitoso!")
-							return resultPostTitan, nil
+					log.Printf("HoraReplica2: " + fecha)
+					if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+						fecha = time.Now().Format("2006-01-02 15:04:05")
+						log.Printf("HoraReplica3: " + fecha)
+						if len(resultPostTitan) > 0 {
+							status := resultPostTitan["Status"]
+							if status == "201" {
+								fmt.Println("Registro en Titan exitoso!")
+								return resultPostTitan, nil
+							} else {
+								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+								return nil, outputError
+							}
 						} else {
-							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+							res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
+							fmt.Println(res, errEl)
+							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
 							return nil, outputError
 						}
 					} else {
-						res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
-						fmt.Println(res, errEl)
-						outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+						outputError = map[string]interface{}{"funcion": "/PostReplica2_Titan", "err": err.Error()}
 						return nil, outputError
 					}
 				} else {
-					outputError = map[string]interface{}{"funcion": "/PostReplica2_Titan", "err": err.Error()}
+					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Error desconocido al registrar la novedad en Argo"}
 					return nil, outputError
 				}
 			} else {
