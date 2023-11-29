@@ -98,19 +98,30 @@ func Temporizador() {
 func ReplicaFechaPosterior(horaActual time.Time) {
 
 	var novedadesResponse []map[string]interface{}
+	var novedadesEnRes []map[string]interface{}
 	var replicaResult map[string]interface{}
 	var outputError map[string]interface{}
 
 	codEstado := ""
+	codEstadoEn := ""
 	var estadoNovedad map[string]interface{}
-	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENTR", &estadoNovedad)
-
-	if error3 == nil {
+	var estadoNovedadEn map[string]interface{}
+	err1 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENTR", &estadoNovedad)
+	if err1 == nil {
 		if len(estadoNovedad) != 0 {
 			inter := estadoNovedad["Data"].([]interface{})
 			data := inter[0].(map[string]interface{})
 			idEstado, _ := data["Id"].(float64)
 			codEstado = strconv.FormatFloat(idEstado, 'f', -1, 64)
+		}
+	}
+	err2 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENEJ", &estadoNovedadEn)
+	if err2 == nil {
+		if len(estadoNovedad) != 0 {
+			interf := estadoNovedadEn["Data"].([]interface{})
+			data := interf[0].(map[string]interface{})
+			idEstado, _ := data["Id"].(float64)
+			codEstadoEn = strconv.FormatFloat(idEstado, 'f', -1, 64)
 		}
 	}
 
@@ -133,6 +144,22 @@ func ReplicaFechaPosterior(horaActual time.Time) {
 	} else {
 		fmt.Println(err)
 	}
+
+	url = "/novedades_poscontractuales?query=Estado:" + codEstadoEn + "&limit=0"
+
+	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesEnRes); err == nil {
+		if len(novedadesEnRes[0]) > 0 {
+			for _, novedadRegistro := range novedadesEnRes {
+				estadoResult, outputError := TerminarNovedad(novedadRegistro)
+				if outputError == nil {
+					log.Println(estadoResult)
+				} else {
+					log.Println(outputError)
+				}
+			}
+		}
+	}
+
 }
 
 func ConsultarTipoNovedad(novedad map[string]interface{}) (result map[string]interface{}, outputError map[string]interface{}) {
@@ -212,6 +239,52 @@ func ConsultarTipoNovedad(novedad map[string]interface{}) (result map[string]int
 	return nil, nil
 }
 
+func TerminarNovedad(novedad map[string]interface{}) (map[string]interface{}, map[string]interface{}) {
+
+	currentDate := time.Now()
+	timeLayout := "2006-01-02"
+	fechaReferencia := currentDate.Format(timeLayout)
+	var fechasResponse []map[string]interface{}
+
+	var outputError map[string]interface{}
+	var result map[string]interface{}
+
+	url := "/fechas?query=IdNovedadesPoscontractuales.Id:" + fmt.Sprintf("%v", novedad["Id"]) + "&limit=0"
+	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &fechasResponse); err == nil {
+		for _, fechaRegistro := range fechasResponse {
+			idTipoFecha := fechaRegistro["IdTipoFecha"].(map[string]interface{})
+			tipoFecha := int(idTipoFecha["Id"].(float64))
+			if tipoFecha == 12 {
+				fechaParse, _ := time.Parse("2006-01-02 15:04:05 +0000 +0000", fmt.Sprint(fechaRegistro["Fecha"]))
+				fecha := fechaParse.Format(timeLayout)
+				if fecha == fechaReferencia || fechaParse.After(currentDate) {
+					numContrato := int(novedad["ContratoId"].(float64))
+					vigencia := int(novedad["Vigencia"].(float64))
+					idNovedad := fmt.Sprintf("%v", novedad["Id"])
+					errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 6)
+					if errEstado == nil {
+						errEstadoNov := CambioEstadoNovedad(idNovedad, "TERM")
+						if errEstadoNov == nil {
+							result = map[string]interface{}{"funcion": "/TerminarNovedad", "Message": "Estado de novedad actualizado!"}
+						} else {
+							outputError = map[string]interface{}{"funcion": "/Term-CambioEstadoNovedad", "err": errEstadoNov}
+							return nil, outputError
+						}
+					} else {
+						outputError = map[string]interface{}{"funcion": "/Term-CambioEstadoContrato", "err": errEstado}
+						return nil, outputError
+					}
+				}
+			}
+		}
+	} else {
+		outputError = map[string]interface{}{"funcion": "/TerminarNovedad", "err": "Fallo al consultar fechas de la novedad"}
+		return nil, outputError
+	}
+	result = nil
+	return result, nil
+}
+
 func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]interface{}, fechas []map[string]interface{}) (result map[string]interface{}, outputError map[string]interface{}) {
 
 	numContrato := int(novedad["ContratoId"].(float64))
@@ -282,7 +355,7 @@ func ReplicaSuspension(novedad map[string]interface{}, propiedades []map[string]
 	if result, err := PostReplica(url, ArgoSuspensionPost, TitanSuspensionPost); err == nil {
 		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 2)
 		if errEstado == nil {
-			errEstadoNov := CambioEstadoNovedad(idNovedad)
+			errEstadoNov := CambioEstadoNovedad(idNovedad, "ENEJ")
 			if errEstadoNov == nil {
 				return result, nil
 			} else {
@@ -379,7 +452,7 @@ func ReplicaCesion(novedad map[string]interface{}, propiedades []map[string]inte
 
 	url = "/novedadCPS/ceder_contrato"
 	if result, err := PostReplica(url, ArgoCesionPost, TitanCesionPost); err == nil {
-		errEstadoNov := CambioEstadoNovedad(idNovedad)
+		errEstadoNov := CambioEstadoNovedad(idNovedad, "ENEJ")
 		if errEstadoNov == nil {
 			return result, nil
 		} else {
@@ -479,7 +552,7 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 		if err = SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
 			errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 4)
 			if errEstado == nil {
-				errEstadoNov := CambioEstadoNovedad(idNovedad)
+				errEstadoNov := CambioEstadoNovedad(idNovedad, "TERM")
 				if errEstadoNov == nil {
 					return result, nil
 				} else {
@@ -556,7 +629,7 @@ func ReplicaTerminacion(novedad map[string]interface{}, propiedades []map[string
 		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 8)
 		if errEstado == nil {
 
-			errEstadoNov := CambioEstadoNovedad(idNovedad)
+			errEstadoNov := CambioEstadoNovedad(idNovedad, "TERM")
 			if errEstadoNov == nil {
 				return result, nil
 			} else {
@@ -664,7 +737,7 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 	if result, err := PostReplica(url, ArgoOtrosiPost, TitanOtrosiPost); err == nil {
 		errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 4)
 		if errEstado == nil {
-			errEstadoNov := CambioEstadoNovedad(idNovedad)
+			errEstadoNov := CambioEstadoNovedad(idNovedad, "ENEJ")
 			if errEstadoNov == nil {
 				return result, nil
 			} else {
@@ -892,12 +965,12 @@ func CambioEstadoContrato(numContrato string, vigencia string, estado int) error
 	}
 }
 
-func CambioEstadoNovedad(idNovedad string) error {
+func CambioEstadoNovedad(idNovedad string, estado string) error {
 	var estadoNovedad map[string]interface{}
 	var novedad map[string]interface{}
 	var resultadoRegistro map[string]interface{}
 
-	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENEJ", &estadoNovedad)
+	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:"+estado, &estadoNovedad)
 	var codEstado string
 	if error3 == nil {
 		if len(estadoNovedad) != 0 {
