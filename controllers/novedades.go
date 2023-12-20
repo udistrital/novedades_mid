@@ -84,8 +84,7 @@ func (c *NovedadesController) GetOne() {
 	//alertas := append([]interface{}{"error"})
 	idStr := c.Ctx.Input.Param(":id")
 	vigencia := c.Ctx.Input.Param(":vigencia")
-
-	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+"&limit=0&sortby=FechaCreacion&order=asc", &novedades)
+	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/novedades_poscontractuales/?query=contrato_id:"+idStr+",vigencia:"+vigencia+",activo:true&limit=0&sortby=FechaCreacion&order=asc", &novedades)
 
 	if len(novedades) != 0 {
 		if novedades[0]["TipoNovedad"] != nil {
@@ -286,19 +285,19 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		fmt.Println("Novedad de adicion/prorroga")
 		NovedadPoscontractualPost = models.ConstruirNovedadAdProrrogaPost(registroNovedadPost)
 	}
-	codTerminada := ""
+	// codTerminada := ""
 	codEntramite := ""
 	// codEnejecuion := ""
-	var estadoTerminada map[string]interface{}
-	error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:TERM", &estadoTerminada)
-	if error3 == nil {
-		if len(estadoTerminada) != 0 {
-			inter := estadoTerminada["Data"].([]interface{})
-			data := inter[0].(map[string]interface{})
-			idEstado, _ := data["Id"].(float64)
-			codTerminada = strconv.FormatFloat(idEstado, 'f', -1, 64)
-		}
-	}
+	// var estadoTerminada map[string]interface{}
+	// error3 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:TERM", &estadoTerminada)
+	// if error3 == nil {
+	// 	if len(estadoTerminada) != 0 {
+	// 		inter := estadoTerminada["Data"].([]interface{})
+	// 		data := inter[0].(map[string]interface{})
+	// 		idEstado, _ := data["Id"].(float64)
+	// 		codTerminada = strconv.FormatFloat(idEstado, 'f', -1, 64)
+	// 	}
+	// }
 	var estadoEntramite map[string]interface{}
 	error4 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENTR", &estadoEntramite)
 	if error4 == nil {
@@ -324,7 +323,7 @@ func RegistrarNovedad(novedad map[string]interface{}) (status interface{}, outpu
 		novedad := NovedadPoscontractualPost["NovedadPoscontractual"].(map[string]interface{})
 		if novedad["Estado"] == codEntramite {
 			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad", "POST", &resultadoRegistro, NovedadPoscontractualPost)
-		} else if novedad["Estado"] == codTerminada {
+		} else {
 			errRegNovedad = request.SendJson(beego.AppConfig.String("NovedadesCrudService")+"/trNovedad/trnovedadpoliza", "POST", &resultadoRegistro, NovedadPoscontractualPost)
 		}
 	} else {
