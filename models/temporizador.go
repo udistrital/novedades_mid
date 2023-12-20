@@ -98,14 +98,14 @@ func Temporizador() {
 func ReplicaFechaPosterior(horaActual time.Time) {
 
 	var novedadesResponse []map[string]interface{}
-	var novedadesEnRes []map[string]interface{}
+	// var novedadesEnRes []map[string]interface{}
 	var replicaResult map[string]interface{}
 	var outputError map[string]interface{}
 
 	codEstado := ""
-	codEstadoEn := ""
+	// codEstadoEn := ""
 	var estadoNovedad map[string]interface{}
-	var estadoNovedadEn map[string]interface{}
+	// var estadoNovedadEn map[string]interface{}
 	err1 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENTR", &estadoNovedad)
 	if err1 == nil {
 		if len(estadoNovedad) != 0 {
@@ -115,15 +115,15 @@ func ReplicaFechaPosterior(horaActual time.Time) {
 			codEstado = strconv.FormatFloat(idEstado, 'f', -1, 64)
 		}
 	}
-	err2 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENEJ", &estadoNovedadEn)
-	if err2 == nil {
-		if len(estadoNovedad) != 0 {
-			interf := estadoNovedadEn["Data"].([]interface{})
-			data := interf[0].(map[string]interface{})
-			idEstado, _ := data["Id"].(float64)
-			codEstadoEn = strconv.FormatFloat(idEstado, 'f', -1, 64)
-		}
-	}
+	// err2 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENEJ", &estadoNovedadEn)
+	// if err2 == nil {
+	// 	if len(estadoNovedad) != 0 {
+	// 		interf := estadoNovedadEn["Data"].([]interface{})
+	// 		data := interf[0].(map[string]interface{})
+	// 		idEstado, _ := data["Id"].(float64)
+	// 		codEstadoEn = strconv.FormatFloat(idEstado, 'f', -1, 64)
+	// 	}
+	// }
 
 	url := "/novedades_poscontractuales?query=Estado:" + codEstado + "&limit=0"
 
@@ -145,20 +145,20 @@ func ReplicaFechaPosterior(horaActual time.Time) {
 		fmt.Println(err)
 	}
 
-	url = "/novedades_poscontractuales?query=Estado:" + codEstadoEn + "&limit=0"
+	// url = "/novedades_poscontractuales?query=Estado:" + codEstadoEn + "&limit=0"
 
-	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesEnRes); err == nil {
-		if len(novedadesEnRes[0]) > 0 {
-			for _, novedadRegistro := range novedadesEnRes {
-				estadoResult, outputError := TerminarNovedad(novedadRegistro)
-				if outputError == nil {
-					log.Println(estadoResult)
-				} else {
-					log.Println(outputError)
-				}
-			}
-		}
-	}
+	// if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesEnRes); err == nil {
+	// 	if len(novedadesEnRes[0]) > 0 {
+	// 		for _, novedadRegistro := range novedadesEnRes {
+	// 			estadoResult, outputError := TerminarNovedad(novedadRegistro)
+	// 			if outputError == nil {
+	// 				log.Println(estadoResult)
+	// 			} else {
+	// 				log.Println(outputError)
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 }
 
