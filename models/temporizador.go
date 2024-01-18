@@ -21,15 +21,15 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 		"NumeroContrato":  fmt.Sprintf("%v", informacionReplica["NumeroContrato"]),
 		"Vigencia":        int(informacionReplica["Vigencia"].(float64)),
 		"FechaRegistro":   informacionReplica["FechaRegistro"],
-		"Contratista":     informacionReplica["Contratista"],
-		"PlazoEjecucion":  informacionReplica["PlazoEjecucion"],
+		"Contratista":     int(informacionReplica["Contratista"].(float64)),
+		"PlazoEjecucion":  int(informacionReplica["PlazoEjecucion"].(float64)),
 		"FechaInicio":     informacionReplica["FechaInicio"],
 		"FechaFin":        informacionReplica["FechaFin"],
-		"UnidadEjecucion": informacionReplica["UnidadEjecucion"],
+		"UnidadEjecucion": int(informacionReplica["UnidadEjecucion"].(float64)),
 		"TipoNovedad":     int(informacionReplica["TipoNovedad"].(float64)),
-		"NumeroCdp":       informacionReplica["NumeroCdp"],
-		"VigenciaCdp":     informacionReplica["VigenciaCdp"],
-		"ValorNovedad":    informacionReplica["ValorNovedad"],
+		"NumeroCdp":       int(informacionReplica["NumeroCdp"].(float64)),
+		"VigenciaCdp":     int(informacionReplica["VigenciaCdp"].(float64)),
+		"ValorNovedad":    int(informacionReplica["ValorNovedad"].(float64)),
 	}
 
 	TitanNovedadPost = map[string]interface{}{
@@ -778,7 +778,11 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 			var novArgo = resultQuery[0]
 			var fechaInicio = FormatFechaReplica(novArgo["FechaInicio"].(string), time.RFC3339)
 			var fechaFin = FormatFechaReplica(novArgo["FechaFin"].(string), time.RFC3339)
-			if (fechaInicio[0:10] != ArgoOtrosiPost["FechaInicio"].(string)[0:10]) || (fechaFin[0:10] != ArgoOtrosiPost["FechaFin"].(string)[0:10]) {
+			var FechaRegistro = FormatFechaReplica(novArgo["FechaRegistro"].(string), time.RFC3339)
+			// Si la fecha de inicio, fin o registro es diferente, se hace el registro
+			if (fechaInicio[0:10] != ArgoOtrosiPost["FechaInicio"].(string)[0:10]) ||
+				(fechaFin[0:10] != ArgoOtrosiPost["FechaFin"].(string)[0:10]) ||
+				(FechaRegistro[0:10] != ArgoOtrosiPost["FechaRegistro"].(string)[0:10]) {
 				// if errTitan := GetJson(beego.AppConfig.String("TitanMidService")+query, &result); errTitan == nil {
 				if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
 					if len(resultPostArgo) > 0 {
@@ -821,7 +825,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 
 				// }
 			} else {
-				outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "La novedad ya existe en argo"}
+				outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "Ya existe un registro con las fechas ingresadas"}
 				return nil, outputError
 			}
 		} else {
