@@ -21,15 +21,15 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 		"NumeroContrato":  fmt.Sprintf("%v", informacionReplica["NumeroContrato"]),
 		"Vigencia":        int(informacionReplica["Vigencia"].(float64)),
 		"FechaRegistro":   informacionReplica["FechaRegistro"],
-		"Contratista":     int(informacionReplica["Contratista"].(float64)),
-		"PlazoEjecucion":  int(informacionReplica["PlazoEjecucion"].(float64)),
+		"Contratista":     informacionReplica["Contratista"],
+		"PlazoEjecucion":  informacionReplica["PlazoEjecucion"],
 		"FechaInicio":     informacionReplica["FechaInicio"],
 		"FechaFin":        informacionReplica["FechaFin"],
-		"UnidadEjecucion": int(informacionReplica["UnidadEjecucion"].(float64)),
+		"UnidadEjecucion": informacionReplica["UnidadEjecucion"],
 		"TipoNovedad":     int(informacionReplica["TipoNovedad"].(float64)),
-		"NumeroCdp":       int(informacionReplica["NumeroCdp"].(float64)),
-		"VigenciaCdp":     int(informacionReplica["VigenciaCdp"].(float64)),
-		"ValorNovedad":    int(informacionReplica["ValorNovedad"].(float64)),
+		"NumeroCdp":       informacionReplica["NumeroCdp"],
+		"VigenciaCdp":     informacionReplica["VigenciaCdp"],
+		"ValorNovedad":    informacionReplica["ValorNovedad"],
 	}
 
 	TitanNovedadPost = map[string]interface{}{
@@ -800,13 +800,13 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 								} else {
 									res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
 									fmt.Println(res, errEl)
-									outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+									outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": "Falló el registro en Titan"}
 									return nil, outputError
 								}
 							} else {
 								res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
 								fmt.Println(res, errEl)
-								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Falló el registro en Titan"}
 								return nil, outputError
 							}
 						} else {
@@ -843,13 +843,13 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 								fmt.Println("Registro en Titan exitoso!")
 								return resultPostTitan, nil
 							} else {
-								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": "Falló el registro en Titan"}
 								return nil, outputError
 							}
 						} else {
 							res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
 							fmt.Println(res, errEl)
-							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Falló el registro en Titan"}
 							return nil, outputError
 						}
 					} else {
@@ -857,7 +857,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 						return nil, outputError
 					}
 				} else {
-					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Error desconocido al registrar la novedad en Argo"}
+					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Falló el registro de la novedad en Argo"}
 					return nil, outputError
 				}
 			} else {
@@ -866,7 +866,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 			}
 		}
 	} else {
-		outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "Error al consultar novedades en argo!"}
+		outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "Error al consultar novedades existentes en argo!"}
 		return nil, outputError
 	}
 }
