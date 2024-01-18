@@ -778,7 +778,11 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 			var novArgo = resultQuery[0]
 			var fechaInicio = FormatFechaReplica(novArgo["FechaInicio"].(string), time.RFC3339)
 			var fechaFin = FormatFechaReplica(novArgo["FechaFin"].(string), time.RFC3339)
-			if (fechaInicio[0:10] != ArgoOtrosiPost["FechaInicio"].(string)[0:10]) || (fechaFin[0:10] != ArgoOtrosiPost["FechaFin"].(string)[0:10]) {
+			var FechaRegistro = FormatFechaReplica(novArgo["FechaRegistro"].(string), time.RFC3339)
+			// Si la fecha de inicio, fin o registro es diferente, se hace el registro
+			if (fechaInicio[0:10] != ArgoOtrosiPost["FechaInicio"].(string)[0:10]) ||
+				(fechaFin[0:10] != ArgoOtrosiPost["FechaFin"].(string)[0:10]) ||
+				(FechaRegistro[0:10] != ArgoOtrosiPost["FechaRegistro"].(string)[0:10]) {
 				// if errTitan := GetJson(beego.AppConfig.String("TitanMidService")+query, &result); errTitan == nil {
 				if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
 					if len(resultPostArgo) > 0 {
@@ -796,13 +800,13 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 								} else {
 									res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
 									fmt.Println(res, errEl)
-									outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+									outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": "Falló el registro en Titan"}
 									return nil, outputError
 								}
 							} else {
 								res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
 								fmt.Println(res, errEl)
-								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Falló el registro en Titan"}
 								return nil, outputError
 							}
 						} else {
@@ -821,7 +825,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 
 				// }
 			} else {
-				outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "La novedad ya existe en argo"}
+				outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "Ya existe un registro con las fechas ingresadas"}
 				return nil, outputError
 			}
 		} else {
@@ -839,13 +843,13 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 								fmt.Println("Registro en Titan exitoso!")
 								return resultPostTitan, nil
 							} else {
-								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": err}
+								outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": "Falló el registro en Titan"}
 								return nil, outputError
 							}
 						} else {
 							res, errEl := EliminarRegistroArgo(strconv.FormatFloat(idArgo, 'f', -1, 64))
 							fmt.Println(res, errEl)
-							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": err}
+							outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Falló el registro en Titan"}
 							return nil, outputError
 						}
 					} else {
@@ -853,7 +857,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 						return nil, outputError
 					}
 				} else {
-					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Error desconocido al registrar la novedad en Argo"}
+					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Falló el registro de la novedad en Argo"}
 					return nil, outputError
 				}
 			} else {
@@ -862,7 +866,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 			}
 		}
 	} else {
-		outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "Error al consultar novedades en argo!"}
+		outputError = map[string]interface{}{"funcion": "/PostReplica_Argo", "err": "Error al consultar novedades existentes en argo!"}
 		return nil, outputError
 	}
 }
