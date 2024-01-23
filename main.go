@@ -4,6 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/udistrital/auditoria"
+	"github.com/udistrital/novedades_mid/models"
 	_ "github.com/udistrital/novedades_mid/routers"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 )
@@ -33,8 +34,8 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
+	go models.Temporizador()
 	auditoria.InitMiddleware()
 	apistatus.Init()
 	beego.Run()
-
 }
