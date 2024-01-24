@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -80,11 +81,11 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 
 func Temporizador() {
 	// 18000
-	tdr := time.Tick(10 * time.Minute)
+	tdr := time.Tick(30 * time.Minute)
 	for horaActual := range tdr {
-		log.Printf("Temporizador ejecutándose")
+		log.Printf("Ejecución temporizador...")
 		dt := time.Now()
-		until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T10:45:00+00:00")
+		until, _ := time.Parse(time.RFC3339, dt.String()[0:10]+"T17:45:00+00:00")
 		if dt.After(until) {
 			ReplicaFechaPosterior(horaActual)
 		}
@@ -98,14 +99,14 @@ func Temporizador() {
 func ReplicaFechaPosterior(horaActual time.Time) {
 
 	var novedadesResponse []map[string]interface{}
-	// var novedadesEnRes []map[string]interface{}
+	var novedadesEnRes []map[string]interface{}
 	var replicaResult map[string]interface{}
 	var outputError map[string]interface{}
 
 	codEstado := ""
-	// codEstadoEn := ""
+	codEstadoEn := ""
 	var estadoNovedad map[string]interface{}
-	// var estadoNovedadEn map[string]interface{}
+	var estadoNovedadEn map[string]interface{}
 	err1 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENTR", &estadoNovedad)
 	if err1 == nil {
 		if len(estadoNovedad) != 0 {
@@ -115,17 +116,17 @@ func ReplicaFechaPosterior(horaActual time.Time) {
 			codEstado = strconv.FormatFloat(idEstado, 'f', -1, 64)
 		}
 	}
-	// err2 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENEJ", &estadoNovedadEn)
-	// if err2 == nil {
-	// 	if len(estadoNovedad) != 0 {
-	// 		interf := estadoNovedadEn["Data"].([]interface{})
-	// 		data := interf[0].(map[string]interface{})
-	// 		idEstado, _ := data["Id"].(float64)
-	// 		codEstadoEn = strconv.FormatFloat(idEstado, 'f', -1, 64)
-	// 	}
-	// }
+	err2 := request.GetJson(beego.AppConfig.String("ParametrosCrudService")+"/parametro?query=TipoParametroId.CodigoAbreviacion:ENOV,CodigoAbreviacion:ENEJ", &estadoNovedadEn)
+	if err2 == nil {
+		if len(estadoNovedad) != 0 {
+			interf := estadoNovedadEn["Data"].([]interface{})
+			data := interf[0].(map[string]interface{})
+			idEstado, _ := data["Id"].(float64)
+			codEstadoEn = strconv.FormatFloat(idEstado, 'f', -1, 64)
+		}
+	}
 
-	url := "/novedades_poscontractuales?query=Estado:" + codEstado + "&limit=0"
+	url := "/novedades_poscontractuales?query=Estado:" + codEstado + ",activo:true&limit=0"
 
 	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesResponse); err == nil {
 		if len(novedadesResponse[0]) > 0 {
@@ -142,23 +143,23 @@ func ReplicaFechaPosterior(horaActual time.Time) {
 			}
 		}
 	} else {
-		fmt.Println(err)
+		fmt.Println("Error: ", err)
 	}
 
-	// url = "/novedades_poscontractuales?query=Estado:" + codEstadoEn + "&limit=0"
+	url = "/novedades_poscontractuales?query=Estado:" + codEstadoEn + ",activo:true&limit=0"
 
-	// if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesEnRes); err == nil {
-	// 	if len(novedadesEnRes[0]) > 0 {
-	// 		for _, novedadRegistro := range novedadesEnRes {
-	// 			estadoResult, outputError := TerminarNovedad(novedadRegistro)
-	// 			if outputError == nil {
-	// 				log.Println(estadoResult)
-	// 			} else {
-	// 				log.Println(outputError)
-	// 			}
-	// 		}
-	// 	}
-	// }
+	if err := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+url, &novedadesEnRes); err == nil {
+		if len(novedadesEnRes[0]) > 0 {
+			for _, novedadRegistro := range novedadesEnRes {
+				estadoResult, outputError := TerminarNovedad(novedadRegistro)
+				if outputError == nil {
+					log.Println("ResultFinNovedad: ", estadoResult)
+				} else {
+					log.Println("ErrorFinNovedad: ", outputError)
+				}
+			}
+		}
+	}
 
 }
 
@@ -257,7 +258,7 @@ func TerminarNovedad(novedad map[string]interface{}) (map[string]interface{}, ma
 			if tipoFecha == 12 {
 				fechaParse, _ := time.Parse("2006-01-02 15:04:05 +0000 +0000", fmt.Sprint(fechaRegistro["Fecha"]))
 				fecha := fechaParse.Format(timeLayout)
-				if fecha == fechaReferencia || fechaParse.After(currentDate) {
+				if fecha == fechaReferencia || currentDate.After(fechaParse) {
 					numContrato := int(novedad["ContratoId"].(float64))
 					vigencia := int(novedad["Vigencia"].(float64))
 					idNovedad := fmt.Sprintf("%v", novedad["Id"])
@@ -939,30 +940,35 @@ func CambioEstadoContrato(numContrato string, vigencia string, estado int) error
 	errContrato := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+"/contrato_suscrito?query=NumeroContratoSuscrito:"+numContrato+",Vigencia:"+vigencia, &resultContrato)
 	if errContrato == nil {
 
-		result := resultContrato[0]
-		numeroContrato := result["NumeroContrato"].(map[string]interface{})
-		num_contrato_id := numeroContrato["Id"].(string)
-		vigencia := result["Vigencia"].(float64)
+		if len(resultContrato) != 0 {
+			result := resultContrato[0]
+			numeroContrato := result["NumeroContrato"].(map[string]interface{})
+			num_contrato_id := numeroContrato["Id"].(string)
+			vigencia := result["Vigencia"].(float64)
 
-		body := make(map[string]interface{})
-		body = map[string]interface{}{
-			"FechaRegistro":  time.Now().Format("2006-01-02T15:04:05.000Z"),
-			"NumeroContrato": num_contrato_id,
-			"Usuario":        "NOVEDADES",
-			"Vigencia":       vigencia,
-		}
+			body := make(map[string]interface{})
+			body = map[string]interface{}{
+				"FechaRegistro":  time.Now().Format("2006-01-02T15:04:05.000Z"),
+				"NumeroContrato": num_contrato_id,
+				"Usuario":        "NOVEDADES",
+				"Vigencia":       vigencia,
+			}
 
-		body["Estado"] = map[string]interface{}{
-			"Id": estado,
-		}
+			body["Estado"] = map[string]interface{}{
+				"Id": estado,
+			}
 
-		url := beego.AppConfig.String("AdministrativaAmazonService") + "/contrato_estado"
-		errEstado := request.SendJson(url, "POST", &resultadoEstadoAdmamazon, &body)
-		if errEstado == nil {
-			fmt.Println("Estado del contrato actualizado!!")
-			return nil
+			url := beego.AppConfig.String("AdministrativaAmazonService") + "/contrato_estado"
+			errEstado := request.SendJson(url, "POST", &resultadoEstadoAdmamazon, &body)
+			if errEstado == nil {
+				fmt.Println("Estado del contrato actualizado!!")
+				return nil
+			} else {
+				return errEstado
+			}
 		} else {
-			return errEstado
+			errContrato = errors.New("no se encontró el contrato")
+			return errContrato
 		}
 	} else {
 		return errContrato
