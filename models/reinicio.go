@@ -86,19 +86,6 @@ func ConstruirNovedadReinicio(novedad map[string]interface{}) (novedadformatted 
 	})
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             NovedadReinicio["fecha_terminacion_anticipada"],
-		"FechaCreacion":     nil,
-		"FechaModificacion": nil,
-		"Id":                0,
-		"IdNovedadesPoscontractuales": map[string]interface{}{
-			"Id": nil,
-		},
-		"IdTipoFecha": map[string]interface{}{
-			"Id": 9,
-		},
-	})
-	fechas = append(fechas, map[string]interface{}{
-		"Activo":            true,
 		"Fecha":             NovedadReinicio["fechasuspension"],
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
@@ -373,7 +360,11 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	return NovedadAdicionGet
 }
 
-func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[string]interface{}, outputError map[string]interface{}) {
+func ReplicaReinicio(novedad map[string]interface{}, idStr string) (map[string]interface{}, map[string]interface{}) {
+
+	resultPostArgo := make(map[string]interface{})
+	resultPostTitan := make(map[string]interface{})
+	var outputError map[string]interface{}
 
 	ArgoReinicioPost := make(map[string]interface{})
 	ArgoReinicioPost = map[string]interface{}{
@@ -399,14 +390,20 @@ func ReplicaReinicio(novedad map[string]interface{}, idStr string) (result map[s
 	// fmt.Println("TitanReinicioPost: ", TitanReinicioPost)
 
 	url := "/novedad_postcontractual/" + idStr
-	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &resultPostArgo, &ArgoReinicioPost); err == nil {
 		url = "/novedadCPS/reiniciar_contrato"
-		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &result, &TitanReinicioPost); err == nil {
-			if len(result) > 0 {
-				fmt.Println("Replica de reinicio realizada!")
-				return result, nil
+		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanReinicioPost); err == nil {
+			if len(resultPostTitan) > 0 {
+				status := resultPostTitan["Status"]
+				if status == "201" {
+					fmt.Println("Registro en Titan exitoso!")
+					return resultPostTitan, nil
+				} else {
+					outputError = map[string]interface{}{"funcion": "/PostReplica_Titan_Status", "err": "Falló el registro en Titan"}
+					return nil, outputError
+				}
 			} else {
-				outputError = map[string]interface{}{"funcion": "/TitanPostReinicio", "err": err.Error()}
+				outputError = map[string]interface{}{"funcion": "/PostReplica_Titan", "err": "Falló el registro en Titan"}
 				return nil, outputError
 			}
 		} else {
