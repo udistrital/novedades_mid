@@ -104,7 +104,7 @@ func RegistrarDoc(documento []map[string]interface{}, url string) (status interf
 
 	var resultadoRegistro map[string]interface{}
 	var errRegDoc interface{}
-	errRegDoc = models.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/"+url, "POST", &resultadoRegistro, documento)
+	errRegDoc = request.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/"+url, "POST", &resultadoRegistro, documento)
 	if resultadoRegistro != nil {
 		return resultadoRegistro["res"], nil
 	} else {
@@ -176,7 +176,7 @@ func ActualizarEstadoDocNovedad(documento string, estado string) (err error) {
 	var resultadoRegistro map[string]interface{}
 	var errRegDoc interface{}
 
-	errRegDoc = models.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/"+documento+"/metadata", "POST", &resultadoRegistro, documento)
+	errRegDoc = request.SendJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/"+documento+"/metadata", "POST", &resultadoRegistro, documento)
 	fmt.Println(errRegDoc)
 	// var estructura []interface{}
 	// {

@@ -549,8 +549,8 @@ func ReplicaTempReinicio(novedad map[string]interface{}, propiedades []map[strin
 
 	url = "/novedad_postcontractual/" + idNovedadString
 
-	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
-		if err = SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
+	if err := request.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &result, &ArgoReinicioPost); err == nil {
+		if err = request.SendJson(beego.AppConfig.String("TitanMidService")+"/novedadCPS/reiniciar_contrato", "POST", &result, &TitanReinicioPost); err == nil {
 			errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 4)
 			if errEstado == nil {
 				errEstadoNov := CambioEstadoNovedad(idNovedad, "TERM")
@@ -774,7 +774,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	log.Printf("HoraReplica1: " + fecha)
 
 	query := "/novedad_postcontractual?query=NumeroContrato:" + num_contrato + ",Vigencia:" + vigencia + ",TipoNovedad:" + argo_tipo_novedad + "&sortby=Id&order=desc"
-	if errArgo := GetJson(beego.AppConfig.String("AdministrativaAmazonService")+query, &resultQuery); errArgo == nil {
+	if errArgo := request.GetJson(beego.AppConfig.String("AdministrativaAmazonService")+query, &resultQuery); errArgo == nil {
 		if len(resultQuery) > 0 {
 			var novArgo = resultQuery[0]
 			var fechaInicio = FormatFechaReplica(novArgo["FechaInicio"].(string), time.RFC3339)
@@ -785,12 +785,12 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 				(fechaFin[0:10] != ArgoOtrosiPost["FechaFin"].(string)[0:10]) ||
 				(FechaRegistro[0:10] != ArgoOtrosiPost["FechaRegistro"].(string)[0:10]) {
 				// if errTitan := GetJson(beego.AppConfig.String("TitanMidService")+query, &result); errTitan == nil {
-				if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
+				if err := request.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
 					if len(resultPostArgo) > 0 {
 						idArgo := resultPostArgo["Id"].(float64)
 						fecha = time.Now().Format("2006-01-02 15:04:05")
 						log.Printf("HoraReplica2: " + fecha)
-						if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+						if err := request.SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
 							fecha = time.Now().Format("2006-01-02 15:04:05")
 							log.Printf("HoraReplica3: " + fecha)
 							if len(resultPostTitan) > 0 {
@@ -830,12 +830,12 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 				return nil, outputError
 			}
 		} else {
-			if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
+			if err := request.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual", "POST", &resultPostArgo, &ArgoOtrosiPost); err == nil {
 				if len(resultPostArgo) > 0 {
 					idArgo := resultPostArgo["Id"].(float64)
 					fecha = time.Now().Format("2006-01-02 15:04:05")
 					log.Printf("HoraReplica2: " + fecha)
-					if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
+					if err := request.SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanOtrosiPost); err == nil {
 						fecha = time.Now().Format("2006-01-02 15:04:05")
 						log.Printf("HoraReplica3: " + fecha)
 						if len(resultPostTitan) > 0 {
@@ -923,7 +923,7 @@ func FormatFechaReplica(fecha string, format string) string {
 
 func EliminarRegistroArgo(idArgo string) (map[string]interface{}, map[string]interface{}) {
 	var result map[string]interface{}
-	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual/"+idArgo, "DELETE", &result, ""); err == nil {
+	if err := request.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/novedad_postcontractual/"+idArgo, "DELETE", &result, ""); err == nil {
 		fmt.Println("Registro eliminado!!")
 		return result, nil
 	} else {
