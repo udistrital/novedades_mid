@@ -105,7 +105,7 @@ func (c *ReplicaController) GetOne() {
 	//var resultjbpmjson models.JbpmReplica
 	idStr := c.Ctx.Input.Param(":id")
 	var alerta models.Alert
-	error := models.GetJsonWSO2(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr, &resultjbpm)
+	error := request.GetJsonWSO2(beego.AppConfig.String("jbpmService")+"/services/bodega_temporal.HTTPEndpoint/novedad/"+idStr, &resultjbpm)
 	formatdata.JsonPrint(resultjbpm)
 
 	if error == nil {

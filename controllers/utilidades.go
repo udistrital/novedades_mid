@@ -2,12 +2,10 @@ package controllers
 
 import (
 	"bytes"
-	"encoding/json"
 
 	//"encoding/xml"
 	"fmt"
 	"math/big"
-	"net/http"
 	"reflect"
 	"strings"
 
@@ -15,6 +13,8 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
+
+	request "github.com/udistrital/utils_oas/request"
 )
 
 // func sendJson(url string, trequest string, target interface{}, datajson interface{}) error {
@@ -40,7 +40,7 @@ import (
 // 	return json.NewDecoder(r.Body).Decode(target)
 // }
 
-func getJson(url string, target interface{}) error {
+/*func getJson(url string, target interface{}) error {
 	r, err := http.Get(url)
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func getJson(url string, target interface{}) error {
 	}()
 
 	return json.NewDecoder(r.Body).Decode(target)
-}
+}*/
 
 // func getXml(url string, target interface{}) error {
 // 	r, err := http.Get(url)
@@ -120,13 +120,15 @@ func getJson(url string, target interface{}) error {
 // 	return
 // }
 
-//CargarReglasBase general
+// CargarReglasBase general
 func CargarReglasBase(dominio string) (reglas string, err error) {
 	//carga de reglas desde el ruler
 	var reglasbase string = ``
 	var v []models.Predicado
 	//err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
-	err = getJson("http://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
+	//antes de la actualización de xray
+	//err = request.getJson("http://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
+	err = request.GetJson("http://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
 	if err != nil {
 		return
 	}

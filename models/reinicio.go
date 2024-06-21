@@ -390,9 +390,9 @@ func ReplicaReinicio(novedad map[string]interface{}, idStr string) (map[string]i
 	// fmt.Println("TitanReinicioPost: ", TitanReinicioPost)
 
 	url := "/novedad_postcontractual/" + idStr
-	if err := SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &resultPostArgo, &ArgoReinicioPost); err == nil {
+	if err := request.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+url, "PUT", &resultPostArgo, &ArgoReinicioPost); err == nil {
 		url = "/novedadCPS/reiniciar_contrato"
-		if err := SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanReinicioPost); err == nil {
+		if err := request.SendJson(beego.AppConfig.String("TitanMidService")+url, "POST", &resultPostTitan, &TitanReinicioPost); err == nil {
 			if len(resultPostTitan) > 0 {
 				status := resultPostTitan["Status"]
 				if status == "201" {

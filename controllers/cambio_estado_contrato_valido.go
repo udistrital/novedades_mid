@@ -5,7 +5,9 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
+
 	//. "github.com/udistrital/golog"
+	"github.com/udistrital/utils_oas/request"
 )
 
 // CambioEstadoContratoValidoController operations for CambioEstadoContratoValido
@@ -64,7 +66,7 @@ func (c *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 func consultaEstado(estados []models.EstadoContrato) (status string, err error) {
 	var resEstado string
 
-	errRegDoc := models.SendJson(beego.AppConfig.String("AdminMidApi")+"/validarCambioEstado", "POST", &resEstado, &estados)
+	errRegDoc := request.SendJson(beego.AppConfig.String("AdminMidApi")+"/validarCambioEstado", "POST", &resEstado, &estados)
 
 	if errRegDoc == nil {
 		return resEstado, nil

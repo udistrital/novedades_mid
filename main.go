@@ -7,6 +7,7 @@ import (
 	"github.com/udistrital/novedades_mid/models"
 	_ "github.com/udistrital/novedades_mid/routers"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
+	"github.com/udistrital/utils_oas/xray"
 )
 
 func main() {
@@ -36,6 +37,7 @@ func main() {
 	}))
 	go models.Temporizador()
 	auditoria.InitMiddleware()
+	xray.InitXRay()
 	apistatus.Init()
 	beego.Run()
 }
