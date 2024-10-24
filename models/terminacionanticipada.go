@@ -235,6 +235,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 	var propiedades []map[string]interface{}
 	NovedadAdicion = novedad
 	NovedadAdicionGet := make(map[string]interface{})
+	var cesionario interface{}
 	var fecharegistro interface{}
 	var fechaterminacionanticipada interface{}
 	var fechasolicitud interface{}
@@ -245,8 +246,6 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 	var estadoNovedad map[string]interface{}
 	var nombreEstadoNov string
 	var codEstado string
-
-	var numerooficioestadocuentas interface{}
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
@@ -281,8 +280,8 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 			for _, propiedad := range propiedades {
 				tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
 				nombrepropiedad := tipopropiedad["Nombre"]
-				if nombrepropiedad == "NumeroOficioEstadoCuentas" {
-					numerooficioestadocuentas = propiedad["Propiedad"]
+				if nombrepropiedad == "Cesionario" {
+					cesionario = propiedad["Propiedad"]
 				}
 			}
 		}
@@ -303,45 +302,43 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 	}
 
 	NovedadAdicionGet = map[string]interface{}{
-		"id":                         NovedadAdicion["Id"].(float64),
-		"aclaracion":                 "",
-		"camposaclaracion":           "",
-		"camposmodificacion":         "",
-		"camposmodificados":          "",
-		"cedente":                    "",
-		"cesionario":                 "",
-		"contrato":                   NovedadAdicion["ContratoId"],
-		"fechaadicion":               "",
-		"fechacesion":                "",
-		"fechaliquidacion":           "",
-		"fechaprorroga":              "",
-		"fecharegistro":              fecharegistro,
-		"fechareinicio":              "",
-		"fechasolicitud":             fechasolicitud,
-		"fechasuspension":            "",
-		"fechaexpedicion":            fechaexpedicion,
-		"fechaterminacionanticipada": fechaterminacionanticipada,
-		"motivo":                     NovedadAdicion["Motivo"],
-		"numeroactaentrega":          "",
-		"numerocdp":                  "",
-		"numerooficioestadocuentas":  numerooficioestadocuentas,
-		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
-		"observacion":                "",
-		"periodosuspension":          "",
-		"plazoactual":                "",
-		"poliza":                     "",
-		"tiempoprorroga":             "",
-		"tiponovedad":                NovedadAdicion["TipoNovedad"],
-		"nombreTipoNovedad":          tipoNovedadNombre,
-		"valoradicion":               "",
-		"valorfinalcontrato":         "",
-		"vigencia":                   NovedadAdicion["Vigencia"],
-		"fechafinefectiva":           fechafinefectiva,
-		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
-		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
-		"nombreEstado":               nombreEstadoNov,
-		"estado":                     codEstado,
-		"enlace":                     NovedadAdicion["EnlaceDocumento"],
+		"Id":                         NovedadAdicion["Id"].(float64),
+		"Aclaracion":                 "",
+		"Cedente":                    0,
+		"Cesionario":                 cesionario,
+		"Contrato":                   NovedadAdicion["ContratoId"],
+		"EntidadAseguradora":         0,
+		"Fechaadicion":               "",
+		"Fechacesion":                "",
+		"Fechaliquidacion":           "",
+		"Fechaprorroga":              "",
+		"Fecharegistro":              fecharegistro,
+		"Fechareinicio":              "",
+		"Fechasolicitud":             fechasolicitud,
+		"Fechasuspension":            "",
+		"Fechaexpedicion":            fechaexpedicion,
+		"Fechaterminacionanticipada": fechaterminacionanticipada,
+		"Motivo":                     NovedadAdicion["Motivo"],
+		"Numeroactaentrega":          "",
+		"Numerocdp":                  0,
+		"Numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
+		"Observacion":                "",
+		"Periodosuspension":          0,
+		"Plazoactual":                0,
+		"Poliza":                     "",
+		"Tiempoprorroga":             0,
+		"Tiponovedad":                NovedadAdicion["TipoNovedad"],
+		"NombreTipoNovedad":          tipoNovedadNombre,
+		"CodAbreviacionTipo":         "NP_TER",
+		"Valoradicion":               0,
+		"Valorfinalcontrato":         0,
+		"Vigencia":                   NovedadAdicion["Vigencia"],
+		"Fechafinefectiva":           fechafinefectiva,
+		"Numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
+		"Numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
+		"Estado":                     codEstado,
+		"NombreEstado":               nombreEstadoNov,
+		"Enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
 	return NovedadAdicionGet
