@@ -245,7 +245,6 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	var codEstado string
 
 	var cesionario interface{}
-	var numerooficioestadocuentas interface{}
 	var periodosuspension interface{}
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
@@ -287,9 +286,6 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		for _, propiedad := range propiedades {
 			tipopropiedad := propiedad["IdTipoPropiedad"].(map[string]interface{})
 			nombrepropiedad := tipopropiedad["Nombre"]
-			if nombrepropiedad == "NumeroOficioEstadoCuentas" {
-				numerooficioestadocuentas = propiedad["Propiedad"]
-			}
 			if nombrepropiedad == "Cesionario" {
 				cesionario = propiedad["Propiedad"]
 			}
@@ -314,45 +310,43 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	}
 
 	NovedadAdicionGet = map[string]interface{}{
-		"id":                         NovedadAdicion["Id"].(float64),
-		"aclaracion":                 "",
-		"camposaclaracion":           "",
-		"camposmodificacion":         "",
-		"camposmodificados":          "",
-		"cedente":                    "",
-		"cesionario":                 cesionario,
-		"contrato":                   NovedadAdicion["ContratoId"],
-		"fechaadicion":               "",
-		"fechacesion":                "",
-		"fechaliquidacion":           "",
-		"fechaprorroga":              "",
-		"fecharegistro":              fecharegistro,
-		"fechareinicio":              fechareinicio,
-		"fechasolicitud":             fechasolicitud,
-		"fechasuspension":            fechasuspension,
-		"fechaterminacionanticipada": fechaterminacionanticipada,
-		"fechaexpedicion":            fechaexpedicion,
-		"motivo":                     NovedadAdicion["Motivo"],
-		"numeroactaentrega":          "",
-		"numerocdp":                  "",
-		"numerooficioestadocuentas":  numerooficioestadocuentas,
-		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
-		"observacion":                NovedadAdicion["Observacion"],
-		"periodosuspension":          periodosuspension,
-		"plazoactual":                "",
-		"poliza":                     "",
-		"tiempoprorroga":             "",
-		"tiponovedad":                NovedadAdicion["TipoNovedad"],
-		"nombreTipoNovedad":          tipoNovedadNombre,
-		"valoradicion":               "",
-		"valorfinalcontrato":         "",
-		"vigencia":                   NovedadAdicion["Vigencia"],
-		"fechafinefectiva":           fechafinefectiva,
-		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
-		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
-		"nombreEstado":               nombreEstadoNov,
-		"estado":                     codEstado,
-		"enlace":                     NovedadAdicion["EnlaceDocumento"],
+		"Id":                         NovedadAdicion["Id"].(float64),
+		"Aclaracion":                 NovedadAdicion["Aclaracion"],
+		"Cedente":                    0,
+		"Cesionario":                 cesionario,
+		"Contrato":                   NovedadAdicion["ContratoId"],
+		"EntidadAseguradora":         0,
+		"FechaAdicion":               "",
+		"FechaCesion":                "",
+		"FechaLiquidacion":           "",
+		"FechaProrroga":              "",
+		"FechaRegistro":              fecharegistro,
+		"FechaReinicio":              fechareinicio,
+		"FechaSolicitud":             fechasolicitud,
+		"FechaExpedicion":            fechaexpedicion,
+		"FechaSuspension":            fechasuspension,
+		"FechaTerminacionAnticipada": fechaterminacionanticipada,
+		"Motivo":                     NovedadAdicion["Motivo"],
+		"NumeroActaEntrega":          "",
+		"NumeroCdp":                  NovedadAdicion["NumeroCdpId"],
+		"NumeroSolicitud":            NovedadAdicion["NumeroSolicitud"],
+		"Observacion":                NovedadAdicion["Observacion"],
+		"PeriodoSuspension":          periodosuspension,
+		"PlazoActual":                0,
+		"Poliza":                     "",
+		"TiempoProrroga":             0,
+		"TipoNovedad":                NovedadAdicion["TipoNovedad"],
+		"NombreTipoNovedad":          tipoNovedadNombre,
+		"CodAbreviacionTipo":         "NP_REI",
+		"ValorAdicion":               0,
+		"ValorFinalContrato":         0,
+		"Vigencia":                   NovedadAdicion["Vigencia"],
+		"FechaFinEfectiva":           fechafinefectiva,
+		"NumeroOficioSupervisor":     NovedadAdicion["OficioSupervisor"],
+		"NumeroOficioOrdenador":      NovedadAdicion["OficioOrdenador"],
+		"Estado":                     codEstado,
+		"NombreEstado":               nombreEstadoNov,
+		"Enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
 	fmt.Println(error, error1)
