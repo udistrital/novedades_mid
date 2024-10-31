@@ -303,7 +303,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 
 	NovedadAdicionGet = map[string]interface{}{
 		"Id":                         NovedadAdicion["Id"].(float64),
-		"Aclaracion":                 "",
+		"Aclaracion":                 NovedadAdicion["Aclaracion"],
 		"Cedente":                    0,
 		"Cesionario":                 cesionario,
 		"Contrato":                   NovedadAdicion["ContratoId"],
