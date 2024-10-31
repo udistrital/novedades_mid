@@ -252,10 +252,9 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 
 	var cedente interface{}
 	var cesionario interface{}
-	var numeroactaentrega interface{}
 
-	var polizas interface{}
-	var entidadaseguradora interface{}
+	// var polizas interface{}
+	// var entidadaseguradora interface{}
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
@@ -294,17 +293,14 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 			if nombrepropiedad == "Cesionario" {
 				cesionario = propiedad["Propiedad"]
 			}
-			if nombrepropiedad == "NumeroActaEntrega" {
-				numeroactaentrega = propiedad["Propiedad"]
-			}
 		}
 	}
-	if len(poliza[0]) > 0 {
-		for _, poliz := range poliza {
-			polizas = poliz["NumeroPolizaId"]
-			entidadaseguradora = poliz["EntidadAseguradoraId"]
-		}
-	}
+	// if len(poliza[0]) > 0 {
+	// 	for _, poliz := range poliza {
+	// 		polizas = poliz["NumeroPolizaId"]
+	// 		entidadaseguradora = poliz["EntidadAseguradoraId"]
+	// 	}
+	// }
 
 	if error3 == nil {
 		if len(tiponovedad[0]) != 0 {
@@ -322,10 +318,11 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 
 	NovedadAdicionGet = map[string]interface{}{
 		"Id":                         NovedadAdicion["Id"].(float64),
-		"Aclaracion":                 NovedadAdicion["Aclaracion"],
+		"Aclaracion":                 "",
 		"Cedente":                    cedente,
 		"Cesionario":                 cesionario,
 		"Contrato":                   NovedadAdicion["ContratoId"],
+		"EntidadAseguradora":         0,
 		"FechaAdicion":               "",
 		"FechaCesion":                fechacesion,
 		"FechaLiquidacion":           "",
@@ -333,26 +330,26 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"FechaRegistro":              fecharegistro,
 		"FechaReinicio":              "",
 		"FechaSolicitud":             fechasolicitud,
-		"FechaExpedicion":            fechaexpedicion,
 		"FechaSuspension":            "",
+		"FechaFinSuspension":         "",
+		"FechaFinEfectiva":           fechafinefectiva,
 		"FechaTerminacionAnticipada": "",
+		"FechaExpedicion":            fechaexpedicion,
 		"Motivo":                     NovedadAdicion["Motivo"],
-		"NumeroActaEntrega":          numeroactaentrega,
+		"NumeroActaEntrega":          "",
 		"NumeroCdp":                  NovedadAdicion["NumeroCdpId"],
 		"NumeroSolicitud":            NovedadAdicion["NumeroSolicitud"],
-		"Observacion":                NovedadAdicion["Observacion"],
+		"Observacion":                "",
 		"PeriodoSuspension":          0,
 		"PlazoActual":                0,
-		"Poliza":                     polizas,
+		"Poliza":                     "",
 		"TiempoProrroga":             0,
 		"TipoNovedad":                NovedadAdicion["TipoNovedad"],
 		"NombreTipoNovedad":          tipoNovedadNombre,
-		"CodAbreviacionTipo":         "NP_CES",
+		"CodAbreviacionTipo":         "NP_SUS",
 		"ValorAdicion":               0,
 		"ValorFinalContrato":         0,
 		"Vigencia":                   NovedadAdicion["Vigencia"],
-		"FechaFinEfectiva":           fechafinefectiva,
-		"EntidadAseguradora":         entidadaseguradora,
 		"NumeroOficioSupervisor":     NovedadAdicion["OficioSupervisor"],
 		"NumeroOficioOrdenador":      NovedadAdicion["OficioOrdenador"],
 		"Estado":                     codEstado,

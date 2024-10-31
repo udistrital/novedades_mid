@@ -236,7 +236,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 	var fechasolicitud interface{}
 	var fechasuspension interface{}
 	var fechaexpedicion interface{}
-	var fechaterminacionanticipada interface{}
+	var fechafinsuspension interface{}
 	var fechafinefectiva interface{}
 	var tiponovedad []map[string]interface{}
 	var tipoNovedadNombre string
@@ -271,8 +271,8 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrefecha == "FechaSuspension" {
 				fechasuspension = fecha["Fecha"]
 			}
-			if nombrefecha == "FechaTerminacionAnticipada" {
-				fechaterminacionanticipada = fecha["Fecha"]
+			if nombrefecha == "FechaFinSuspension" {
+				fechafinsuspension = fecha["Fecha"]
 			}
 			if nombrefecha == "FechaFinEfectiva" {
 				fechafinefectiva = fecha["Fecha"]
@@ -311,7 +311,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 
 	NovedadAdicionGet = map[string]interface{}{
 		"Id":                         NovedadAdicion["Id"].(float64),
-		"Aclaracion":                 NovedadAdicion["Aclaracion"],
+		"Aclaracion":                 "",
 		"Cedente":                    0,
 		"Cesionario":                 cesionario,
 		"Contrato":                   NovedadAdicion["ContratoId"],
@@ -323,25 +323,26 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		"FechaRegistro":              fecharegistro,
 		"FechaReinicio":              fechareinicio,
 		"FechaSolicitud":             fechasolicitud,
-		"FechaExpedicion":            fechaexpedicion,
 		"FechaSuspension":            fechasuspension,
-		"FechaTerminacionAnticipada": fechaterminacionanticipada,
+		"FechaFinSuspension":         fechafinsuspension,
+		"FechaFinEfectiva":           fechafinefectiva,
+		"FechaTerminacionAnticipada": "",
+		"FechaExpedicion":            fechaexpedicion,
 		"Motivo":                     NovedadAdicion["Motivo"],
 		"NumeroActaEntrega":          "",
 		"NumeroCdp":                  NovedadAdicion["NumeroCdpId"],
 		"NumeroSolicitud":            NovedadAdicion["NumeroSolicitud"],
-		"Observacion":                NovedadAdicion["Observacion"],
+		"Observacion":                "",
 		"PeriodoSuspension":          periodosuspension,
 		"PlazoActual":                0,
 		"Poliza":                     "",
 		"TiempoProrroga":             0,
 		"TipoNovedad":                NovedadAdicion["TipoNovedad"],
 		"NombreTipoNovedad":          tipoNovedadNombre,
-		"CodAbreviacionTipo":         "NP_REI",
+		"CodAbreviacionTipo":         "NP_SUS",
 		"ValorAdicion":               0,
 		"ValorFinalContrato":         0,
 		"Vigencia":                   NovedadAdicion["Vigencia"],
-		"FechaFinEfectiva":           fechafinefectiva,
 		"NumeroOficioSupervisor":     NovedadAdicion["OficioSupervisor"],
 		"NumeroOficioOrdenador":      NovedadAdicion["OficioOrdenador"],
 		"Estado":                     codEstado,
