@@ -315,7 +315,7 @@ func GetNovedadAdProrroga(novedad map[string]interface{}) (novedadformatted map[
 		"TiempoProrroga":             tiempoprorroga,
 		"TipoNovedad":                NovedadAdicion["TipoNovedad"],
 		"NombreTipoNovedad":          tipoNovedadNombre,
-		"CodAbreviacionTipo":         "NP_SUS",
+		"CodAbreviacionTipo":         "NP_ADPRO",
 		"ValorAdicion":               valoradicion,
 		"ValorFinalContrato":         0,
 		"Vigencia":                   NovedadAdicion["Vigencia"],
