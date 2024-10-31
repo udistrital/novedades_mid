@@ -339,7 +339,7 @@ func GetNovedadReinicio(novedad map[string]interface{}) (novedadformatted map[st
 		"TiempoProrroga":             0,
 		"TipoNovedad":                NovedadAdicion["TipoNovedad"],
 		"NombreTipoNovedad":          tipoNovedadNombre,
-		"CodAbreviacionTipo":         "NP_SUS",
+		"CodAbreviacionTipo":         "NP_REI",
 		"ValorAdicion":               0,
 		"ValorFinalContrato":         0,
 		"Vigencia":                   NovedadAdicion["Vigencia"],

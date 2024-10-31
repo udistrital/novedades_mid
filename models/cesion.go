@@ -346,7 +346,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"TiempoProrroga":             0,
 		"TipoNovedad":                NovedadAdicion["TipoNovedad"],
 		"NombreTipoNovedad":          tipoNovedadNombre,
-		"CodAbreviacionTipo":         "NP_SUS",
+		"CodAbreviacionTipo":         "NP_CES",
 		"ValorAdicion":               0,
 		"ValorFinalContrato":         0,
 		"Vigencia":                   NovedadAdicion["Vigencia"],
