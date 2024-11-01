@@ -315,6 +315,7 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 		"ValorAdicion":               0,
 		"ValorFinalContrato":         0,
 		"Vigencia":                   NovedadAdicion["Vigencia"],
+		"VigenciaCdp":                NovedadAdicion["VigenciaCdp"],
 		"NumeroOficioSupervisor":     NovedadAdicion["OficioSupervisor"],
 		"NumeroOficioOrdenador":      NovedadAdicion["OficioOrdenador"],
 		"Estado":                     codEstado,
