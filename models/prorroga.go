@@ -220,7 +220,6 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 	var fechafinefectiva interface{}
 	var fechaexpedicion interface{}
 	var cesionario interface{}
-	var valoradicion interface{}
 	var tiempoprorroga interface{}
 	var tiponovedad []map[string]interface{}
 	var tipoNovedadNombre string
@@ -262,9 +261,6 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 			if nombrepropiedad == "Cesionario" {
 				cesionario = propiedad["Propiedad"]
 			}
-			if nombrepropiedad == "ValorAdicion" {
-				valoradicion = propiedad["Propiedad"]
-			}
 			if nombrepropiedad == "TiempoProrroga" {
 				tiempoprorroga = propiedad["Propiedad"]
 			}
@@ -286,45 +282,45 @@ func GetNovedadProrroga(novedad map[string]interface{}) (novedadformatted map[st
 	}
 
 	NovedadAdicionGet = map[string]interface{}{
-		"id":                         NovedadAdicion["Id"].(float64),
-		"aclaracion":                 NovedadAdicion["Aclaracion"],
-		"camposaclaracion":           "",
-		"camposmodificacion":         "",
-		"camposmodificados":          "",
-		"cedente":                    "",
-		"cesionario":                 cesionario,
-		"contrato":                   NovedadAdicion["ContratoId"],
-		"fechaadicion":               fechaadicion,
-		"fechacesion":                "",
-		"fechaliquidacion":           "",
-		"fechaprorroga":              fechaprorroga,
-		"fecharegistro":              "",
-		"fechareinicio":              "",
-		"fechasolicitud":             fechasolicitud,
-		"fechasuspension":            "",
-		"fechaterminacionanticipada": "",
-		"fechaexpedicion":            fechaexpedicion,
-		"motivo":                     NovedadAdicion["Motivo"],
-		"numeroactaentrega":          "",
-		"numerocdp":                  NovedadAdicion["NumeroCdpId"],
-		"numerooficioestadocuentas":  "",
-		"numerosolicitud":            NovedadAdicion["NumeroSolicitud"],
-		"observacion":                NovedadAdicion["Observacion"],
-		"periodosuspension":          "",
-		"plazoactual":                "",
-		"poliza":                     "",
-		"tiempoprorroga":             tiempoprorroga,
-		"tiponovedad":                NovedadAdicion["TipoNovedad"],
-		"nombreTipoNovedad":          tipoNovedadNombre,
-		"valoradicion":               valoradicion,
-		"valorfinalcontrato":         "",
-		"vigencia":                   NovedadAdicion["Vigencia"],
-		"fechafinefectiva":           fechafinefectiva,
-		"numerooficiosupervisor":     NovedadAdicion["OficioSupervisor"],
-		"numerooficioordenador":      NovedadAdicion["OficioOrdenador"],
-		"nombreEstado":               nombreEstadoNov,
-		"estado":                     codEstado,
-		"enlace":                     NovedadAdicion["EnlaceDocumento"],
+		"Id":                         NovedadAdicion["Id"].(float64),
+		"Aclaracion":                 "",
+		"Cedente":                    0,
+		"Cesionario":                 cesionario,
+		"Contrato":                   NovedadAdicion["ContratoId"],
+		"EntidadAseguradora":         0,
+		"FechaAdicion":               fechaadicion,
+		"FechaCesion":                "",
+		"FechaLiquidacion":           "",
+		"FechaProrroga":              fechaprorroga,
+		"FechaRegistro":              "",
+		"FechaReinicio":              "",
+		"FechaSolicitud":             fechasolicitud,
+		"FechaSuspension":            "",
+		"FechaFinSuspension":         "",
+		"FechaFinEfectiva":           fechafinefectiva,
+		"FechaTerminacionAnticipada": "",
+		"FechaExpedicion":            fechaexpedicion,
+		"Motivo":                     NovedadAdicion["Motivo"],
+		"NumeroActaEntrega":          "",
+		"NumeroCdp":                  NovedadAdicion["NumeroCdpId"],
+		"NumeroSolicitud":            NovedadAdicion["NumeroSolicitud"],
+		"Observacion":                "",
+		"PeriodoSuspension":          0,
+		"PlazoActual":                0,
+		"Poliza":                     "",
+		"TiempoProrroga":             tiempoprorroga,
+		"TipoNovedad":                NovedadAdicion["TipoNovedad"],
+		"NombreTipoNovedad":          tipoNovedadNombre,
+		"CodAbreviacionTipo":         "NP_PRO",
+		"ValorAdicion":               0,
+		"ValorFinalContrato":         0,
+		"Vigencia":                   NovedadAdicion["Vigencia"],
+		"VigenciaCdp":                NovedadAdicion["VigenciaCdp"],
+		"NumeroOficioSupervisor":     NovedadAdicion["OficioSupervisor"],
+		"NumeroOficioOrdenador":      NovedadAdicion["OficioOrdenador"],
+		"Estado":                     codEstado,
+		"NombreEstado":               nombreEstadoNov,
+		"Enlace":                     NovedadAdicion["EnlaceDocumento"],
 	}
 
 	fmt.Println(error, error1)
