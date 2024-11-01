@@ -335,6 +335,7 @@ func GetNovedadTAnticipada(novedad map[string]interface{}) (novedadformatted map
 		"ValorAdicion":               0,
 		"ValorFinalContrato":         0,
 		"Vigencia":                   NovedadAdicion["Vigencia"],
+		"VigenciaCdp":                NovedadAdicion["VigenciaCdp"],
 		"NumeroOficioSupervisor":     NovedadAdicion["OficioSupervisor"],
 		"NumeroOficioOrdenador":      NovedadAdicion["OficioOrdenador"],
 		"Estado":                     codEstado,

@@ -290,6 +290,7 @@ func GetNovedadAdicion(novedad map[string]interface{}) (novedadformatted map[str
 		"ValorAdicion":               valoradicion,
 		"ValorFinalContrato":         0,
 		"Vigencia":                   NovedadAdicion["Vigencia"],
+		"VigenciaCdp":                NovedadAdicion["VigenciaCdp"],
 		"NumeroOficioSupervisor":     NovedadAdicion["OficioSupervisor"],
 		"NumeroOficioOrdenador":      NovedadAdicion["OficioOrdenador"],
 		"Estado":                     codEstado,
