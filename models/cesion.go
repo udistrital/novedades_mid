@@ -253,8 +253,8 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 	var cedente interface{}
 	var cesionario interface{}
 
-	// var polizas interface{}
-	// var entidadaseguradora interface{}
+	var polizas interface{}
+	var entidadaseguradora interface{}
 
 	error := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/fechas/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &fechas)
 	error1 := request.GetJson(beego.AppConfig.String("NovedadesCrudService")+"/propiedad/?query=id_novedades_poscontractuales:"+strconv.FormatFloat((NovedadAdicion["Id"]).(float64), 'f', -1, 64)+"&limit=0", &propiedades)
