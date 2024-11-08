@@ -322,7 +322,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"Cedente":                    cedente,
 		"Cesionario":                 cesionario,
 		"Contrato":                   NovedadAdicion["ContratoId"],
-		"EntidadAseguradora":         0,
+		"EntidadAseguradora":         entidadaseguradora,
 		"FechaAdicion":               "",
 		"FechaCesion":                fechacesion,
 		"FechaLiquidacion":           "",
