@@ -295,12 +295,12 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 			}
 		}
 	}
-	// if len(poliza[0]) > 0 {
-	// 	for _, poliz := range poliza {
-	// 		polizas = poliz["NumeroPolizaId"]
-	// 		entidadaseguradora = poliz["EntidadAseguradoraId"]
-	// 	}
-	// }
+	if len(poliza[0]) > 0 {
+		for _, poliz := range poliza {
+			polizas = poliz["NumeroPolizaId"]
+			entidadaseguradora = poliz["EntidadAseguradoraId"]
+		}
+	}
 
 	if error3 == nil {
 		if len(tiponovedad[0]) != 0 {
@@ -342,7 +342,7 @@ func GetNovedadCesion(novedad map[string]interface{}) (novedadformatted map[stri
 		"Observacion":                "",
 		"PeriodoSuspension":          0,
 		"PlazoActual":                0,
-		"Poliza":                     "",
+		"Poliza":                     polizas,
 		"TiempoProrroga":             0,
 		"TipoNovedad":                NovedadAdicion["TipoNovedad"],
 		"NombreTipoNovedad":          tipoNovedadNombre,
