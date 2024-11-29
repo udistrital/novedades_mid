@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"github.com/udistrital/novedades_mid/models"
 	"encoding/json"
+
+	"github.com/udistrital/novedades_mid/models"
 
 	"github.com/astaxie/beego"
 )
@@ -89,4 +90,3 @@ func (o *ObjectController) Delete() {
 	o.Data["json"] = "delete success!"
 	o.ServeJSON()
 }
-
