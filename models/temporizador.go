@@ -259,20 +259,12 @@ func TerminarNovedad(novedad map[string]interface{}) (map[string]interface{}, ma
 				fechaParse, _ := time.Parse("2006-01-02 15:04:05 +0000 +0000", fmt.Sprint(fechaRegistro["Fecha"]))
 				fecha := fechaParse.Format(timeLayout)
 				if fecha == fechaReferencia || currentDate.After(fechaParse) {
-					numContrato := int(novedad["ContratoId"].(float64))
-					vigencia := int(novedad["Vigencia"].(float64))
 					idNovedad := fmt.Sprintf("%v", novedad["Id"])
-					errEstado := CambioEstadoContrato(strconv.Itoa(numContrato), strconv.Itoa(vigencia), 6)
-					if errEstado == nil {
-						errEstadoNov := CambioEstadoNovedad(idNovedad, "TERM")
-						if errEstadoNov == nil {
-							result = map[string]interface{}{"funcion": "/TerminarNovedad", "Message": "Estado de novedad actualizado!"}
-						} else {
-							outputError = map[string]interface{}{"funcion": "/Term-CambioEstadoNovedad", "err": errEstadoNov}
-							return nil, outputError
-						}
+					errEstadoNov := CambioEstadoNovedad(idNovedad, "TERM")
+					if errEstadoNov == nil {
+						result = map[string]interface{}{"funcion": "/TerminarNovedad", "Message": "Estado de novedad actualizado!"}
 					} else {
-						outputError = map[string]interface{}{"funcion": "/Term-CambioEstadoContrato", "err": errEstado}
+						outputError = map[string]interface{}{"funcion": "/Term-CambioEstadoNovedad", "err": errEstadoNov}
 						return nil, outputError
 					}
 				}
