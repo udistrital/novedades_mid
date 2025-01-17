@@ -16,6 +16,7 @@ type CambioEstadoContratoValidoController struct {
 // URLMapping ...
 func (c *CambioEstadoContratoValidoController) URLMapping() {
 	c.Mapping("ValidarCambioEstado", c.ValidarCambioEstado)
+	c.Mapping("DeleteEstadoContrato", c.DeleteEstadoContrato)
 }
 
 // ValidarCambiosEstado ...
@@ -70,4 +71,37 @@ func consultaEstado(estados []models.EstadoContrato) (status string, err error) 
 		return resEstado, nil
 	}
 	return "", errRegDoc
+}
+
+// DeleteEstadoContrato ...
+// @Title DeleteEstadoContrato
+// @Description delete EstadoContrato by id
+// @Param	id		path 	string	true		"id de estado a eliminar"
+// @Success 200 {string} OK!
+// @Failure 403 id is empty
+// @router /:id [delete]
+func (c *CambioEstadoContratoValidoController) DeleteEstadoContrato() {
+	id := c.Ctx.Input.Param(":id")
+	if id != "" {
+		err := DeleteEstadoContrato(id)
+		if err == nil {
+			c.Data["json"] = "OK"
+		} else {
+			c.Data["json"] = err.Error()
+			c.Ctx.Output.SetStatus(400)
+		}
+	} else {
+		c.Data["json"] = "id is empty"
+		c.Ctx.Output.SetStatus(403)
+	}
+	c.ServeJSON()
+}
+
+func DeleteEstadoContrato(idEstado string) error {
+	var resEstado string
+	errRegDoc := models.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"contrato_estado/"+idEstado, "DELETE", &resEstado, nil)
+	if errRegDoc == nil {
+		return nil
+	}
+	return errRegDoc
 }
