@@ -1,8 +1,7 @@
 swagger: "2.0"
 info:
   title: beego Test API
-  description: |
-    beego has a very cool tools to autogenerate documents for your API
+  description: beego has a very cool tools to autogenerate documents for your API
   version: 1.0.0
   termsOfService: http://beego.me/
   contact:
@@ -16,9 +15,7 @@ paths:
     post:
       tags:
       - gestor_documental
-      description: |-
-        Crear documento en Nuxeo
-        <br>
+      description: Crear documento en Nuxeo
       operationId: GestorDocumentalController.PostGestorDocumental
       parameters:
       - in: body
@@ -36,9 +33,7 @@ paths:
     get:
       tags:
       - gestor_documental
-      description: |-
-        obtener documento por enlace
-        <br>
+      description: obtener documento por enlace
       operationId: GestorDocumentalController.GetGestorDocumental
       parameters:
       - in: path
@@ -55,9 +50,7 @@ paths:
     put:
       tags:
       - gestor_documental
-      description: |-
-        Crear documento en Nuxeo
-        <br>
+      description: Crear documento en Nuxeo
       operationId: GestorDocumentalController.PostGestorDocumental
       parameters:
       - in: body
@@ -75,9 +68,7 @@ paths:
     get:
       tags:
       - novedad
-      description: |-
-        get Novedades
-        <br>
+      description: get Novedades
       operationId: NovedadesController.GetAll
       parameters:
       - in: query
@@ -94,8 +85,7 @@ paths:
         type: string
       - in: query
         name: order
-        description: Order corresponding to each sortby field, if single value, apply
-          to all sortby fields. e.g. desc,asc ...
+        description: Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...
         type: string
       - in: query
         name: limit
@@ -115,9 +105,7 @@ paths:
     post:
       tags:
       - novedad
-      description: |-
-        create Novedades
-        <br>
+      description: create Novedades
       operationId: NovedadesController.Create
       parameters:
       - in: body
@@ -137,9 +125,7 @@ paths:
     delete:
       tags:
       - novedad
-      description: |-
-        delete the Novedades
-        <br>
+      description: delete the Novedades
       operationId: NovedadesController.Delete
       parameters:
       - in: path
@@ -156,9 +142,7 @@ paths:
     get:
       tags:
       - novedad
-      description: |-
-        get Novedades by id
-        <br>
+      description: get Novedades by id
       operationId: NovedadesController.GetOne
       parameters:
       - in: path
@@ -176,9 +160,7 @@ paths:
     put:
       tags:
       - novedad
-      description: |-
-        update the Novedades
-        <br>
+      description: update the Novedades
       operationId: NovedadesController.Put
       parameters:
       - in: path
@@ -203,9 +185,7 @@ paths:
     get:
       tags:
       - object
-      description: |-
-        get all objects
-        <br>
+      description: get all objects
       operationId: ObjectController.GetAll
       responses:
         "200":
@@ -217,9 +197,7 @@ paths:
     post:
       tags:
       - object
-      description: |-
-        create object
-        <br>
+      description: create object
       operationId: ObjectController.Create
       parameters:
       - in: body
@@ -237,9 +215,7 @@ paths:
     get:
       tags:
       - object
-      description: |-
-        find object by objectid
-        <br>
+      description: find object by objectid
       operationId: ObjectController.Get
       parameters:
       - in: path
@@ -257,9 +233,7 @@ paths:
     put:
       tags:
       - object
-      description: |-
-        update the object
-        <br>
+      description: update the object
       operationId: ObjectController.Update
       parameters:
       - in: path
@@ -283,9 +257,7 @@ paths:
     delete:
       tags:
       - object
-      description: |-
-        delete the object
-        <br>
+      description: delete the object
       operationId: ObjectController.Delete
       parameters:
       - in: path
@@ -302,9 +274,7 @@ paths:
     post:
       tags:
       - registro_novedad
-      description: |-
-        Agregar RegistroNovedad
-        <br>
+      description: Agregar RegistroNovedad
       operationId: RegistroNovedadController.PostRegistroNovedad
       parameters:
       - in: body
@@ -322,9 +292,7 @@ paths:
     get:
       tags:
       - replica
-      description: |-
-        get Replica
-        <br>
+      description: get Replica
       operationId: ReplicaController.GetAll
       parameters:
       - in: query
@@ -341,8 +309,7 @@ paths:
         type: string
       - in: query
         name: order
-        description: Order corresponding to each sortby field, if single value, apply
-          to all sortby fields. e.g. desc,asc ...
+        description: Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...
         type: string
       - in: query
         name: limit
@@ -362,9 +329,7 @@ paths:
     post:
       tags:
       - replica
-      description: |-
-        create Replica
-        <br>
+      description: create Replica
       operationId: ReplicaController.Create
       parameters:
       - in: body
@@ -384,9 +349,7 @@ paths:
     get:
       tags:
       - replica
-      description: |-
-        get Replica by id
-        <br>
+      description: get Replica by id
       operationId: ReplicaController.GetOne
       parameters:
       - in: path
@@ -404,9 +367,7 @@ paths:
     put:
       tags:
       - replica
-      description: |-
-        update the Replica
-        <br>
+      description: update the Replica
       operationId: ReplicaController.Put
       parameters:
       - in: path
@@ -430,9 +391,7 @@ paths:
     delete:
       tags:
       - replica
-      description: |-
-        delete the Replica
-        <br>
+      description: delete the Replica
       operationId: ReplicaController.Delete
       parameters:
       - in: path
@@ -449,9 +408,7 @@ paths:
     get:
       tags:
       - user
-      description: |-
-        get all Users
-        <br>
+      description: get all Users
       operationId: UserController.GetAll
       responses:
         "200":
@@ -461,9 +418,7 @@ paths:
     post:
       tags:
       - user
-      description: |-
-        create users
-        <br>
+      description: create users
       operationId: UserController.CreateUser
       parameters:
       - in: body
@@ -481,9 +436,7 @@ paths:
     get:
       tags:
       - user
-      description: |-
-        get user by uid
-        <br>
+      description: get user by uid
       operationId: UserController.Get
       parameters:
       - in: path
@@ -501,9 +454,7 @@ paths:
     put:
       tags:
       - user
-      description: |-
-        update the user
-        <br>
+      description: update the user
       operationId: UserController.Update
       parameters:
       - in: path
@@ -527,9 +478,7 @@ paths:
     delete:
       tags:
       - user
-      description: |-
-        delete the user
-        <br>
+      description: delete the user
       operationId: UserController.Delete
       parameters:
       - in: path
@@ -546,9 +495,7 @@ paths:
     get:
       tags:
       - user
-      description: |-
-        Logs user into the system
-        <br>
+      description: Logs user into the system
       operationId: UserController.Login
       parameters:
       - in: query
@@ -570,9 +517,7 @@ paths:
     get:
       tags:
       - user
-      description: |-
-        Logs out current logged in user session
-        <br>
+      description: Logs out current logged in user session
       operationId: UserController.logout
       responses:
         "200":
@@ -581,9 +526,7 @@ paths:
     post:
       tags:
       - validarCambioEstado
-      description: |-
-        create ValidarCambiosEstado
-        <br>
+      description: create ValidarCambiosEstado
       operationId: CambioEstadoContratoValidoController.ValidarCambiosEstado
       parameters:
       - in: body
@@ -599,16 +542,36 @@ paths:
             $ref: '#/definitions/models.Alert'
         "400":
           description: body is empty
+  /validarCambioEstado/{id}:
+    delete:
+      tags:
+      - validarCambioEstado
+      description: delete EstadoContrato by id
+      operationId: CambioEstadoContratoValidoController.DeleteEstadoContrato
+      parameters:
+      - in: path
+        name: id
+        description: id de estado a eliminar
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} OK!'
+        "403":
+          description: id is empty
 definitions:
   '{}':
     title: '{}'
+    type: object
+  47380.0xc0004085d0.false:
+    title: "false"
     type: object
   models.Alert:
     title: Alert
     type: object
     properties:
       Body:
-        $ref: '#/definitions/models.interface'
+        $ref: '#/definitions/47380.0xc0004085d0.false'
       Code:
         type: string
       Type:
@@ -655,9 +618,6 @@ definitions:
         $ref: '#/definitions/models.Profile'
       Username:
         type: string
-  models.interface:
-    title: interface
-    type: object
 tags:
 - name: object
   description: |

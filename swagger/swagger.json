@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "beego Test API",
-        "description": "beego has a very cool tools to autogenerate documents for your API\n",
+        "description": "beego has a very cool tools to autogenerate documents for your API",
         "version": "1.0.0",
         "termsOfService": "http://beego.me/",
         "contact": {
@@ -20,7 +20,7 @@
                 "tags": [
                     "gestor_documental"
                 ],
-                "description": "Crear documento en Nuxeo\n\u003cbr\u003e",
+                "description": "Crear documento en Nuxeo",
                 "operationId": "GestorDocumentalController.PostGestorDocumental",
                 "parameters": [
                     {
@@ -48,7 +48,7 @@
                 "tags": [
                     "gestor_documental"
                 ],
-                "description": "obtener documento por enlace\n\u003cbr\u003e",
+                "description": "obtener documento por enlace",
                 "operationId": "GestorDocumentalController.GetGestorDocumental",
                 "parameters": [
                     {
@@ -74,7 +74,7 @@
                 "tags": [
                     "gestor_documental"
                 ],
-                "description": "Crear documento en Nuxeo\n\u003cbr\u003e",
+                "description": "Crear documento en Nuxeo",
                 "operationId": "GestorDocumentalController.PostGestorDocumental",
                 "parameters": [
                     {
@@ -102,7 +102,7 @@
                 "tags": [
                     "novedad"
                 ],
-                "description": "get Novedades\n\u003cbr\u003e",
+                "description": "get Novedades",
                 "operationId": "NovedadesController.GetAll",
                 "parameters": [
                     {
@@ -158,7 +158,7 @@
                 "tags": [
                     "novedad"
                 ],
-                "description": "create Novedades\n\u003cbr\u003e",
+                "description": "create Novedades",
                 "operationId": "NovedadesController.Create",
                 "parameters": [
                     {
@@ -189,7 +189,7 @@
                 "tags": [
                     "novedad"
                 ],
-                "description": "delete the Novedades\n\u003cbr\u003e",
+                "description": "delete the Novedades",
                 "operationId": "NovedadesController.Delete",
                 "parameters": [
                     {
@@ -215,7 +215,7 @@
                 "tags": [
                     "novedad"
                 ],
-                "description": "get Novedades by id\n\u003cbr\u003e",
+                "description": "get Novedades by id",
                 "operationId": "NovedadesController.GetOne",
                 "parameters": [
                     {
@@ -242,7 +242,7 @@
                 "tags": [
                     "novedad"
                 ],
-                "description": "update the Novedades\n\u003cbr\u003e",
+                "description": "update the Novedades",
                 "operationId": "NovedadesController.Put",
                 "parameters": [
                     {
@@ -280,7 +280,7 @@
                 "tags": [
                     "object"
                 ],
-                "description": "get all objects\n\u003cbr\u003e",
+                "description": "get all objects",
                 "operationId": "ObjectController.GetAll",
                 "responses": {
                     "200": {
@@ -298,7 +298,7 @@
                 "tags": [
                     "object"
                 ],
-                "description": "create object\n\u003cbr\u003e",
+                "description": "create object",
                 "operationId": "ObjectController.Create",
                 "parameters": [
                     {
@@ -326,7 +326,7 @@
                 "tags": [
                     "object"
                 ],
-                "description": "find object by objectid\n\u003cbr\u003e",
+                "description": "find object by objectid",
                 "operationId": "ObjectController.Get",
                 "parameters": [
                     {
@@ -353,7 +353,7 @@
                 "tags": [
                     "object"
                 ],
-                "description": "update the object\n\u003cbr\u003e",
+                "description": "update the object",
                 "operationId": "ObjectController.Update",
                 "parameters": [
                     {
@@ -389,7 +389,7 @@
                 "tags": [
                     "object"
                 ],
-                "description": "delete the object\n\u003cbr\u003e",
+                "description": "delete the object",
                 "operationId": "ObjectController.Delete",
                 "parameters": [
                     {
@@ -415,7 +415,7 @@
                 "tags": [
                     "registro_novedad"
                 ],
-                "description": "Agregar RegistroNovedad\n\u003cbr\u003e",
+                "description": "Agregar RegistroNovedad",
                 "operationId": "RegistroNovedadController.PostRegistroNovedad",
                 "parameters": [
                     {
@@ -443,7 +443,7 @@
                 "tags": [
                     "replica"
                 ],
-                "description": "get Replica\n\u003cbr\u003e",
+                "description": "get Replica",
                 "operationId": "ReplicaController.GetAll",
                 "parameters": [
                     {
@@ -499,7 +499,7 @@
                 "tags": [
                     "replica"
                 ],
-                "description": "create Replica\n\u003cbr\u003e",
+                "description": "create Replica",
                 "operationId": "ReplicaController.Create",
                 "parameters": [
                     {
@@ -530,7 +530,7 @@
                 "tags": [
                     "replica"
                 ],
-                "description": "get Replica by id\n\u003cbr\u003e",
+                "description": "get Replica by id",
                 "operationId": "ReplicaController.GetOne",
                 "parameters": [
                     {
@@ -557,7 +557,7 @@
                 "tags": [
                     "replica"
                 ],
-                "description": "update the Replica\n\u003cbr\u003e",
+                "description": "update the Replica",
                 "operationId": "ReplicaController.Put",
                 "parameters": [
                     {
@@ -593,7 +593,7 @@
                 "tags": [
                     "replica"
                 ],
-                "description": "delete the Replica\n\u003cbr\u003e",
+                "description": "delete the Replica",
                 "operationId": "ReplicaController.Delete",
                 "parameters": [
                     {
@@ -619,7 +619,7 @@
                 "tags": [
                     "user"
                 ],
-                "description": "get all Users\n\u003cbr\u003e",
+                "description": "get all Users",
                 "operationId": "UserController.GetAll",
                 "responses": {
                     "200": {
@@ -634,7 +634,7 @@
                 "tags": [
                     "user"
                 ],
-                "description": "create users\n\u003cbr\u003e",
+                "description": "create users",
                 "operationId": "UserController.CreateUser",
                 "parameters": [
                     {
@@ -662,7 +662,7 @@
                 "tags": [
                     "user"
                 ],
-                "description": "Logs user into the system\n\u003cbr\u003e",
+                "description": "Logs user into the system",
                 "operationId": "UserController.Login",
                 "parameters": [
                     {
@@ -695,7 +695,7 @@
                 "tags": [
                     "user"
                 ],
-                "description": "Logs out current logged in user session\n\u003cbr\u003e",
+                "description": "Logs out current logged in user session",
                 "operationId": "UserController.logout",
                 "responses": {
                     "200": {
@@ -709,7 +709,7 @@
                 "tags": [
                     "user"
                 ],
-                "description": "get user by uid\n\u003cbr\u003e",
+                "description": "get user by uid",
                 "operationId": "UserController.Get",
                 "parameters": [
                     {
@@ -736,7 +736,7 @@
                 "tags": [
                     "user"
                 ],
-                "description": "update the user\n\u003cbr\u003e",
+                "description": "update the user",
                 "operationId": "UserController.Update",
                 "parameters": [
                     {
@@ -772,7 +772,7 @@
                 "tags": [
                     "user"
                 ],
-                "description": "delete the user\n\u003cbr\u003e",
+                "description": "delete the user",
                 "operationId": "UserController.Delete",
                 "parameters": [
                     {
@@ -798,7 +798,7 @@
                 "tags": [
                     "validarCambioEstado"
                 ],
-                "description": "create ValidarCambiosEstado\n\u003cbr\u003e",
+                "description": "create ValidarCambiosEstado",
                 "operationId": "CambioEstadoContratoValidoController.ValidarCambiosEstado",
                 "parameters": [
                     {
@@ -823,15 +823,45 @@
                     }
                 }
             }
+        },
+        "/validarCambioEstado/{id}": {
+            "delete": {
+                "tags": [
+                    "validarCambioEstado"
+                ],
+                "description": "delete EstadoContrato by id",
+                "operationId": "CambioEstadoContratoValidoController.DeleteEstadoContrato",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id de estado a eliminar",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK!"
+                    },
+                    "403": {
+                        "description": "id is empty"
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "47380.0xc0004085d0.false": {
+            "title": "false",
+            "type": "object"
+        },
         "models.Alert": {
             "title": "Alert",
             "type": "object",
             "properties": {
                 "Body": {
-                    "$ref": "#/definitions/models.interface"
+                    "$ref": "#/definitions/47380.0xc0004085d0.false"
                 },
                 "Code": {
                     "type": "string"
@@ -901,10 +931,6 @@
                     "type": "string"
                 }
             }
-        },
-        "models.interface": {
-            "title": "interface",
-            "type": "object"
         },
         "{}": {
             "title": "{}",
