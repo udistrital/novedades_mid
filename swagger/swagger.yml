@@ -542,28 +542,11 @@ paths:
             $ref: '#/definitions/models.Alert'
         "400":
           description: body is empty
-  /validarCambioEstado/{id}:
-    delete:
-      tags:
-      - validarCambioEstado
-      description: delete EstadoContrato by id
-      operationId: CambioEstadoContratoValidoController.DeleteEstadoContrato
-      parameters:
-      - in: path
-        name: id
-        description: id de estado a eliminar
-        required: true
-        type: string
-      responses:
-        "200":
-          description: '{string} OK!'
-        "403":
-          description: id is empty
 definitions:
   '{}':
     title: '{}'
     type: object
-  47380.0xc0004085d0.false:
+  47380.0xc0004091d0.false:
     title: "false"
     type: object
   models.Alert:
@@ -571,7 +554,7 @@ definitions:
     type: object
     properties:
       Body:
-        $ref: '#/definitions/47380.0xc0004085d0.false'
+        $ref: '#/definitions/47380.0xc0004091d0.false'
       Code:
         type: string
       Type:
