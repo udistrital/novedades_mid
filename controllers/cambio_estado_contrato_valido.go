@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
-	//. "github.com/udistrital/golog"
+	"github.com/udistrital/utils_oas/request"
 )
 
 // CambioEstadoContratoValidoController operations for CambioEstadoContratoValido
@@ -16,7 +17,6 @@ type CambioEstadoContratoValidoController struct {
 // URLMapping ...
 func (c *CambioEstadoContratoValidoController) URLMapping() {
 	c.Mapping("ValidarCambioEstado", c.ValidarCambioEstado)
-	c.Mapping("DeleteEstadoContrato", c.DeleteEstadoContrato)
 }
 
 // ValidarCambiosEstado ...
@@ -29,6 +29,7 @@ func (c *CambioEstadoContratoValidoController) URLMapping() {
 func (c *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 
 	var estados []models.EstadoContrato //0: actual y 1:siguiente
+	var cambioEstado map[string]interface{}
 	var alertErr models.Alert
 	alertas := append([]interface{}{"Response:"})
 
@@ -50,11 +51,27 @@ func (c *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 		}
 
 	} else {
-		alertErr.Type = "error"
-		alertErr.Code = "400"
-		alertas = append(alertas, err.Error())
-		alertErr.Body = alertas
-		c.Ctx.Output.SetStatus(400)
+		if err2 := json.Unmarshal(c.Ctx.Input.RequestBody, &cambioEstado); err2 == nil {
+			if result, err1 := ActivarContrato(cambioEstado); err1 == nil {
+				alertErr.Type = "OK"
+				alertErr.Code = "200"
+				alertas = append(alertas, result)
+				alertErr.Body = alertas
+				c.Ctx.Output.SetStatus(200)
+			} else {
+				alertErr.Type = "error"
+				alertErr.Code = "400"
+				alertas = append(alertas, err1)
+				alertErr.Body = alertas
+				c.Ctx.Output.SetStatus(400)
+			}
+		} else {
+			alertErr.Type = "error"
+			alertErr.Code = "400"
+			alertas = append(alertas, err.Error())
+			alertErr.Body = alertas
+			c.Ctx.Output.SetStatus(400)
+		}
 	}
 
 	c.Data["json"] = alertErr
@@ -73,35 +90,19 @@ func consultaEstado(estados []models.EstadoContrato) (status string, err error) 
 	return "", errRegDoc
 }
 
-// DeleteEstadoContrato ...
-// @Title DeleteEstadoContrato
-// @Description delete EstadoContrato by id
-// @Param	id		path 	string	true		"id de estado a eliminar"
-// @Success 200 {string} OK!
-// @Failure 403 id is empty
-// @router /:id [delete]
-func (c *CambioEstadoContratoValidoController) DeleteEstadoContrato() {
-	id := c.Ctx.Input.Param(":id")
-	if id != "" {
-		err := DeleteEstadoContrato(id)
-		if err == nil {
-			c.Data["json"] = "OK"
-		} else {
-			c.Data["json"] = err.Error()
-			c.Ctx.Output.SetStatus(400)
-		}
-	} else {
-		c.Data["json"] = "id is empty"
-		c.Ctx.Output.SetStatus(403)
+func ActivarContrato(cambioEstado map[string]interface{}) (map[string]interface{}, map[string]interface{}) {
+	var result map[string]interface{}
+	estadoStruct := models.CambioEstado{}
+	estadoStruct.Estado.Id = int(cambioEstado["Estado"].(map[string]interface{})["Id"].(float64))
+	estadoStruct.FechaRegistro = cambioEstado["FechaRegistro"].(string)
+	estadoStruct.NumeroContrato = cambioEstado["NumeroContrato"].(string)
+	estadoStruct.Usuario = cambioEstado["Usuario"].(string)
+	estadoStruct.Vigencia = int(cambioEstado["Vigencia"].(float64))
+	errRegDoc := request.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"/contrato_estado", "POST", &result, estadoStruct)
+	if errRegDoc != nil {
+		fmt.Println("Error sending JSON:", errRegDoc)
+		errorMap := map[string]interface{}{"funcion": "/ActivarContrato", "err": errRegDoc.Error()}
+		return nil, errorMap
 	}
-	c.ServeJSON()
-}
-
-func DeleteEstadoContrato(idEstado string) error {
-	var resEstado string
-	errRegDoc := models.SendJson(beego.AppConfig.String("AdministrativaAmazonService")+"contrato_estado/"+idEstado, "DELETE", &resEstado, nil)
-	if errRegDoc == nil {
-		return nil
-	}
-	return errRegDoc
+	return result, nil
 }
