@@ -138,6 +138,24 @@ paths:
           description: '{string} delete success!'
         "403":
           description: id is empty
+    patch:
+      tags:
+      - novedad
+      description: Inactiva una novedad específica por su ID
+      operationId: NovedadesController.Inactivar novedad por ID
+      parameters:
+      - in: path
+        name: id
+        description: ID de la novedad
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/map[string]interface{}'
+        "400":
+          description: '{object} map[string]interface{}'
   /novedad/{id}/{vigencia}:
     get:
       tags:
