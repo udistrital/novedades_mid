@@ -6,7 +6,9 @@ import (
 	"strconv"
 
 	"github.com/astaxie/beego"
+	"github.com/udistrital/novedades_mid/helpers"
 	"github.com/udistrital/novedades_mid/models"
+	"github.com/udistrital/novedades_mid/services"
 	"github.com/udistrital/utils_oas/formatdata"
 	"github.com/udistrital/utils_oas/request"
 	"github.com/udistrital/utils_oas/time_bogota"
@@ -24,6 +26,7 @@ func (c *NovedadesController) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("Patch", c.Patch)
 }
 
 // Post ...
@@ -241,6 +244,35 @@ func (c *NovedadesController) Delete() {
 	}
 
 	c.Data["json"] = alertErr
+	c.ServeJSON()
+}
+
+// Patch ...
+// @Title Inactivar novedad por ID
+// @Description Inactiva una novedad específica por su ID
+// @Param	id		path	string	true	"ID de la novedad"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @router /:id [patch]
+func (c *NovedadesController) Patch() {
+	id := c.Ctx.Input.Param(":id")
+
+	if id == "" {
+		c.Data["json"] = helpers.ErrEmiter(nil, "id vacío")
+		c.Ctx.Output.SetStatus(400)
+		c.ServeJSON()
+		return
+	}
+
+	result := services.AnularNovedadPorID(id)
+
+	if !result.Success {
+		c.Data["json"] = result
+		c.Ctx.Output.SetStatus(result.Status)
+	} else {
+		c.Data["json"] = result
+	}
+
 	c.ServeJSON()
 }
 
