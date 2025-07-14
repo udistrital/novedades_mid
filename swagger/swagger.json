@@ -208,6 +208,33 @@
                         "description": "id is empty"
                     }
                 }
+            },
+            "patch": {
+                "tags": [
+                    "novedad"
+                ],
+                "description": "Inactiva una novedad específica por su ID",
+                "operationId": "NovedadesController.Inactivar novedad por ID",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID de la novedad",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/map[string]interface{}"
+                        }
+                    },
+                    "400": {
+                        "description": "{object} map[string]interface{}"
+                    }
+                }
             }
         },
         "/novedad/{id}/{vigencia}": {
@@ -826,8 +853,12 @@
         }
     },
     "definitions": {
-        "47380.0xc0004091d0.false": {
+        "45982.0xc00042eff0.false": {
             "title": "false",
+            "type": "object"
+        },
+        "map[string]interface{}": {
+            "title": "map[string]interface{}",
             "type": "object"
         },
         "models.Alert": {
@@ -835,7 +866,7 @@
             "type": "object",
             "properties": {
                 "Body": {
-                    "$ref": "#/definitions/47380.0xc0004091d0.false"
+                    "$ref": "#/definitions/45982.0xc00042eff0.false"
                 },
                 "Code": {
                     "type": "string"
