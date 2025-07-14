@@ -853,12 +853,8 @@
         }
     },
     "definitions": {
-        "45982.0xc00042eff0.false": {
+        "47380.0xc0004091d0.false": {
             "title": "false",
-            "type": "object"
-        },
-        "map[string]interface{}": {
-            "title": "map[string]interface{}",
             "type": "object"
         },
         "models.Alert": {
@@ -866,7 +862,7 @@
             "type": "object",
             "properties": {
                 "Body": {
-                    "$ref": "#/definitions/45982.0xc00042eff0.false"
+                    "$ref": "#/definitions/47380.0xc0004091d0.false"
                 },
                 "Code": {
                     "type": "string"
