@@ -5,7 +5,6 @@ go 1.22
 require (
 	github.com/astaxie/beego v1.12.3
 	github.com/smartystreets/goconvey v1.8.1
-	github.com/udistrital/auditoria v0.0.0-20240801050554-30b15f390b24
 	github.com/udistrital/utils_oas v0.0.0-20250618194922-b7eea7a9bf62
 )
 
