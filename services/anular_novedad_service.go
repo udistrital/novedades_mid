@@ -1,83 +1,65 @@
 package services
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/helpers"
 	"github.com/udistrital/novedades_mid/models"
+	"github.com/udistrital/utils_oas/request"
 	"github.com/udistrital/utils_oas/requestresponse"
 )
 
 func AnularNovedadPorID(id string) requestresponse.APIResponse {
-	url := beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/" + id
+	var novedades []models.Novedad
 
-	client := &http.Client{}
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return helpers.ErrEmiter(err)
+	urlGet := beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/?query=id:" + id + "&limit=0"
+	err := request.GetJson(urlGet, &novedades)
+	if err != nil || len(novedades) == 0 {
+		return helpers.ErrEmiter(fmt.Errorf("error obteniendo novedad con id %s: %v", id, err))
 	}
 
-	resp, err := client.Do(req)
-	if err != nil {
-		return helpers.ErrEmiter(err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return helpers.ErrEmiter(
-			fmt.Errorf("fallo al obtener la novedad: código %d", resp.StatusCode))
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return helpers.ErrEmiter(err)
-	}
-
-	var novedad models.Novedad
-	if err := json.Unmarshal(body, &novedad); err != nil {
-		return helpers.ErrEmiter(fmt.Errorf("error al convertir novedad con id %s", id))
-	}
-
-	layoutEntrada := "2006-01-02 15:04:05 -0700 -0700"
-	layoutSalida := "2006-01-02 15:04:05"
-
-	if parsed, err := time.Parse(layoutEntrada, novedad.FechaCreacion); err == nil {
-		novedad.FechaCreacion = parsed.Format(layoutSalida)
-	}
-	if parsed, err := time.Parse(layoutEntrada, novedad.FechaModificacion); err == nil {
-		novedad.FechaModificacion = parsed.Format(layoutSalida)
-	}
-
+	novedad := novedades[0]
 	novedad.Activo = false
+	novedad.FechaModificacion = time.Now().Format("2006-01-02 15:04:05")
+	novedad.FechaCreacion = time.Now().Format("2006-01-02 15:04:05")
 
-	jsonBody, err := json.Marshal(novedad)
+	urlPut := beego.AppConfig.String("NovedadesCrudService") + "/novedades_poscontractuales/" + id
+	var respuesta map[string]interface{}
+	err = request.SendJson(urlPut, "PUT", &respuesta, novedad)
 	if err != nil {
-		return helpers.ErrEmiter(err)
+		return helpers.ErrEmiter(fmt.Errorf("error al enviar PUT para novedad con id %s: %v", id, err))
 	}
 
-	putReq, err := http.NewRequest("PUT", url, bytes.NewBuffer(jsonBody))
-	if err != nil {
-		return helpers.ErrEmiter(err)
-	}
-	putReq.Header.Set("Content-Type", "application/json")
+	var amazonEliminada interface{} = nil
+	var amazonNovedades []map[string]interface{}
+	urlAmazonGet := fmt.Sprintf(
+		"%s/novedad_postcontractual/?query=NumeroContrato:%s,Vigencia:%d&sortby=FechaInicio&order=desc&limit=-1",
+		beego.AppConfig.String("AdministrativaAmazonService"),
+		strconv.Itoa(novedad.ContratoId),
+		novedad.Vigencia,
+	)
 
-	putResp, err := client.Do(putReq)
-	if err != nil {
-		return helpers.ErrEmiter(err)
+	if err := request.GetJson(urlAmazonGet, &amazonNovedades); err == nil && len(amazonNovedades) > 0 {
+		if idAmazon, ok := amazonNovedades[0]["Id"].(float64); ok {
+			urlDelete := fmt.Sprintf("%s/novedad_postcontractual/%d",
+				beego.AppConfig.String("AdministrativaAmazonService"),
+				int(idAmazon),
+			)
+			var deleteResp map[string]interface{}
+			if err := request.SendJson(urlDelete, "DELETE", &deleteResp, nil); err == nil {
+				amazonEliminada = deleteResp
+			}
+		}
 	}
-	defer putResp.Body.Close()
 
-	putBody, err := io.ReadAll(putResp.Body)
-	if err != nil {
-		return helpers.ErrEmiter(err)
+	combined := map[string]interface{}{
+		"novedad_anulada":  respuesta,
+		"amazon_eliminada": amazonEliminada,
 	}
-
-	return requestresponse.APIResponseDTO(true, putResp.StatusCode, json.RawMessage(putBody))
+	raw, _ := json.Marshal(combined)
+	return requestresponse.APIResponseDTO(true, 200, json.RawMessage(raw))
 }
