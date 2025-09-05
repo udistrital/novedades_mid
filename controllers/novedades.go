@@ -256,15 +256,18 @@ func (c *NovedadesController) Delete() {
 // @router /:id [patch]
 func (c *NovedadesController) Patch() {
 	id := c.Ctx.Input.Param(":id")
-
 	if id == "" {
 		c.Data["json"] = helpers.ErrEmiter(nil, "id vacío")
 		c.Ctx.Output.SetStatus(400)
 		c.ServeJSON()
 		return
 	}
+	usuario := "CC" + c.Ctx.Input.Header("X-User")
+	if usuario == "CC" {
+		usuario = "MID"
+	}
 
-	result := services.AnularNovedadPorID(id)
+	result := services.AnularNovedadYRevertirEstado(id, usuario)
 
 	if !result.Success {
 		c.Data["json"] = result
@@ -272,7 +275,6 @@ func (c *NovedadesController) Patch() {
 	} else {
 		c.Data["json"] = result
 	}
-
 	c.ServeJSON()
 }
 
