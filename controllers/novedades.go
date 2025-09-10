@@ -266,9 +266,11 @@ func (c *NovedadesController) Patch() {
 
 	usuario := strings.TrimSpace(c.GetString("usuario"))
 	if usuario == "" {
-		raw := strings.TrimSpace(c.Ctx.Input.Header("X-User"))
-		if raw != "" {
-			usuario = "CC" + raw
+		x := strings.TrimSpace(c.Ctx.Input.Header("X-User"))
+		if x != "" && !strings.HasPrefix(x, "CC") {
+			usuario = "CC" + x
+		} else if x != "" {
+			usuario = x
 		} else {
 			usuario = "MID"
 		}
