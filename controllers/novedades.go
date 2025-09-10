@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/helpers"
@@ -262,9 +263,15 @@ func (c *NovedadesController) Patch() {
 		c.ServeJSON()
 		return
 	}
-	usuario := "CC" + c.Ctx.Input.Header("X-User")
-	if usuario == "CC" {
-		usuario = "MID"
+
+	usuario := strings.TrimSpace(c.GetString("usuario"))
+	if usuario == "" {
+		raw := strings.TrimSpace(c.Ctx.Input.Header("X-User"))
+		if raw != "" {
+			usuario = "CC" + raw
+		} else {
+			usuario = "MID"
+		}
 	}
 
 	result := services.AnularNovedadYRevertirEstado(id, usuario)
