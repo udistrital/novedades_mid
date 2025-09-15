@@ -41,7 +41,7 @@ func listTitanContratoRowsByAny(contratoIdNovedad, numeroContratoIdArgo, vigenci
 	if r, e := queryTitanContratoRowsPorNumero(argo, vigencia); e == nil && len(r) > 0 {
 		return r, argo, tried, nil
 	}
-	return nil, "", tried, fmt.Errorf("No se hallaron filas en Titan para candidatos %v", tried)
+	return nil, "", tried, fmt.Errorf("no se hallaron filas en Titan para candidatos %v", tried)
 }
 
 func putContratoRow(row map[string]interface{}) (map[string]interface{}, error) {
@@ -68,7 +68,7 @@ func getTitanContratoById(id int) (map[string]interface{}, error) {
 	url := fmt.Sprintf("%s/contrato/%d", base, id)
 	obj, err := helpers.GetObjectFromURL(url)
 	if err != nil || obj == nil {
-		return nil, fmt.Errorf("No se encontró contrato Titan %d: %v", id, err)
+		return nil, fmt.Errorf("no se encontró contrato titan %d: %v", id, err)
 	}
 	return obj, nil
 }
@@ -107,7 +107,6 @@ func deleteCPAndDetailsForMonth(ano, mes int, contratoIds []int) []map[string]in
 		}
 		for _, cp := range cps {
 			cpId := helpers.GetRowId(cp)
-			// borrar detalles
 			qDet := neturl.QueryEscape(fmt.Sprintf("ContratoPreliquidacionId.Id:%d,Activo:true", cpId))
 			urlDet := fmt.Sprintf("%s/detalle_preliquidacion?limit=-1&query=%s", base, qDet)
 			if dets, err := helpers.GetDataListFromURL(urlDet); err == nil {
@@ -119,7 +118,6 @@ func deleteCPAndDetailsForMonth(ano, mes int, contratoIds []int) []map[string]in
 					}
 				}
 			}
-			// borrar cabecera
 			var delCP map[string]interface{}
 			if err := request.SendJson(fmt.Sprintf("%s/contrato_preliquidacion/%d", base, cpId), "DELETE", &delCP, nil); err != nil {
 				out = append(out, map[string]interface{}{"contrato_id": contratoId, "cp_id": cpId, "ok": false, "error": err.Error()})

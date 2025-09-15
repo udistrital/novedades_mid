@@ -37,7 +37,7 @@ func (c *ReplicaController) Post() {
 
 	var informacionReplica map[string]interface{}
 	var alert models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &informacionReplica); err == nil {
 
@@ -204,7 +204,7 @@ func (c *ReplicaController) GetAll() {
 func (c *ReplicaController) Put() {
 	var novedad map[string]interface{} //[]models.NovedadSuspensionPut
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 	idStr := c.Ctx.Input.Param(":id")
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &novedad); err == nil {

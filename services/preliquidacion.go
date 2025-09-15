@@ -29,14 +29,31 @@ func PostReplica_Titan(contrato map[string]interface{}, fi, ff time.Time, ano, m
 	}
 	payload := models.NewPreliquidacionReplicaFromContrato(contrato, fi, ff)
 	pre, err := reprocesarPreliquidacionConBody(payload)
-	resp["payload"] = payload // queda serializable como struct
+	resp["payload"] = payload
 	resp["resp"] = pre
 	resp["error"] = helpers.ErrorString(err)
 	return resp
 }
-func ReplicafechaAnterior(contrato map[string]interface{},
+
+func PostReplica_TitanFull(contrato map[string]interface{}, fi, ff time.Time) map[string]interface{} {
+	resp := map[string]interface{}{
+		"funcion": "/PostReplica_TitanFull",
+	}
+	payload := models.NewPreliquidacionReplicaFromContrato(contrato, fi, ff)
+	payload.Completo = true
+
+	pre, err := reprocesarPreliquidacionConBody(payload)
+	resp["payload"] = payload
+	resp["resp"] = pre
+	resp["error"] = helpers.ErrorString(err)
+	return resp
+}
+
+func ReplicafechaAnterior(
+	contrato map[string]interface{},
 	mesesEliminar [][2]int, mesesCrear [][2]int,
-	globalIni, globalFin time.Time, contratoIds []int) []map[string]interface{} {
+	globalIni, globalFin time.Time, contratoIds []int,
+) []map[string]interface{} {
 
 	var salida []map[string]interface{}
 
@@ -53,25 +70,24 @@ func ReplicafechaAnterior(contrato map[string]interface{},
 	for _, par := range mesesCrear {
 		m := par[0]
 		a := par[1]
-
 		delPrev := deleteCPAndDetailsForMonth(a, m, contratoIds)
-
-		fiMes, ffMes := helpers.MonthBoundsClipped(a, m, globalIni, globalFin)
-		if fiMes.After(ffMes) {
-			salida = append(salida, map[string]interface{}{
-				"post_mes":               []int{m, a},
-				"eliminacion_previa_mes": delPrev,
-				"skip":                   "FechaInicio > FechaFin (mes fuera del rango restituido)",
-			})
-			continue
-		}
-		post := PostReplica_Titan(contrato, fiMes, ffMes, a, m)
 		salida = append(salida, map[string]interface{}{
-			"post_mes":               []int{m, a},
 			"eliminacion_previa_mes": delPrev,
-			"post":                   post,
+			"mes":                    []int{m, a},
+			"post":                   "deferido_a_full",
 		})
 	}
+
+	postFull := PostReplica_TitanFull(contrato, globalIni, globalFin)
+	salida = append(salida, map[string]interface{}{
+		"post_full": map[string]interface{}{
+			"rango": map[string]string{
+				"FechaInicio": globalIni.Format(time.RFC3339),
+				"FechaFin":    globalFin.Format(time.RFC3339),
+			},
+			"resultado": postFull,
+		},
+	})
 
 	return salida
 }
