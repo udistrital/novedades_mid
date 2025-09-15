@@ -41,7 +41,7 @@ func (c *NovedadesController) Post() {
 
 	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
 
@@ -188,7 +188,7 @@ func (c *NovedadesController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
 
@@ -229,7 +229,7 @@ func (c *NovedadesController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
 	// var registroNovedad map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	result, err1 := EliminarNovedad(idStr)
 	if err1 == nil {
