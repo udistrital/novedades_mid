@@ -35,6 +35,21 @@ type PreliquidacionReplica struct {
 	Vigencia          int         `json:"Vigencia"`
 }
 
+// --- Helpers nuevos: fijar a 12:00 y formatear RFC3339 conservando zona ---
+func atNoon(t time.Time) time.Time {
+	if t.IsZero() {
+		return t
+	}
+	return time.Date(t.Year(), t.Month(), t.Day(), 12, 0, 0, 0, t.Location())
+}
+
+func formatRFC3339LocalNoon(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return atNoon(t).Format(time.RFC3339) // sin UTC(): mantiene offset local
+}
+
 func NewPreliquidacionReplicaFromContrato(contrato map[string]interface{}, fIni, fFin time.Time) PreliquidacionReplica {
 	return PreliquidacionReplica{
 		Activo:            toBool(pick(contrato, "Activo", "activo")),
@@ -44,8 +59,8 @@ func NewPreliquidacionReplicaFromContrato(contrato map[string]interface{}, fIni,
 		Desagregado:       nil,
 		Documento:         toString(pick(contrato, "Documento", "documento")),
 		FechaCreacion:     toString(pick(contrato, "FechaCreacion", "fecha_creacion")),
-		FechaFin:          fFin.UTC().Format(time.RFC3339),
-		FechaInicio:       fIni.UTC().Format(time.RFC3339),
+		FechaFin:          formatRFC3339LocalNoon(fFin), // <-- 12:00 local
+		FechaInicio:       formatRFC3339LocalNoon(fIni), // <-- 12:00 local
 		FechaModificacion: toString(pick(contrato, "FechaModificacion", "fecha_modificacion")),
 		Id:                toInt(pick(contrato, "Id", "id")),
 		NombreCompleto:    toString(pick(contrato, "NombreCompleto", "nombre_completo")),

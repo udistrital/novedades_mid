@@ -7,6 +7,14 @@ import (
 	"time"
 )
 
+// --- Nuevo helper: normaliza cualquier time.Time al mediodía (12:00:00.000) ---
+func atNoon(t time.Time) time.Time {
+	if t.IsZero() {
+		return t
+	}
+	return time.Date(t.Year(), t.Month(), t.Day(), 12, 0, 0, 0, t.Location())
+}
+
 func GetRowId(m map[string]interface{}) int {
 	switch v := m["Id"].(type) {
 	case float64:
@@ -37,12 +45,13 @@ func ParseFechaCreacion(m map[string]interface{}) time.Time {
 	for _, k := range []string{"FechaCreacion", "fecha_creacion", "CreatedAt"} {
 		if v, ok := m[k]; ok {
 			if t := ParseTimeAny(v); !t.IsZero() {
-				return t
+				return atNoon(t) // <-- fuerza 12:00:00.000
 			}
 		}
 	}
 	if id := GetRowId(m); id > 0 {
-		return time.Unix(int64(id), 0)
+		// Si cae por Id como Unix, también se normaliza a 12:00
+		return atNoon(time.Unix(int64(id), 0))
 	}
 	return time.Time{}
 }
@@ -63,6 +72,10 @@ func PickInitialRow(rows []map[string]interface{}) map[string]interface{} {
 }
 
 func UpdateRowFechasActivo(row map[string]interface{}, fIni, fFin time.Time, activo bool) map[string]interface{} {
+	// Normaliza siempre a 12:00 antes de guardar
+	fIni = atNoon(fIni)
+	fFin = atNoon(fFin)
+
 	row["FechaInicio"] = fIni.Format(time.RFC3339)
 	row["FechaFin"] = fFin.Format(time.RFC3339)
 	row["FechaModificacion"] = time.Now().Format("2006-01-02 15:04:05")
@@ -74,13 +87,13 @@ func FechasDeRow(row map[string]interface{}) (time.Time, time.Time) {
 	var fi, ff time.Time
 	for _, k := range []string{"FechaInicio", "fecha_inicio"} {
 		if v, ok := row[k]; ok {
-			fi = ParseTimeAny(v)
+			fi = atNoon(ParseTimeAny(v)) // <-- fuerza 12:00
 			break
 		}
 	}
 	for _, k := range []string{"FechaFin", "fecha_fin"} {
 		if v, ok := row[k]; ok {
-			ff = ParseTimeAny(v)
+			ff = atNoon(ParseTimeAny(v)) // <-- fuerza 12:00
 			break
 		}
 	}
