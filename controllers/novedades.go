@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/helpers"
@@ -40,7 +41,7 @@ func (c *NovedadesController) Post() {
 
 	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
 
@@ -187,7 +188,7 @@ func (c *NovedadesController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
 
@@ -228,7 +229,7 @@ func (c *NovedadesController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
 	// var registroNovedad map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	result, err1 := EliminarNovedad(idStr)
 	if err1 == nil {
@@ -256,7 +257,6 @@ func (c *NovedadesController) Delete() {
 // @router /:id [patch]
 func (c *NovedadesController) Patch() {
 	id := c.Ctx.Input.Param(":id")
-
 	if id == "" {
 		c.Data["json"] = helpers.ErrEmiter(nil, "id vacío")
 		c.Ctx.Output.SetStatus(400)
@@ -264,7 +264,19 @@ func (c *NovedadesController) Patch() {
 		return
 	}
 
-	result := services.AnularNovedadPorID(id)
+	usuario := strings.TrimSpace(c.GetString("usuario"))
+	if usuario == "" {
+		x := strings.TrimSpace(c.Ctx.Input.Header("X-User"))
+		if x != "" && !strings.HasPrefix(x, "CC") {
+			usuario = "CC" + x
+		} else if x != "" {
+			usuario = x
+		} else {
+			usuario = "MID"
+		}
+	}
+
+	result := services.AnularNovedadYRevertirEstado(id, usuario)
 
 	if !result.Success {
 		c.Data["json"] = result
@@ -272,7 +284,6 @@ func (c *NovedadesController) Patch() {
 	} else {
 		c.Data["json"] = result
 	}
-
 	c.ServeJSON()
 }
 

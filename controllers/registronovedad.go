@@ -33,7 +33,7 @@ func (c *RegistroNovedadController) URLMapping() {
 func (c *RegistroNovedadController) PostRegistroNovedad() {
 	var registroNovedad map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroNovedad); err == nil {
 
@@ -62,7 +62,7 @@ func (c *RegistroNovedadController) PostRegistroNovedad() {
 
 }
 
-//RegistrarNovedadMongo Función para registrar la novedad en mongodb
+// RegistrarNovedadMongo Función para registrar la novedad en mongodb
 func RegistrarNovedadMongo(novedad map[string]interface{}) (status interface{}, outputError interface{}) {
 
 	horaRegistro := time_bogota.Tiempo_bogota()

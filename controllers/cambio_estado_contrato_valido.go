@@ -31,7 +31,7 @@ func (c *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 	var estados []models.EstadoContrato //0: actual y 1:siguiente
 	var cambioEstado map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	//result, err1 := consultarCambioEstado(estados)
 
@@ -45,7 +45,7 @@ func (c *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 		} else {
 			alertErr.Type = "error"
 			alertErr.Code = "400"
-			alertas = append(alertas, err.Error())
+			alertas = append(alertas, err1.Error())
 			alertErr.Body = alertas
 			c.Ctx.Output.SetStatus(400)
 		}
