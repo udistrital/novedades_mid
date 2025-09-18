@@ -1,11 +1,11 @@
 module github.com/udistrital/novedades_mid
 
-go 1.22
+go 1.24
 
 require (
 	github.com/astaxie/beego v1.12.3
 	github.com/smartystreets/goconvey v1.8.1
-	github.com/udistrital/utils_oas v0.0.0-20250618194922-b7eea7a9bf62
+	github.com/udistrital/utils_oas v0.0.0-20250917065514-c74562ac40b4
 )
 
 require (
