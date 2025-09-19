@@ -58,6 +58,7 @@ func ReplicafechaAnterior(informacionReplica map[string]interface{}) (result map
 		TitanNovedadPost["FechaFin"] = FormatFechaReplica(informacionReplica["FechaFin"].(string), "2006-01-02T15:04:05.000Z")
 		TitanNovedadPost["Valor"] = informacionReplica["ValorNovedad"]
 		TitanNovedadPost["Cdp"] = informacionReplica["NumeroCdp"]
+		TitanNovedadPost["VigenciaCdp"] = informacionReplica["VigenciaCdp"]
 		TitanNovedadPost["Rp"] = 0
 		url = "/novedadCPS/otrosi_contrato"
 	}
@@ -709,6 +710,7 @@ func ReplicaAdicionProrroga(novedad map[string]interface{}, propiedades []map[st
 		"Documento":      contratistaDoc,
 		"FechaFin":       FormatFechaReplica(fechaFin, "2006-01-02 15:04:05 +0000 +0000"),
 		"Cdp":            numeroCdp,
+		"VigenciaCdp":    vigenciaCdp,
 		"Rp":             numeroRp,
 		"Valor":          valoradicion,
 		"Vigencia":       vigencia,
