@@ -30,49 +30,6 @@ func AnularNovedadYRevertirEstado(id string, usuario string) requestresponse.API
 	if strings.TrimSpace(numStr) == "" {
 		numStr = strconv.Itoa(n.ContratoId)
 	}
-
-	amazonList, errAL := fetchAmazonNovedades(numStr, n.Vigencia)
-	if errAL != nil {
-		return helpers.ErrEmiter(fmt.Errorf("error consultando novedades Amazon: %v", errAL))
-	}
-
-	var bodyIni, bodyFin time.Time
-	var idsToDelete []int
-	var keepID int
-
-	if len(amazonList) <= 1 {
-		if aiIni, aiFin, err := getFechasActaInicioPorIdVigencia(numeroContratoID, n.Vigencia); err == nil {
-			bodyIni, bodyFin = aiIni, aiFin
-		}
-		if len(amazonList) == 1 {
-			if idAmazon := helpers.GetRowId(amazonList[0]); idAmazon > 0 {
-				idsToDelete = append(idsToDelete, idAmazon)
-			}
-		}
-	} else {
-		adpro220 := findLatestTipo(amazonList, 220)
-		if adpro220 == nil {
-			raw, _ := json.Marshal(map[string]interface{}{
-				"error": "No se puede anular: existen múltiples novedades en Amazon pero ninguna es de tipo 220.",
-			})
-			return requestresponse.APIResponseDTO(false, 400, json.RawMessage(raw))
-		}
-		bodyIni, bodyFin = fechasDeAmazon(adpro220)
-		keepID = helpers.GetRowId(adpro220)
-		for _, rec := range amazonList {
-			idAmazon := helpers.GetRowId(rec)
-			if idAmazon != 0 && idAmazon != keepID {
-				idsToDelete = append(idsToDelete, idAmazon)
-			}
-		}
-	}
-
-	if bodyIni.IsZero() || bodyFin.IsZero() {
-		if aiIni, aiFin, err := getFechasActaInicioPorIdVigencia(numeroContratoID, n.Vigencia); err == nil {
-			bodyIni, bodyFin = aiIni, aiFin
-		}
-	}
-
 	fechaISO := time.Now().UTC().Format("2006-01-02T15:04:05Z")
 	cambiosEstado := map[string]interface{}{"estado_10": nil, "estado_4": nil}
 	resp10, err10 := postContratoEstado(10, numeroContratoID, n.Vigencia, usuario, fechaISO)
@@ -89,7 +46,36 @@ func AnularNovedadYRevertirEstado(id string, usuario string) requestresponse.API
 		return requestresponse.APIResponseDTO(false, 400, json.RawMessage(raw))
 	}
 	cambiosEstado["estado_4"] = resp4
+	topNov, prevNov, _ := getTopAndPrevNovedadAmazon(n.ContratoId, n.Vigencia)
+	var topIni, topFin time.Time
+	if topNov != nil {
+		if v, ok := topNov["FechaInicio"]; ok {
+			topIni = helpers.ParseTimeAny(v)
+		}
+		if v, ok := topNov["FechaFin"]; ok {
+			topFin = helpers.ParseTimeAny(v)
+		}
+		if topFin.IsZero() && !topIni.IsZero() {
+			topFin = topIni
+		}
+	}
 
+	var bodyIni, bodyFin time.Time
+	if prevNov != nil {
+		if v, ok := prevNov["FechaInicio"]; ok {
+			bodyIni = helpers.ParseTimeAny(v)
+		}
+		if v, ok := prevNov["FechaFin"]; ok {
+			bodyFin = helpers.ParseTimeAny(v)
+		}
+	}
+	if bodyIni.IsZero() {
+		if aiIni, aiFin, err := getFechasActaInicioPorIdVigencia(numeroContratoID, n.Vigencia); err == nil {
+			bodyIni, bodyFin = aiIni, aiFin
+		} else {
+			beego.Warn("[AnularNovedad] No se pudo derivar fechas de acta_inicio: ", err)
+		}
+	}
 	n.Activo = false
 	now := time.Now().Format("2006-01-02 15:04:05")
 	n.FechaModificacion = now
@@ -103,16 +89,18 @@ func AnularNovedadYRevertirEstado(id string, usuario string) requestresponse.API
 		})
 		return requestresponse.APIResponseDTO(false, 400, json.RawMessage(raw))
 	}
-
-	var amazonEliminadas []map[string]interface{}
-	if len(idsToDelete) > 0 {
-		for _, delID := range idsToDelete {
-			urlDelete := fmt.Sprintf("%s/novedad_postcontractual/%d", beego.AppConfig.String("AdministrativaAmazonService"), delID)
+	var amazonEliminada interface{} = nil
+	if topNov != nil {
+		if idAmazon, ok := topNov["Id"].(float64); ok {
+			urlDelete := fmt.Sprintf("%s/novedad_postcontractual/%d",
+				beego.AppConfig.String("AdministrativaAmazonService"),
+				int(idAmazon),
+			)
 			var deleteResp interface{}
 			if err := request.SendJson(urlDelete, "DELETE", &deleteResp, nil); err == nil {
-				amazonEliminadas = append(amazonEliminadas, map[string]interface{}{"id": delID, "ok": true})
+				amazonEliminada = deleteResp
 			} else {
-				amazonEliminadas = append(amazonEliminadas, map[string]interface{}{"id": delID, "ok": false, "error": err.Error()})
+				amazonEliminada = map[string]interface{}{"error": err.Error()}
 			}
 		}
 	}
@@ -129,15 +117,7 @@ func AnularNovedadYRevertirEstado(id string, usuario string) requestresponse.API
 	}
 	_ = usado
 
-	var initial map[string]interface{}
-	if helpers.IsAdicionOProrroga(n.TipoNovedad) {
-		initial = helpers.PickInitialRow(rows)
-	} else {
-		initial = helpers.PickRowPreferExtraRP(rows)
-	}
-	if initial == nil {
-		initial = helpers.PickInitialRow(rows)
-	}
+	initial := helpers.PickInitialRow(rows)
 	initialId := helpers.GetRowId(initial)
 
 	helpers.AjustarValorContratoParaAnulacion(initial, rows, n.TipoNovedad)
@@ -175,12 +155,14 @@ func AnularNovedadYRevertirEstado(id string, usuario string) requestresponse.API
 		if rid == initialId {
 			continue
 		}
+
 		if n.TipoNovedad == 8 || n.TipoNovedad == 1 || n.TipoNovedad == 2 {
 			fiExtra, ffExtra := helpers.FechasDeRow(r)
 			if !fiExtra.IsZero() || !ffExtra.IsZero() {
 				contratosExtraCPEliminados = append(contratosExtraCPEliminados, deleteCPAndDetailsForContratoRange(rid, fiExtra, ffExtra)...)
 			}
 			contratosExtraCPEliminados = append(contratosExtraCPEliminados, deleteAllCPAndDetailsForContrato(n.Vigencia, rid)...)
+
 			if err := deleteTitanContratoById(rid); err != nil {
 				r["Activo"] = false
 				r["FechaModificacion"] = time.Now().Format("2006-01-02 15:04:05")
@@ -229,30 +211,18 @@ func AnularNovedadYRevertirEstado(id string, usuario string) requestresponse.API
 		}
 	}
 
-	var elimStart, elimEnd time.Time
-	for _, delID := range idsToDelete {
-		if rec := findByID(amazonList, delID); rec != nil {
-			fi, ff := fechasDeAmazon(rec)
-			if !fi.IsZero() && (elimStart.IsZero() || fi.Before(elimStart)) {
-				elimStart = fi
-			}
-			if !ff.IsZero() && (elimEnd.IsZero() || ff.After(elimEnd)) {
-				elimEnd = ff
-			}
-		}
-	}
-	mesesAnulados := helpers.MesesEntreSafe(elimStart, elimEnd)
+	mesesAnulados := helpers.MesesEntreSafe(topIni, topFin)
 	mesesRestituir := helpers.MesesEntreSafe(bodyIni, bodyFin)
 
 	replicaMeses := ReplicafechaAnterior(contratoFull, mesesAnulados, mesesRestituir, bodyIni, bodyFin, contratoIds)
 
 	combined := map[string]interface{}{
-		"novedad_anulada":   respPUTNov,
-		"amazon_eliminadas": amazonEliminadas,
-		"cambios_estado":    cambiosEstado,
+		"novedad_anulada":  respPUTNov,
+		"amazon_eliminada": amazonEliminada,
+		"cambios_estado":   cambiosEstado,
 		"titan": map[string]interface{}{
-			"numero_contrato_utilizado":     numStr,
-			"contrato_inicial_id":           initialId,
+			"numero_contrato_utilizado": numStr,
+
 			"contrato_updates":              updates,
 			"contratos_eliminados":          contratosEliminados,
 			"contratos_extra_cp_eliminados": contratosExtraCPEliminados,
@@ -267,70 +237,4 @@ func AnularNovedadYRevertirEstado(id string, usuario string) requestresponse.API
 	}
 	raw, _ := json.Marshal(combined)
 	return requestresponse.APIResponseDTO(true, 200, json.RawMessage(raw))
-}
-
-func fetchAmazonNovedades(numContrato string, vigencia int) ([]map[string]interface{}, error) {
-	url := fmt.Sprintf("%s/novedad_postcontractual?query=NumeroContrato:%s,Vigencia:%d", beego.AppConfig.String("AdministrativaAmazonService"), numContrato, vigencia)
-	var data []map[string]interface{}
-	if err := request.GetJson(url, &data); err != nil {
-		return nil, err
-	}
-	return data, nil
-}
-
-func fechasDeAmazon(rec map[string]interface{}) (time.Time, time.Time) {
-	var fi, ff time.Time
-	if v, ok := rec["FechaInicio"]; ok {
-		fi = helpers.ParseTimeAny(v)
-	}
-	if v, ok := rec["FechaFin"]; ok {
-		ff = helpers.ParseTimeAny(v)
-	}
-	if ff.IsZero() && !fi.IsZero() {
-		ff = fi
-	}
-	return fi, ff
-}
-
-func findLatestTipo(list []map[string]interface{}, tipo int) map[string]interface{} {
-	var best map[string]interface{}
-	var bestId int
-	for _, rec := range list {
-		if t, ok := rec["TipoNovedad"]; ok {
-			tv := intFromAny(t)
-			if tv == tipo {
-				rid := helpers.GetRowId(rec)
-				if rid > bestId {
-					best = rec
-					bestId = rid
-				}
-			}
-		}
-	}
-	return best
-}
-
-func findByID(list []map[string]interface{}, id int) map[string]interface{} {
-	for _, rec := range list {
-		if helpers.GetRowId(rec) == id {
-			return rec
-		}
-	}
-	return nil
-}
-
-func intFromAny(v interface{}) int {
-	switch t := v.(type) {
-	case int:
-		return t
-	case int64:
-		return int(t)
-	case float64:
-		return int(t)
-	case string:
-		i, _ := strconv.Atoi(strings.TrimSpace(t))
-		return i
-	default:
-		return 0
-	}
 }
