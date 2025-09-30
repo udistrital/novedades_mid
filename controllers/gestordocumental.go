@@ -32,7 +32,7 @@ func (c *GestorDocumentalController) GetOne() {
 	var novedad map[string]interface{}
 	idStr := c.Ctx.Input.Param(":enlace")
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	error := request.GetJson(beego.AppConfig.String("GestorDocumentalMid")+"/document/"+idStr, &novedad)
 
@@ -70,7 +70,7 @@ func (c *GestorDocumentalController) Post() {
 
 	var registroDoc []map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroDoc); err == nil {
 
@@ -130,7 +130,7 @@ func (c *GestorDocumentalController) Put() {
 
 	var registroDoc []map[string]interface{}
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	alertas := []interface{}{"Response:"}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &registroDoc); err == nil {
 		result, err1 := RegistrarDoc(registroDoc, "firma_electronica")
 
