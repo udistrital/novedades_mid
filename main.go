@@ -8,6 +8,7 @@ import (
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 	"github.com/udistrital/utils_oas/auditoria"
 	"github.com/udistrital/utils_oas/xray"
+	security "github.com/udistrital/utils_oas/security"
 )
 
 func main() {
@@ -39,5 +40,6 @@ func main() {
 	xray.InitXRay()
 	auditoria.InitMiddleware()
 	apistatus.Init()
+	security.SetSecurityHeaders()
 	beego.Run()
 }
