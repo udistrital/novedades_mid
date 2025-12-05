@@ -264,8 +264,14 @@ func (c *NovedadesController) Patch() {
 		return
 	}
 
-	usuario := strings.TrimSpace(c.GetString("usuario"))
-	if usuario == "" {
+	var body map[string]interface{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &body)
+
+	usuario := ""
+
+	if val, ok := body["usuario"].(string); ok && strings.TrimSpace(val) != "" {
+		usuario = strings.TrimSpace(val)
+	} else {
 		x := strings.TrimSpace(c.Ctx.Input.Header("X-User"))
 		if x != "" && !strings.HasPrefix(x, "CC") {
 			usuario = "CC" + x
