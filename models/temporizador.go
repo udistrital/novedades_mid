@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/utils_oas/request"
 )
 
@@ -750,7 +749,7 @@ func PostReplica(url string, ArgoOtrosiPost map[string]interface{}, TitanOtrosiP
 	var resultQuery []map[string]interface{}
 	var fecha string
 	fecha = time.Now().Format("2006-01-02 15:04:05")
-	logs.Info("HoraReplica1: " + fecha)
+	log.Printf("HoraReplica1: " + fecha)
 	query := "/novedad_postcontractual?query=NumeroContrato:" + num_contrato + ",Vigencia:" + vigencia + ",TipoNovedad:" + argo_tipo_novedad + "&sortby=Id&order=desc"
 	if errArgo := GetJson(beego.AppConfig.String("AdministrativaAmazonService")+query, &resultQuery); errArgo == nil {
 		if len(resultQuery) > 0 {

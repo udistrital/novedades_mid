@@ -2,29 +2,30 @@ package main
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/udistrital/novedades_mid/models"
 	_ "github.com/udistrital/novedades_mid/routers"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 	"github.com/udistrital/utils_oas/auditoria"
-	"github.com/udistrital/utils_oas/customerrorv2"
-	security "github.com/udistrital/utils_oas/security"
 	"github.com/udistrital/utils_oas/xray"
+	security "github.com/udistrital/utils_oas/security"
 )
 
 func main() {
-	allowedOrigins := []string{"*.udistrital.edu.co"}
 	if beego.BConfig.RunMode == "dev" {
-		allowedOrigins = []string{"*"}
-		orm.Debug = true
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 
+	AllowedOrigins := []string{"https://*.udistrital.edu.co", "http://api.intranetoas.udistrital.edu.co:*", "http://api2.intranetoas.udistrital.edu.co:*"}
+	if beego.BConfig.RunMode != "production" {
+		AllowedOrigins = []string{"*"}
+	}
+
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowOrigins: allowedOrigins,
+		//AllowOrigins: []string{"*"},
+		//AllowOrigins: []string{"https://*.portaloas.udistrital.edu.co"},
+		AllowOrigins: AllowedOrigins,
 		AllowMethods: []string{"PUT", "PATCH", "GET", "POST", "OPTIONS", "DELETE"},
 		AllowHeaders: []string{"Origin", "x-requested-with",
 			"content-type",
@@ -35,15 +36,10 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-
 	go models.Temporizador()
-	err := xray.InitXRay()
-	if err != nil {
-		logs.Error("error configurando AWS XRay: %v", err)
-	}
-	apistatus.Init()
+	xray.InitXRay()
 	auditoria.InitMiddleware()
-	beego.ErrorController(&customerrorv2.CustomErrorController{})
+	apistatus.Init()
 	security.SetSecurityHeaders()
 	beego.Run()
 }
