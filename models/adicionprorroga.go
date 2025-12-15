@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/utils_oas/request"
 	"github.com/udistrital/utils_oas/time_bogota"
 )
@@ -63,22 +64,25 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 	fechas := make([]map[string]interface{}, 0)
 	loc, err := time.LoadLocation("America/Bogota")
 	if err != nil {
-		return err
+		logs.Error("error obteniendo objeto tim1.Location", err)
+		return nil
 	}
 
 	fechaSolicitudStr, ok := NovedadAdProrroga["fechasolicitud"].(string)
 	if !ok {
-		return fmt.Errorf("fechasolicitud is not a string")
+		logs.Error("fechasolicitud no es string", err)
+		return nil
 	}
 
 	f_solicitud, err := time.Parse(time.RFC3339, fechaSolicitudStr)
 	if err != nil {
-		return err
+		logs.Error("error convirtiendo fechasolicitud a time.Time", err)
+		return nil
 	}
-	
+
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             fSolicitud.In(loc),
+		"Fecha":             f_solicitud.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
