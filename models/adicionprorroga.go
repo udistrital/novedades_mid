@@ -61,12 +61,24 @@ func ConstruirNovedadAdProrrogaPost(novedad map[string]interface{}) (novedadform
 	}
 
 	fechas := make([]map[string]interface{}, 0)
-	loc, _ := time.LoadLocation("America/Bogota")
-	f_solicitud, _ := time.Parse("2006-01-02T15:04:05Z07:00", NovedadAdProrroga["fechasolicitud"].(string))
+	loc, err := time.LoadLocation("America/Bogota")
+	if err != nil {
+		return err
+	}
 
+	fechaSolicitudStr, ok := NovedadAdProrroga["fechasolicitud"].(string)
+	if !ok {
+		return fmt.Errorf("fechasolicitud is not a string")
+	}
+
+	f_solicitud, err := time.Parse(time.RFC3339, fechaSolicitudStr)
+	if err != nil {
+		return err
+	}
+	
 	fechas = append(fechas, map[string]interface{}{
 		"Activo":            true,
-		"Fecha":             f_solicitud.In(loc),
+		"Fecha":             fSolicitud.In(loc),
 		"FechaCreacion":     nil,
 		"FechaModificacion": nil,
 		"Id":                0,
