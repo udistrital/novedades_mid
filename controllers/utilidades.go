@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 
+	//"encoding/xml"
 	"fmt"
 	"math/big"
 	"net/http"
 	"reflect"
 	"strings"
+
+	//"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/novedades_mid/models"
@@ -117,7 +120,7 @@ func getJson(url string, target interface{}) error {
 // 	return
 // }
 
-// CargarReglasBase general
+//CargarReglasBase general
 func CargarReglasBase(dominio string) (reglas string, err error) {
 	//carga de reglas desde el ruler
 	var reglasbase string = ``
