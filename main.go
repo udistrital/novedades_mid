@@ -7,8 +7,8 @@ import (
 	_ "github.com/udistrital/novedades_mid/routers"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 	"github.com/udistrital/utils_oas/auditoria"
-	"github.com/udistrital/utils_oas/xray"
 	security "github.com/udistrital/utils_oas/security"
+	"github.com/udistrital/utils_oas/xray"
 )
 
 func main() {
