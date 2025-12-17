@@ -1,8 +1,7 @@
 lastupdate.tmp
 .vscode/
 novedades_mid
-administrativa_no_sql_api
-ejec.sh
+main
 swagger/*.png
 swagger/*.html
 swagger/*.js
@@ -15,4 +14,3 @@ swagger/images/
 swagger/lang/
 swagger/lib/
 .scannerwork/
-conf/notas.txt
