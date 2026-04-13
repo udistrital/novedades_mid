@@ -405,7 +405,7 @@ func FormatAdmAmazonNovedadAdProrroga(novedad []map[string]interface{}) (novedad
 			"FechaRegistro":   fechasolicitud,
 			"Contratista":     nil,
 			"NumeroCdp":       NovedadAdicion["NumeroCdpId"].(float64),
-			"VigenciaCdp":     NovedadAdicion["Vigencia"].(float64),
+			"VigenciaCdp":     NovedadAdicion["VigenciaCdp"].(float64),
 			"PlazoEjecucion":  tiempoprorroga.(float64),
 			"UnidadEjecucion": 205,
 			"ValorNovedad":    valoradicion.(float64),

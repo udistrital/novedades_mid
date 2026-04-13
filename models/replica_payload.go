@@ -33,6 +33,7 @@ type PreliquidacionReplica struct {
 	Vacaciones        int         `json:"Vacaciones"`
 	ValorContrato     float64     `json:"ValorContrato"`
 	Vigencia          int         `json:"Vigencia"`
+	VigenciaCdp       int         `json:"VigenciaCdp"`
 }
 
 func atNoon(t time.Time) time.Time {
@@ -52,7 +53,7 @@ func formatRFC3339LocalNoon(t time.Time) string {
 func NewPreliquidacionReplicaFromContrato(contrato map[string]interface{}, fIni, fFin time.Time) PreliquidacionReplica {
 	return PreliquidacionReplica{
 		Activo:            toBool(pick(contrato, "Activo", "activo")),
-		Cdp:               toInt(pick(contrato, "Cdp", "cdp")),
+		Cdp:               toInt(pick(contrato, "NumeroCdp", "numero_cdp")),
 		Completo:          false,
 		DependenciaId:     toInt(pick(contrato, "DependenciaId", "dependencia_id")),
 		Desagregado:       nil,
@@ -75,6 +76,7 @@ func NewPreliquidacionReplicaFromContrato(contrato map[string]interface{}, fIni,
 		Vacaciones:        toInt(pick(contrato, "Vacaciones", "vacaciones")),
 		ValorContrato:     toFloat64(pick(contrato, "ValorContrato", "valor_contrato")),
 		Vigencia:          toInt(pick(contrato, "Vigencia", "vigencia")),
+		VigenciaCdp:       toInt(pick(contrato, "VigenciaCdp", "vigencia_cdp")),
 	}
 }
 
