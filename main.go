@@ -8,6 +8,7 @@ import (
 	_ "github.com/udistrital/novedades_mid/routers"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 	"github.com/udistrital/utils_oas/auditoria"
+	"github.com/udistrital/utils_oas/customerrorv2"
 	"github.com/udistrital/utils_oas/security"
 	"github.com/udistrital/utils_oas/xray"
 )
@@ -38,8 +39,9 @@ func main() {
 	if err != nil {
 		logs.Error("error configurando AWS XRay: %v", err)
 	}
-	auditoria.InitMiddleware()
 	apistatus.Init()
+	auditoria.InitMiddleware()
+	beego.ErrorController(&customerrorv2.CustomErrorController{})
 	security.SetSecurityHeaders()
 	beego.Run()
 }
